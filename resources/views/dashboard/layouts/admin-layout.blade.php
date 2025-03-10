@@ -42,8 +42,8 @@
                 <i class="fas fa-user-shield"></i> Roles & Permissions
                 <ul class="submenu">
                     <li><a href="{{ route('dashboard.roles') }}"><i class="fas fa-user-tag"></i> Manage Roles</a></li>
-                    <li><a href="#"><i class="fas fa-key"></i> Manage Permissions</a></li>
-                    <li><a href="#"><i class="fas fa-users-cog"></i> Assign Roles & Permissions</a></li>
+                    <li><a href="{{ route('permissions.list') }}"><i class="fas fa-key"></i> Manage Permissions</a></li>
+                    <li><a href="{{ route('roles.permissions') }}"><i class="fas fa-users-cog"></i> Assign Roles & Permissions</a></li>
                 </ul>
             </li>
         

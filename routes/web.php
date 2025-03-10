@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RolePermissionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,11 +38,23 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::post('updateUserDetails', [UserController::class, 'updateUserDetails'])->name('updateUserDetails');
         // Route::post('deleteClass', [AcademicController::class, 'deleteClass'])->name('deleteClass');
 
-        Route::get('role-management', [RoleController::class, 'roles'])->name('dashboard.roles');
-        Route::post('roles', [RoleController::class, 'roleAdd'])->name('roles.add');  // Add District
-        Route::put('roles/{role}', [RoleController::class, 'roleUpdate'])->name('roles.update');  // Update District
-        Route::delete('roles/{role}', [RoleController::class, 'roleDelete'])->name('roles.delete');  // Delete District
+    Route::get('role-management', [RoleController::class, 'roles'])->name('dashboard.roles');
+    Route::post('roles', [RoleController::class, 'roleAdd'])->name('roles.add');  // Add District
+    Route::put('roles/{role}', [RoleController::class, 'roleUpdate'])->name('roles.update');  // Update District
+    Route::delete('roles/{role}', [RoleController::class, 'roleDelete'])->name('roles.delete');  // Delete District
 
+    Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.list');
+    Route::post('/permissions', [PermissionController::class, 'store'])->name('permissions.add');
+    Route::put('/permissions/{id}', [PermissionController::class, 'update'])->name('permissions.update');
+    Route::delete('/permissions/{id}', [PermissionController::class, 'destroy'])->name('permissions.delete');
+
+    // Assign Roles and Permission
+    Route::get('roles-and-permissions', [RolePermissionController::class, 'index'])->name('roles.permissions');
+    Route::get('role/{role}/permissions', [RolePermissionController::class, 'viewPermissions']);
+    Route::get('role/{role}/edit-permissions', [RolePermissionController::class, 'editPermissions']);
+    Route::post('role/{role}/update-permissions', [RolePermissionController::class, 'updatePermissions']);
+
+    
 });
 
 

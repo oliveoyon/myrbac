@@ -57,7 +57,7 @@
                                 <input type="text" class="form-control" id="roleName" name="name">
                             </div>
                             <div class="mb-3 text-end custombtn">
-                                <button type="submit" class="btn btn-success btn-primary" id="submitBtn">Save</button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
                             </div>
                         </form>
                     </div>
