@@ -52,7 +52,8 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::get('roles-and-permissions', [RolePermissionController::class, 'index'])->name('roles.permissions');
     Route::get('role/{role}/permissions', [RolePermissionController::class, 'viewPermissions']);
     Route::get('role/{role}/edit-permissions', [RolePermissionController::class, 'editPermissions']);
-    Route::post('role/{role}/update-permissions', [RolePermissionController::class, 'updatePermissions']);
+    Route::post('role/update-permissions/{roleId}', [RolePermissionController::class, 'updatePermissions']);
+
 });
 
 

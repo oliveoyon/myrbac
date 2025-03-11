@@ -50,18 +50,20 @@ public function editPermissions($roleId)
 
 
     // Inside your RoleController.php
-public function updatePermissions(Request $request, Role $role)
-{
-    // Validate the incoming request
-    $request->validate([
-        'permissions' => 'required|array',
-    ]);
-
-    // Sync the permissions with the given role
-    $role->permissions()->sync($request->permissions);
-
-    // Return a response
-    return response()->json(['message' => 'Permissions updated successfully.']);
-}
+    public function updatePermissions(Request $request, $roleId)
+    {
+        try {
+            $role = Role::findOrFail($roleId); // Ensure the role exists
+    
+            $permissions = $request->input('permissions'); // Array of permission IDs
+    
+            // Sync the permissions with the role
+            $role->permissions()->sync($permissions); // Make sure the relationship is correct
+    
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating permissions: ' . $e->getMessage()], 500);
+        }
+    }
 
 }

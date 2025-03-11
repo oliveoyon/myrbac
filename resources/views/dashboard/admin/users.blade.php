@@ -16,7 +16,6 @@
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
                         <i class="fas fa-plus-square mr-1"></i> Add User
                     </button>
-
                 </div>
             </div>
             
@@ -97,6 +96,17 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label class="form-label required" for="role_id">Roles</label>
+                                    <select class="form-control" name="role_id[]" id="role_id" multiple>
+                                        <option value="">Select Role (Multiple)</option>
+                                        @foreach ($roles as $role)
+                                            <option value="{{ $role->name }}">{{ $role->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger error-text role_id_error"></span>
+                                </div>
+
+                                <div class="mb-3">
                                     <label class="form-label required" for="pngo_id">PNGO</label>
                                     <select class="form-control" name="pngo_id" id="pngo_id">
                                         <option value="">Select PNGO</option>
@@ -168,6 +178,17 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label class="form-label required" for="role_id">Roles</label>
+                                    <select class="form-control" name="role_id[]" id="role_id" multiple>
+                                        <option value="">Select Role (Multiple)</option>
+                                        @foreach ($roles as $role)
+                                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger error-text role_id_error"></span>
+                                </div>
+
+                                <div class="mb-3">
                                     <label class="form-label required" for="pngo_id">PNGO</label>
                                     <select class="form-control" name="pngo_id" id="pngo_id">
                                         <option value="">Select PNGO</option>
@@ -218,81 +239,80 @@
 
         $(document).ready(function() {
             // Clear error messages on modal close
-            $('#addUserModal').on('hidden.bs.modal', function() {
-                $('#add-user-form').find('span.error-text').text('');
-            });
+            $('#addUserModal').on('hidden.bs.modal', function () {
+        $('#add-user-form').find('span.error-text').text('');
+    });
 
-            $('#add-user-form').on('submit', function(e) {
-                e.preventDefault();
+    $('#add-user-form').on('submit', function (e) {
+        e.preventDefault();
 
-                // Disable the submit button to prevent double-clicking
-                $(this).find(':submit').prop('disabled', true);
+        // Disable the submit button to prevent double-clicking
+        $(this).find(':submit').prop('disabled', true);
 
-                // Show the loader overlay
-                $('#loader-overlay').show();
+        // Show the loader overlay (if any)
+        $('#loader-overlay').show();
 
-                var form = this;
+        var form = this;
 
-                $.ajax({
-                    url: $(form).attr('action'),
-                    method: $(form).attr('method'),
-                    data: new FormData(form),
-                    processData: false,
-                    dataType: 'json',
-                    contentType: false,
-                    beforeSend: function() {
-                        // Clear previous error messages
-                        $(form).find('span.error-text').text('');
-                    },
-                    success: function(data) {
-                        if (data.code == 0) {
-                            // Handle validation errors
-                            $.each(data.error, function(prefix, val) {
-                                // Find the error span by class name and set the error text
-                                $(form).find('span.' + prefix + '_error').text(val[0]);
-                            });
+        $.ajax({
+            url: $(form).attr('action'),
+            method: $(form).attr('method'),
+            data: new FormData(form),
+            processData: false,
+            dataType: 'json',
+            contentType: false,
+            beforeSend: function () {
+                // Clear previous error messages
+                $(form).find('span.error-text').text('');
+            },
+            success: function (data) {
+                if (data.code == 0) {
+                    // Handle validation errors
+                    $.each(data.error, function (prefix, val) {
+                        // Find the error span by class name and set the error text
+                        $(form).find('span.' + prefix + '_error').text(val[0]);
+                    });
 
-                            // Focus on the first error field
-                            var firstErrorField = $(form).find('span.error-text').first().prev(
-                                'input, select');
-                            if (firstErrorField.length) {
-                                firstErrorField.focus();
-                            }
-                        } else {
-                            // Handle success response
-                            var redirectUrl = data.redirect;
-                            $('#addUserModal').modal('hide');
-                            $('#addUserModal').find('form')[0].reset();
-
-                            // Customize Swal design for success message
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: data.msg,
-                                showConfirmButton: false,
-                                timer: 1500,
-                                background: '#eaf9e7', // Light green background
-                                color: '#2e8b57', // Text color
-                                confirmButtonColor: '#4CAF50' // Button color
-                            });
-
-                            setTimeout(function() {
-                                window.location.href = redirectUrl;
-                            }, 1000);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        // Handle unexpected errors with toastr
-                        toastr.error('Something went wrong! Please try again.');
-                        console.log(xhr.responseText); // For debugging
-                    },
-                    complete: function() {
-                        // Enable the submit button and hide the loader overlay
-                        $(form).find(':submit').prop('disabled', false);
-                        $('#loader-overlay').hide();
+                    // Focus on the first error field
+                    var firstErrorField = $(form).find('span.error-text').first().prev('input, select');
+                    if (firstErrorField.length) {
+                        firstErrorField.focus();
                     }
-                });
-            });
+                } else {
+                    // Handle success response
+                    var redirectUrl = data.redirect;
+                    $('#addUserModal').modal('hide');
+                    $('#addUserModal').find('form')[0].reset();
+
+                    // Customize Swal design for success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.msg,
+                        showConfirmButton: false,
+                        timer: 1500,
+                        background: '#eaf9e7', // Light green background
+                        color: '#2e8b57', // Text color
+                        confirmButtonColor: '#4CAF50' // Button color
+                    });
+
+                    setTimeout(function () {
+                        window.location.href = redirectUrl;
+                    }, 1000);
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle unexpected errors with toastr
+                toastr.error('Something went wrong! Please try again.');
+                console.log(xhr.responseText); // For debugging
+            },
+            complete: function () {
+                // Enable the submit button and hide the loader overlay
+                $(form).find(':submit').prop('disabled', false);
+                $('#loader-overlay').hide();
+            }
+        });
+    });
 
             $(document).on('click', '#editUserBtn', function() {
                 var user_id = $(this).data('id');
@@ -305,6 +325,7 @@
                     $('.editUser').find('input[name="name"]').val(data.details.name);
                     $('.editUser').find('input[name="email"]').val(data.details.email);
                     $('.editUser').find('select[name="district_id"]').val(data.details.district_id);
+                    $('.editUser').find('select[name="role_id"]').val(data.details.role_id);
                     $('.editUser').find('select[name="pngo_id"]').val(data.details.pngo_id);
                     $('.editUser').find('select[name="status"]').val(data.details
                         .status);
