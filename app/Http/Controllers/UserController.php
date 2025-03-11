@@ -31,8 +31,8 @@ class UserController extends Controller
             'status' => 'required',
             'district_id' => 'required|exists:districts,id', 
             'pngo_id' => 'required|exists:pngos,id',
-            'role_id' => 'required|array',
-            'role_id.*' => 'exists:roles,id'
+            'role_name' => 'required|array',
+            'role_name.*' => 'exists:roles,name'
         ]);
 
         if ($validator->fails()) {
@@ -48,7 +48,7 @@ class UserController extends Controller
         $user->status = $request->status;
 
         if ($user->save()) {
-            $user->syncRoles($request->role_id); // Assign multiple roles
+            $user->syncRoles($request->role_name); // Assign multiple roles
 
             return response()->json(['code' => 1, 'msg' => 'User Added Successfully', 'redirect' => route('users.index')]);
         } else {
@@ -73,8 +73,7 @@ class UserController extends Controller
     public function updateUserDetails(Request $request)
     {
         $user_id = $request->uid;
-        $user = User::find($user_id);
-
+        $user = User::with('roles')->find($user_id);
         if (!$user) {
             return response()->json(['code' => 0, 'msg' => 'User not found']);
         }
@@ -85,8 +84,8 @@ class UserController extends Controller
             'status' => 'required',
             'district_id' => 'required|exists:districts,id',
             'pngo_id' => 'required|exists:pngos,id',
-            'role_id' => 'required|array',
-            'role_id.*' => 'exists:roles,id'
+            'role_name' => 'required|array',
+            'role_name.*' => 'exists:roles,name'
         ]);
 
         if ($validator->fails()) {
@@ -104,7 +103,7 @@ class UserController extends Controller
         }
 
         if ($user->save()) {
-            $user->syncRoles($request->role_id); // Update roles
+            $user->syncRoles($request->role_name); // Update roles
 
             return response()->json(['code' => 1, 'msg' => 'User Updated Successfully', 'redirect' => route('users.index')]);
         } else {

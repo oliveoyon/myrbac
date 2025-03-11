@@ -96,14 +96,14 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label required" for="role_id">Roles</label>
-                                    <select class="form-control" name="role_id[]" id="role_id" multiple>
+                                    <label class="form-label required" for="role_name">Roles</label>
+                                    <select class="form-control" name="role_name[]" id="role_name" multiple>
                                         <option value="">Select Role (Multiple)</option>
                                         @foreach ($roles as $role)
                                             <option value="{{ $role->name }}">{{ $role->name }}</option>
                                         @endforeach
                                     </select>
-                                    <span class="text-danger error-text role_id_error"></span>
+                                    <span class="text-danger error-text role_name_error"></span>
                                 </div>
 
                                 <div class="mb-3">
@@ -178,14 +178,14 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label required" for="role_id">Roles</label>
-                                    <select class="form-control" name="role_id[]" id="role_id" multiple>
+                                    <label class="form-label required" for="role_name">Roles</label>
+                                    <select class="form-control" name="role_name[]" id="role_name" multiple>
                                         <option value="">Select Role (Multiple)</option>
                                         @foreach ($roles as $role)
-                                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                            <option value="{{ $role->name }}">{{ $role->name }}</option>
                                         @endforeach
                                     </select>
-                                    <span class="text-danger error-text role_id_error"></span>
+                                    <span class="text-danger error-text role_name_error"></span>
                                 </div>
 
                                 <div class="mb-3">
@@ -325,7 +325,7 @@
                     $('.editUser').find('input[name="name"]').val(data.details.name);
                     $('.editUser').find('input[name="email"]').val(data.details.email);
                     $('.editUser').find('select[name="district_id"]').val(data.details.district_id);
-                    $('.editUser').find('select[name="role_id"]').val(data.details.role_id);
+                    $('.editUser').find('select[name="role_name"]').val(data.details.role_name);
                     $('.editUser').find('select[name="pngo_id"]').val(data.details.pngo_id);
                     $('.editUser').find('select[name="status"]').val(data.details
                         .status);
