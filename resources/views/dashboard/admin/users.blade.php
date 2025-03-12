@@ -2,9 +2,168 @@
 
 @section('title', 'User Management')
 
+
+
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.2.0/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        .modal-body {
+            overflow-y: auto;
+            max-height: 90vh;
+            /* Keeps content scrollable within the full-screen modal */
+        }
+
+        /* Styling for each category box */
+        .category-box {
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            /* Add space between categories */
+        }
+
+        /* Category Header Styling */
+        .category-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        /* Permissions Grid inside each category */
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            /* Space between permission items */
+        }
+
+        /* Individual Permission Item Styling */
+        .permission-item {
+            padding: 10px 15px;
+            background-color: #f4f7fc;
+            border-left: 5px solid #4CAF50;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .permission-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Custom Styling for the Edit Permissions Form */
+        .edit-permission-header {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .category-box {
+            background-color: #f9fafb;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+
+
+        /* Ensuring the grid remains neat on smaller screens */
+        @media (max-width: 768px) {
+            .permissions-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        /* Classic Checkbox Style */
+        .classic-checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            /* Space between checkbox and label */
+            vertical-align: middle;
+            /* Align checkbox with the text */
+            flex-shrink: 0;
+            /* Prevent checkbox from shrinking */
+        }
+
+        /* Label Style for Classic Checkbox */
+        .classic-checkbox-label {
+            font-size: 14px;
+            /* Text size */
+            vertical-align: middle;
+            /* Align label text with checkbox */
+        }
+
+        /* Category Title */
+        .classic-category-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        /* Grid Layout for Permission Items */
+        .classic-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            /* Auto-fit columns with a minimum width of 120px */
+            gap: 16px;
+            /* Space between checkboxes */
+            margin-bottom: 20px;
+            /* Space between categories */
+        }
+
+        /* Permission Items */
+        .form-check {
+            display: flex;
+            align-items: center;
+            /* Vertically align checkbox with label */
+            justify-content: flex-start;
+            /* Align items to the start */
+        }
+
+        /* Column Control for Grid Layout */
+        .col-md-4 {
+            display: flex;
+            justify-content: flex-start;
+            width: 100%;
+            /* Ensure items fit in the grid */
+            align-items: center;
+            /* Vertically align content in the column */
+        }
+
+        /* Make sure the checkboxes and labels have the same height */
+        .form-check input[type="checkbox"] {
+            height: 16px;
+            width: 16px;
+        }
+
+        /* Optional: Adjust the label size */
+        .form-check label {
+            font-size: 14px;
+            padding-left: 5px;
+            /* Space between checkbox and label */
+        }
+
+        /* Make sure the items have consistent width */
+        .classic-row .col-md-4 {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left;
+            width: 100%;
+            flex: 1 1 auto;
+            padding: 5px;
+        }
+    </style>
 @endpush
 
 
@@ -18,7 +177,7 @@
                     </button>
                 </div>
             </div>
-            
+
 
             <div class="alert alert-danger" id="errorAlert" style="display: none;">
                 <ul id="errorList">
@@ -46,18 +205,28 @@
                             <td>{{ $user->status == 1 ? 'Active' : 'Inactive' }}</td>
                             <td>
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-warning btn-xs" data-id="{{ $user->id }}"
-                                        id="editUserBtn"><i class="fas fa-edit"></i></button>
-                                    <button type="button" class="btn btn-danger btn-xs" data-id="{{ $user->id }}"
-                                        id="deleteUserBtn"><i class="fas fa-trash-alt"></i></button>
+                                    <button type="button" class="btn btn-warning btn-sm" data-id="{{ $user->id }}"
+                                        id="editUserBtn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+
+                                    <!-- Button to trigger the modal -->
+                                    <button type="button" class="btn btn-primary btn-sm view-permissions"
+                                        data-toggle="modal" data-id="{{ $user->id }}">
+                                        <i class="fas fa-eye"></i> View Permissions
+                                    </button>
+                                    <button class="btn btn-warning btn-sm edit-user-permissions"
+                                        data-id="{{ $user->id }}" data-name="{{ $user->name }}">
+                                        <i class="fas fa-pencil-alt"></i> Edit Permissions
+                                    </button>
                                 </div>
                             </td>
+
                         </tr>
                     @endforeach
 
                 </tbody>
             </table>
-
 
             <!-- Modal -->
             <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
@@ -127,7 +296,8 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
                                     <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
                             </form>
@@ -222,31 +392,56 @@
     </section>
 
 
-    <!-- Button to trigger the modal -->
-<button type="button" class="btn btn-primary view-permissions" data-id="7">
-    View Permissions
-  </button>
-  
-  <!-- Modal -->
-  <div class="modal fade" id="permissionsViewModal" tabindex="-1" role="dialog" aria-labelledby="permissionsViewModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="permissionsViewModalLabel">User Permissions</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+
+
+
+
+    <div class="modal fade" id="permissionsViewModal" tabindex="-1" role="dialog"
+        aria-labelledby="permissionsViewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="permissionsViewModalLabel">Role Permissions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Dynamic content will be loaded here (view permissions) -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <!-- Permissions will be dynamically inserted here -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
-  
+
+
+    <!-- User Permissions Edit Modal -->
+    <div class="modal fade" id="userPermissionsModal" tabindex="-1" aria-labelledby="userPermissionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userPermissionsModalLabel">Edit User Permissions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editUserPermissionsContent">
+                        <!-- Dynamic Content Loaded via AJAX -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="saveUserPermissions" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
 
 @endsection
 
@@ -266,115 +461,124 @@
 
         $(document).ready(function() {
             // Clear error messages on modal close
-            $('#addUserModal').on('hidden.bs.modal', function () {
-        $('#add-user-form').find('span.error-text').text('');
-    });
-
-    // When the 'View Permissions' button is clicked
-$('.view-permissions').on('click', function() {
-    var userId = $(this).data('id');  // Get the user ID from the button's data attribute
-    $.ajax({
-        url: '/mne/users/' + userId + '/permissions',  // Make the AJAX request to fetch user permissions
-        method: 'GET',
-        success: function(response) {
-            var permissionsList = '';  // Initialize an empty string for the permissions
-
-            // Loop through the grouped permissions returned in the response
-            $.each(response.permissions, function(category, permissions) {
-                permissionsList += '<div class="category-box">'; // Start of category box
-                permissionsList += '<div class="category-header">' + category + '</div>'; // Category name header
-                permissionsList += '<div class="permissions-grid">'; // Start of permission grid
-
-                permissions.forEach(function(permission) {
-                    permissionsList += '<div class="permission-item">' + permission.name + '</div>';  // Display permission name
-                });
-
-                permissionsList += '</div></div>'; // Close permissions grid and category box
+            $('#addUserModal').on('hidden.bs.modal', function() {
+                $('#add-user-form').find('span.error-text').text('');
             });
 
-            // Inject the generated HTML into the modal body
-            $('#permissionsViewModal .modal-body').html(permissionsList);
+            // When the 'View Permissions' button is clicked
+            $('.view-permissions').on('click', function() {
+                var userId = $(this).data('id'); // Get the user ID from the button's data attribute
+                $.ajax({
+                    url: '/mne/users/' + userId +
+                        '/permissions', // Make the AJAX request to fetch user permissions
+                    method: 'GET',
+                    success: function(response) {
+                        var permissionsList =
+                            ''; // Initialize an empty string for the permissions
 
-            // Show the modal
-            $('#permissionsViewModal').modal('show');
-        },
-        error: function() {
-            alert('Error loading permissions.');
-        }
-    });
-});
+                        // Loop through the grouped permissions returned in the response
+                        $.each(response.permissions, function(category, permissions) {
+                            permissionsList +=
+                                '<div class="category-box">'; // Start of category box
+                            permissionsList += '<div class="category-header">' +
+                                category + '</div>'; // Category name header
+                            permissionsList +=
+                                '<div class="permissions-grid">'; // Start of permission grid
 
+                            permissions.forEach(function(permission) {
+                                permissionsList +=
+                                    '<div class="permission-item">' + permission
+                                    .name + '</div>'; // Display permission name
+                            });
 
-    $('#add-user-form').on('submit', function (e) {
-        e.preventDefault();
+                            permissionsList +=
+                                '</div></div>'; // Close permissions grid and category box
+                        });
 
-        // Disable the submit button to prevent double-clicking
-        $(this).find(':submit').prop('disabled', true);
+                        // Inject the generated HTML into the modal body
+                        $('#permissionsViewModal .modal-body').html(permissionsList);
 
-        // Show the loader overlay (if any)
-        $('#loader-overlay').show();
-
-        var form = this;
-
-        $.ajax({
-            url: $(form).attr('action'),
-            method: $(form).attr('method'),
-            data: new FormData(form),
-            processData: false,
-            dataType: 'json',
-            contentType: false,
-            beforeSend: function () {
-                // Clear previous error messages
-                $(form).find('span.error-text').text('');
-            },
-            success: function (data) {
-                if (data.code == 0) {
-                    // Handle validation errors
-                    $.each(data.error, function (prefix, val) {
-                        // Find the error span by class name and set the error text
-                        $(form).find('span.' + prefix + '_error').text(val[0]);
-                    });
-
-                    // Focus on the first error field
-                    var firstErrorField = $(form).find('span.error-text').first().prev('input, select');
-                    if (firstErrorField.length) {
-                        firstErrorField.focus();
+                        // Show the modal
+                        $('#permissionsViewModal').modal('show');
+                    },
+                    error: function() {
+                        alert('Error loading permissions.');
                     }
-                } else {
-                    // Handle success response
-                    var redirectUrl = data.redirect;
-                    $('#addUserModal').modal('hide');
-                    $('#addUserModal').find('form')[0].reset();
+                });
+            });
 
-                    // Customize Swal design for success message
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: data.msg,
-                        showConfirmButton: false,
-                        timer: 1500,
-                        background: '#eaf9e7', // Light green background
-                        color: '#2e8b57', // Text color
-                        confirmButtonColor: '#4CAF50' // Button color
-                    });
 
-                    setTimeout(function () {
-                        window.location.href = redirectUrl;
-                    }, 1000);
-                }
-            },
-            error: function (xhr, status, error) {
-                // Handle unexpected errors with toastr
-                toastr.error('Something went wrong! Please try again.');
-                console.log(xhr.responseText); // For debugging
-            },
-            complete: function () {
-                // Enable the submit button and hide the loader overlay
-                $(form).find(':submit').prop('disabled', false);
-                $('#loader-overlay').hide();
-            }
-        });
-    });
+            $('#add-user-form').on('submit', function(e) {
+                e.preventDefault();
+
+                // Disable the submit button to prevent double-clicking
+                $(this).find(':submit').prop('disabled', true);
+
+                // Show the loader overlay (if any)
+                $('#loader-overlay').show();
+
+                var form = this;
+
+                $.ajax({
+                    url: $(form).attr('action'),
+                    method: $(form).attr('method'),
+                    data: new FormData(form),
+                    processData: false,
+                    dataType: 'json',
+                    contentType: false,
+                    beforeSend: function() {
+                        // Clear previous error messages
+                        $(form).find('span.error-text').text('');
+                    },
+                    success: function(data) {
+                        if (data.code == 0) {
+                            // Handle validation errors
+                            $.each(data.error, function(prefix, val) {
+                                // Find the error span by class name and set the error text
+                                $(form).find('span.' + prefix + '_error').text(val[0]);
+                            });
+
+                            // Focus on the first error field
+                            var firstErrorField = $(form).find('span.error-text').first().prev(
+                                'input, select');
+                            if (firstErrorField.length) {
+                                firstErrorField.focus();
+                            }
+                        } else {
+                            // Handle success response
+                            var redirectUrl = data.redirect;
+                            $('#addUserModal').modal('hide');
+                            $('#addUserModal').find('form')[0].reset();
+
+                            // Customize Swal design for success message
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: data.msg,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                background: '#eaf9e7', // Light green background
+                                color: '#2e8b57', // Text color
+                                confirmButtonColor: '#4CAF50' // Button color
+                            });
+
+                            setTimeout(function() {
+                                window.location.href = redirectUrl;
+                            }, 1000);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle unexpected errors with toastr
+                        toastr.error('Something went wrong! Please try again.');
+                        console.log(xhr.responseText); // For debugging
+                    },
+                    complete: function() {
+                        // Enable the submit button and hide the loader overlay
+                        $(form).find(':submit').prop('disabled', false);
+                        $('#loader-overlay').hide();
+                    }
+                });
+            });
 
             $(document).on('click', '#editUserBtn', function() {
                 var user_id = $(this).data('id');
@@ -460,6 +664,105 @@ $('.view-permissions').on('click', function() {
 
                         // Optionally, log the error to the console
                         console.error('Error:', status, error);
+                    }
+                });
+            });
+
+
+            $('.edit-user-permissions').on('click', function() {
+                var userId = $(this).data('id');
+                var userName = $(this).data('name');
+
+                $('#userPermissionsModalLabel').text('Edit Permissions for ' + userName);
+
+                $.ajax({
+                    url: '/mne/users/' + userId + '/edit-permissions',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response && response.user && response.allPermissions) {
+                            var editForm = '<form id="editUserPermissionsForm">';
+                            editForm += '<input type="hidden" name="user_id" value="' + userId +
+                                '">';
+
+                            var groupedPermissions = {};
+
+                            // Group permissions by category
+                            $.each(response.allPermissions, function(index, permission) {
+                                var category = permission.category || 'Uncategorized';
+                                if (!groupedPermissions[category]) {
+                                    groupedPermissions[category] = [];
+                                }
+                                groupedPermissions[category].push(permission);
+                            });
+
+                            // Render grouped permissions
+                            $.each(groupedPermissions, function(category, permissions) {
+                                editForm += '<div class="mb-4">';
+                                editForm +=
+                                    '<h5 class="text-danger classic-category-title">' +
+                                    category + '</h5>';
+                                editForm +=
+                                '<div class="classic-row">'; // Apply the grid layout
+
+                                $.each(permissions, function(index, permission) {
+                                    var checked = response.userPermissions[
+                                            category] &&
+                                        response.userPermissions[category].some(
+                                            p => p.id === permission.id) ?
+                                        'checked' : '';
+
+                                    editForm += `
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input classic-checkbox" type="checkbox" name="permissions[]" value="${permission.id}" ${checked} id="permission-${permission.id}">
+                                    <label for="permission-${permission.id}" class="classic-checkbox-label">${permission.name}</label>
+                                </div>
+                            </div>`;
+                                });
+
+                                editForm +=
+                                '</div></div>'; // Close the row and category div
+                            });
+
+                            editForm += '</form>';
+                            $('#editUserPermissionsContent').html(editForm);
+                            $('#userPermissionsModal').modal('show');
+                        } else {
+                            alert('Error loading permissions.');
+                        }
+                    },
+                    error: function() {
+                        alert('Error fetching user permissions.');
+                    }
+                });
+            });
+
+
+            // Save Permissions
+            $('#saveUserPermissions').on('click', function() {
+                var formData = $('#editUserPermissionsForm').serialize();
+
+                $.ajax({
+                    url: '/mne/users/' + $('input[name="user_id"]').val() + '/update-permissions',
+                    method: 'POST',
+                    data: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function() {
+                        Swal.fire({
+                            title: 'Permissions Updated!',
+                            text: 'User permissions have been successfully updated.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            $('#userPermissionsModal').modal('hide');
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        alert('Error updating permissions: ' + error);
                     }
                 });
             });

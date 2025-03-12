@@ -149,37 +149,48 @@ class UserController extends Controller
     //     return response()->json(['permissions' => $groupedPermissions]);
     // }
 
-    public function test()
+    public function viewUserPermissions($userId)
     {
-        // Retrieve the user by ID
-        $user = User::findOrFail(7);
-        
-        // Get the list of all permissions assigned to this user
+        $user = User::findOrFail($userId);
         $userPermissions = $user->getAllPermissionsList()['all_permissions'];
-        
-        // Debug: Show the user permissions (names)
-        // dd($userPermissions);
-
-        // Get all permissions from the database (Spatie Permission model)
         $allPermissions = \Spatie\Permission\Models\Permission::all();
-
-        // Debug: Show all permissions (permission model instances)
-        // dd($allPermissions);
-        
-        // Filter the permissions to get only the ones assigned to the user by matching names
         $userPermissionsDetails = $allPermissions->whereIn('name', $userPermissions);
-
-        // Debug: Show the filtered permissions
-        // dd($userPermissionsDetails);
-
-        // Group the permissions by 'category'
         $groupedPermissions = $userPermissionsDetails->groupBy('category');
-
-        // Final debug: Show the grouped permissions
-        // dd($groupedPermissions);
-
-        // Return the grouped permissions in a JSON response
         return response()->json(['permissions' => $groupedPermissions]);
+    }
+
+
+    public function editPermissions($id)
+    {
+        $user = User::findOrFail($id);
+        $userPermissions = $user->getAllPermissionsList()['all_permissions'];
+        $allPermissions = Permission::all();
+        $userPermissions = $allPermissions->whereIn('name', $userPermissions);
+        // $userPermissions = $user->permissions;
+        $userPermissionsByCategory = $userPermissions->groupBy('category');
+
+        return response()->json([
+            'user' => $user,
+            'userPermissions' => $userPermissionsByCategory, // Grouped user permissions
+            'allPermissions' => $allPermissions // All available permissions
+        ]);
+    }
+
+    // Function to update user permissions
+    public function updatePermissions(Request $request, $id)
+    {
+        try {
+            $user = User::findOrFail($id); // Ensure user exists
+            
+            $permissions = $request->input('permissions'); // Array of permission IDs
+            
+            // Sync user permissions
+            $user->permissions()->sync($permissions);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error updating permissions: ' . $e->getMessage()], 500);
+        }
     }
 
 

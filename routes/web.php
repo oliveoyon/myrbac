@@ -56,7 +56,10 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
 
 
     // Route::get('/users/{userId}/permissions', [UserController::class, 'showUserPermissions']);
-    Route::get('/users/{userId}/permissions', [UserController::class, 'test']);
+    Route::get('/users/{userId}/permissions', [UserController::class, 'viewUserPermissions']);
+
+    Route::get('/users/{id}/edit-permissions', [UserController::class, 'editPermissions'])->name('users.edit-permissions');
+Route::post('/users/{id}/update-permissions', [UserController::class, 'updatePermissions'])->name('users.update-permissions');
 
 });
 

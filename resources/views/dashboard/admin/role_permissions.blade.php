@@ -323,7 +323,7 @@
                                     '<h5 class="text-danger classic-category-title">' +
                                     category + '</h5>';
                                 editForm +=
-                                '<div class="classic-row">'; // Apply the grid layout
+                                    '<div class="classic-row">'; // Apply the grid layout
 
                                 $.each(permissions, function(index, permission) {
                                     var checked = response.rolePermissions[
@@ -342,7 +342,7 @@
                                 });
 
                                 editForm +=
-                                '</div></div>'; // Close the row and category div
+                                    '</div></div>'; // Close the row and category div
                             });
 
                             editForm += '</form>';
