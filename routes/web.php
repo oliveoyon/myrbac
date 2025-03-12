@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -18,10 +19,14 @@ Route::get('/', function () {
 // Route::get('/dashboards', [DashboardController::class, 'index'])->name('dashboard.index');
 
 Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
-    // Route::get('/dashboard', function () {return view('dashboard');})->name('dashboard'); //default dashboard of laravel
-
+    
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('permission:Edit Data');
     
+    Route::get('category-management', [CategoryController::class, 'categories'])->name('dashboard.categories');
+    Route::post('categories', [CategoryController::class, 'districtAdd'])->name('categories.add');  // Add Category
+    Route::put('categories/{category}', [CategoryController::class, 'districtUpdate'])->name('categories.update');  // Update Category
+    Route::delete('categories/{category}', [CategoryController::class, 'districtDelete'])->name('categories.delete');  // Delete Category
+
     Route::get('district-management', [DashboardController::class, 'districts'])->name('dashboard.districts');
     Route::post('districts', [DashboardController::class, 'districtAdd'])->name('districts.add');  // Add District
     Route::put('districts/{district}', [DashboardController::class, 'districtUpdate'])->name('districts.update');  // Update District
@@ -36,7 +41,9 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::post('addUser', [UserController::class, 'addUser'])->name('addUser');
     Route::post('getUserDetails', [UserController::class, 'getUserDetails'])->name('getUserDetails');
     Route::post('updateUserDetails', [UserController::class, 'updateUserDetails'])->name('updateUserDetails');
-    
+    Route::get('/users/{userId}/permissions', [UserController::class, 'viewUserPermissions']);
+    Route::get('/users/{id}/edit-permissions', [UserController::class, 'editPermissions'])->name('users.edit-permissions');
+    Route::post('/users/{id}/update-permissions', [UserController::class, 'updatePermissions'])->name('users.update-permissions');
 
     Route::get('role-management', [RoleController::class, 'roles'])->name('dashboard.roles');
     Route::post('roles', [RoleController::class, 'roleAdd'])->name('roles.add');  // Add District
@@ -55,11 +62,7 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::post('role/update-permissions/{roleId}', [RolePermissionController::class, 'updatePermissions']);
 
 
-    // Route::get('/users/{userId}/permissions', [UserController::class, 'showUserPermissions']);
-    Route::get('/users/{userId}/permissions', [UserController::class, 'viewUserPermissions']);
-
-    Route::get('/users/{id}/edit-permissions', [UserController::class, 'editPermissions'])->name('users.edit-permissions');
-Route::post('/users/{id}/update-permissions', [UserController::class, 'updatePermissions'])->name('users.update-permissions');
+    
 
 });
 

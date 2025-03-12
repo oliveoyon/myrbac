@@ -42,6 +42,7 @@
             <li class="has-submenu">
                 <i class="fas fa-user-shield"></i> Roles & Permissions
                 <ul class="submenu">
+                    <li><a href="{{ route('dashboard.categories') }}"><i class="fas fa-tags"></i> Manage Category</a></li>
                     <li><a href="{{ route('dashboard.roles') }}"><i class="fas fa-user-tag"></i> Manage Roles</a></li>
                     <li><a href="{{ route('permissions.list') }}"><i class="fas fa-key"></i> Manage Permissions</a></li>
                     <li><a href="{{ route('roles.permissions') }}"><i class="fas fa-users-cog"></i> Assign Roles & Permissions</a></li>

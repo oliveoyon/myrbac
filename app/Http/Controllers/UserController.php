@@ -137,17 +137,7 @@ class UserController extends Controller
         return response()->json($permissions);
     }
 
-    // public function test()
-    // {
-    //     $user = User::findOrFail(4);
-    //     $allPermissions = \Spatie\Permission\Models\Permission::all();
-    //     $userPermissions = $user->getAllPermissions(); // Using Spatie's method to get all permissions
-
-    //     dd($userPermissions);
-    //     $userPermissionsDetails = $allPermissions->whereIn('name', $userPermissions->pluck('name'));
-    //     $groupedPermissions = $userPermissionsDetails->groupBy('category');
-    //     return response()->json(['permissions' => $groupedPermissions]);
-    // }
+    
 
     public function viewUserPermissions($userId)
     {
