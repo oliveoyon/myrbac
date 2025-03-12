@@ -56,4 +56,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Pngo::class);
     }
+
+    public function getAllPermissionsList()
+    {
+        return [
+            'direct_permissions' => $this->getDirectPermissions()->pluck('name'),
+            'role_permissions' => $this->getPermissionsViaRoles()->pluck('name'),
+            'all_permissions' => $this->getAllPermissions()->pluck('name'),
+        ];
+    }
+    
 }

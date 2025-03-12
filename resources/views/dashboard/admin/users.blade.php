@@ -221,6 +221,33 @@
         </div>
     </section>
 
+
+    <!-- Button to trigger the modal -->
+<button type="button" class="btn btn-primary view-permissions" data-id="7">
+    View Permissions
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="permissionsViewModal" tabindex="-1" role="dialog" aria-labelledby="permissionsViewModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="permissionsViewModalLabel">User Permissions</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Permissions will be dynamically inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
 @endsection
 
 @push('scripts')
@@ -242,6 +269,41 @@
             $('#addUserModal').on('hidden.bs.modal', function () {
         $('#add-user-form').find('span.error-text').text('');
     });
+
+    // When the 'View Permissions' button is clicked
+$('.view-permissions').on('click', function() {
+    var userId = $(this).data('id');  // Get the user ID from the button's data attribute
+    $.ajax({
+        url: '/mne/users/' + userId + '/permissions',  // Make the AJAX request to fetch user permissions
+        method: 'GET',
+        success: function(response) {
+            var permissionsList = '';  // Initialize an empty string for the permissions
+
+            // Loop through the grouped permissions returned in the response
+            $.each(response.permissions, function(category, permissions) {
+                permissionsList += '<div class="category-box">'; // Start of category box
+                permissionsList += '<div class="category-header">' + category + '</div>'; // Category name header
+                permissionsList += '<div class="permissions-grid">'; // Start of permission grid
+
+                permissions.forEach(function(permission) {
+                    permissionsList += '<div class="permission-item">' + permission.name + '</div>';  // Display permission name
+                });
+
+                permissionsList += '</div></div>'; // Close permissions grid and category box
+            });
+
+            // Inject the generated HTML into the modal body
+            $('#permissionsViewModal .modal-body').html(permissionsList);
+
+            // Show the modal
+            $('#permissionsViewModal').modal('show');
+        },
+        error: function() {
+            alert('Error loading permissions.');
+        }
+    });
+});
+
 
     $('#add-user-form').on('submit', function (e) {
         e.preventDefault();

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
@@ -25,6 +26,7 @@ class UserController extends Controller
     // Add a new user and assign roles
     public function addUser(Request $request)
     {
+       
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:users,name',
             'email' => 'required|email|unique:users,email',
@@ -126,4 +128,63 @@ class UserController extends Controller
             return response()->json(['code' => 0, 'msg' => 'Something went wrong']);
         }
     }
+
+    public function showUserPermissions($userId)
+    {
+        $user = User::findOrFail($userId);
+        $permissions = $user->getAllPermissionsList(); // ✅ Correct way to call it
+
+        return response()->json($permissions);
+    }
+
+    // public function test()
+    // {
+    //     $user = User::findOrFail(4);
+    //     $allPermissions = \Spatie\Permission\Models\Permission::all();
+    //     $userPermissions = $user->getAllPermissions(); // Using Spatie's method to get all permissions
+
+    //     dd($userPermissions);
+    //     $userPermissionsDetails = $allPermissions->whereIn('name', $userPermissions->pluck('name'));
+    //     $groupedPermissions = $userPermissionsDetails->groupBy('category');
+    //     return response()->json(['permissions' => $groupedPermissions]);
+    // }
+
+    public function test()
+    {
+        // Retrieve the user by ID
+        $user = User::findOrFail(7);
+        
+        // Get the list of all permissions assigned to this user
+        $userPermissions = $user->getAllPermissionsList()['all_permissions'];
+        
+        // Debug: Show the user permissions (names)
+        // dd($userPermissions);
+
+        // Get all permissions from the database (Spatie Permission model)
+        $allPermissions = \Spatie\Permission\Models\Permission::all();
+
+        // Debug: Show all permissions (permission model instances)
+        // dd($allPermissions);
+        
+        // Filter the permissions to get only the ones assigned to the user by matching names
+        $userPermissionsDetails = $allPermissions->whereIn('name', $userPermissions);
+
+        // Debug: Show the filtered permissions
+        // dd($userPermissionsDetails);
+
+        // Group the permissions by 'category'
+        $groupedPermissions = $userPermissionsDetails->groupBy('category');
+
+        // Final debug: Show the grouped permissions
+        // dd($groupedPermissions);
+
+        // Return the grouped permissions in a JSON response
+        return response()->json(['permissions' => $groupedPermissions]);
+    }
+
+
+
+
+
+    
 }

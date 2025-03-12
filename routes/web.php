@@ -36,7 +36,7 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::post('addUser', [UserController::class, 'addUser'])->name('addUser');
     Route::post('getUserDetails', [UserController::class, 'getUserDetails'])->name('getUserDetails');
     Route::post('updateUserDetails', [UserController::class, 'updateUserDetails'])->name('updateUserDetails');
-        // Route::post('deleteClass', [AcademicController::class, 'deleteClass'])->name('deleteClass');
+    
 
     Route::get('role-management', [RoleController::class, 'roles'])->name('dashboard.roles');
     Route::post('roles', [RoleController::class, 'roleAdd'])->name('roles.add');  // Add District
@@ -53,6 +53,10 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::get('role/{role}/permissions', [RolePermissionController::class, 'viewPermissions']);
     Route::get('role/{role}/edit-permissions', [RolePermissionController::class, 'editPermissions']);
     Route::post('role/update-permissions/{roleId}', [RolePermissionController::class, 'updatePermissions']);
+
+
+    // Route::get('/users/{userId}/permissions', [UserController::class, 'showUserPermissions']);
+    Route::get('/users/{userId}/permissions', [UserController::class, 'test']);
 
 });
 
