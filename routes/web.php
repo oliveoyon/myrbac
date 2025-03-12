@@ -20,7 +20,7 @@ Route::get('/', function () {
 Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     // Route::get('/dashboard', function () {return view('dashboard');})->name('dashboard'); //default dashboard of laravel
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('permission:Edit Data');
     
     Route::get('district-management', [DashboardController::class, 'districts'])->name('dashboard.districts');
     Route::post('districts', [DashboardController::class, 'districtAdd'])->name('districts.add');  // Add District

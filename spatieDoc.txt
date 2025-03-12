@@ -1,0 +1,11 @@
+https://www.youtube.com/watch?v=D1-SSpTH1Fw
+
+https://spatie.be/docs/laravel-permission/v6/installation-laravel
+
+@if(auth()->user()->can('edit users'))
+    <a href="{{ route('users.edit', $user->id) }}">Edit User</a>
+@endif
+
+@if(auth()->user()->hasRole('admin'))
+    <p>You are an admin.</p>
+@endif

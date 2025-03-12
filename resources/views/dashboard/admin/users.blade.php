@@ -205,17 +205,17 @@
                             <td>{{ $user->status == 1 ? 'Active' : 'Inactive' }}</td>
                             <td>
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-warning btn-sm" data-id="{{ $user->id }}"
+                                    <button type="button" class="btn btn-info btn-sm" data-id="{{ $user->id }}"
                                         id="editUserBtn">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
 
                                     <!-- Button to trigger the modal -->
-                                    <button type="button" class="btn btn-primary btn-sm view-permissions"
+                                    <button type="button" class="btn btn-success btn-sm view-permissions"
                                         data-toggle="modal" data-id="{{ $user->id }}">
                                         <i class="fas fa-eye"></i> View Permissions
                                     </button>
-                                    <button class="btn btn-warning btn-sm edit-user-permissions"
+                                    <button class="btn btn-default btn-sm edit-user-permissions"
                                         data-id="{{ $user->id }}" data-name="{{ $user->name }}">
                                         <i class="fas fa-pencil-alt"></i> Edit Permissions
                                     </button>

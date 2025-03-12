@@ -27,14 +27,15 @@
         <div class="logo">DigiTrack</div>
         
         <ul>
-            <li><a href=""><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            @can('Edit Data')
+            <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            @endcan
         
             <li class="has-submenu">
                 <i class="fas fa-cogs"></i> General Settings
                 <ul class="submenu">
                     <li><a href="{{ route('dashboard.districts') }}"><i class="fas fa-map-marker-alt"></i> District Management</a></li>
                     <li><a href="{{ route('dashboard.pngos') }}"><i class="fas fa-handshake"></i> PNGOs Management</a></li>
-                    <li><a href="{{ route('users.index') }}"><i class="fas fa-user"></i> Users</a></li>
                 </ul>
             </li>
         
@@ -44,6 +45,8 @@
                     <li><a href="{{ route('dashboard.roles') }}"><i class="fas fa-user-tag"></i> Manage Roles</a></li>
                     <li><a href="{{ route('permissions.list') }}"><i class="fas fa-key"></i> Manage Permissions</a></li>
                     <li><a href="{{ route('roles.permissions') }}"><i class="fas fa-users-cog"></i> Assign Roles & Permissions</a></li>
+                    <li><a href="{{ route('users.index') }}"><i class="fas fa-user"></i> Users</a></li>
+
                 </ul>
             </li>
         
