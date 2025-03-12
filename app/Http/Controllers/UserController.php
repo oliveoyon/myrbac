@@ -84,8 +84,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255|unique:users,name,' . $user_id . ',id',
             'email' => 'required|email|unique:users,email,' . $user_id . ',id',
             'status' => 'required',
-            'district_id' => 'required|exists:districts,id',
-            'pngo_id' => 'required|exists:pngos,id',
+            // 'district_id' => 'required|exists:districts,id',
+            // 'pngo_id' => 'required|exists:pngos,id',
             'role_name' => 'required|array',
             'role_name.*' => 'exists:roles,name'
         ]);

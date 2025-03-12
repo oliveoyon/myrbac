@@ -27,7 +27,7 @@
         <div class="logo">DigiTrack</div>
         
         <ul>
-            @can('Edit Data')
+            @can('Dashboard')
             <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             @endcan
         

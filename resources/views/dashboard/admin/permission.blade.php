@@ -57,10 +57,10 @@
                             <div class="mb-3">
                                 <label for="category" class="form-label">Category</label>
                                 <select class="form-control" id="category" name="category" required>
-                                    <option value="">Select Category</option>
-                                    <option value="Data Entry">Data Entry</option>
-                                    <option value="Reports">Reports</option>
-                                    <option value="Library">Library</option>
+                                <option value="">Select a Category</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->name }}">{{ $category->name }}</option>
+                                @endforeach
                                     <!-- Add more categories as needed -->
                                 </select>
                             </div>

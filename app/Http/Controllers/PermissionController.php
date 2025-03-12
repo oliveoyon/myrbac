@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
+use App\Models\Category;
 
 class PermissionController extends Controller
 {
     public function index()
     {
         $permissions = Permission::all();
-        return view('dashboard.admin.permission', compact('permissions'));
+        $categories = Category::all();
+        return view('dashboard.admin.permission', compact('permissions', 'categories'));
     }
 
     public function store(Request $request)
