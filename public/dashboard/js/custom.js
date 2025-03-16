@@ -98,3 +98,27 @@ document.addEventListener('click', function(event) {
 });
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    const submenus = document.querySelectorAll('.has-submenu > a');
+    submenus.forEach((submenu) => {
+        submenu.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default link behavior
+            
+            // Find the submenu and toggle its visibility
+            const submenuList = submenu.nextElementSibling;
+            const isVisible = submenuList.style.display === 'block';
+
+            // Close all submenus
+            document.querySelectorAll('.submenu').forEach((menu) => {
+                menu.style.display = 'none';
+            });
+
+            // If it's not already open, open the clicked submenu
+            if (!isVisible) {
+                submenuList.style.display = 'block';
+            }
+        });
+    });
+});
+
+

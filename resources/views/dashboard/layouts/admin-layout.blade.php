@@ -32,7 +32,7 @@
             @endcan
         
             <li class="has-submenu">
-                <i class="fas fa-cogs"></i> General Settings
+                <a href="#"><i class="fas fa-cogs"></i> General Settings</a>
                 <ul class="submenu">
                     <li><a href="{{ route('dashboard.districts') }}"><i class="fas fa-map-marker-alt"></i> District Management</a></li>
                     <li><a href="{{ route('dashboard.pngos') }}"><i class="fas fa-handshake"></i> PNGOs Management</a></li>
@@ -40,19 +40,18 @@
             </li>
         
             <li class="has-submenu">
-                <i class="fas fa-user-shield"></i> Roles & Permissions
+                <a href="#"><i class="fas fa-user-shield"></i> Roles & Permissions</a>
                 <ul class="submenu">
                     <li><a href="{{ route('dashboard.categories') }}"><i class="fas fa-tags"></i> Manage Category</a></li>
                     <li><a href="{{ route('dashboard.roles') }}"><i class="fas fa-user-tag"></i> Manage Roles</a></li>
                     <li><a href="{{ route('permissions.list') }}"><i class="fas fa-key"></i> Manage Permissions</a></li>
                     <li><a href="{{ route('roles.permissions') }}"><i class="fas fa-users-cog"></i> Assign Roles & Permissions</a></li>
                     <li><a href="{{ route('users.index') }}"><i class="fas fa-user"></i> Users</a></li>
-
                 </ul>
             </li>
         
             <li class="has-submenu">
-                <i class="fas fa-file-alt"></i> Reports & Analytics
+                <a href="#"><i class="fas fa-file-alt"></i> Reports & Analytics</a>
                 <ul class="submenu">
                     <li><a href="#"><i class="fas fa-chart-bar"></i> User Activity Report</a></li>
                     <li><a href="#"><i class="fas fa-user-clock"></i> Login History</a></li>
@@ -65,7 +64,7 @@
             <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
         
             <li class="has-submenu">
-                <i class="fas fa-wrench"></i> System Settings
+                <a href="#"><i class="fas fa-wrench"></i> System Settings</a>
                 <ul class="submenu">
                     <li><a href="#"><i class="fas fa-cog"></i> Application Settings</a></li>
                     <li><a href="#"><i class="fas fa-user-lock"></i> Security Settings</a></li>
@@ -74,17 +73,18 @@
     
             <!-- Logout Menu Option for Authenticated Users -->
             @auth
-                <li>
-                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </li>
+            <li>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </li>
             @endauth
         </ul>
     </div>
+    
     
 
     <div class="header">

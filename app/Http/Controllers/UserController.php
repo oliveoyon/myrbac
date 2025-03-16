@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
 class UserController extends Controller
 {
@@ -51,6 +52,7 @@ class UserController extends Controller
 
         if ($user->save()) {
             $user->syncRoles($request->role_name); // Assign multiple roles
+            app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
             return response()->json(['code' => 1, 'msg' => 'User Added Successfully', 'redirect' => route('users.index')]);
         } else {
@@ -106,6 +108,7 @@ class UserController extends Controller
 
         if ($user->save()) {
             $user->syncRoles($request->role_name); // Update roles
+            app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
             return response()->json(['code' => 1, 'msg' => 'User Updated Successfully', 'redirect' => route('users.index')]);
         } else {
@@ -176,6 +179,7 @@ class UserController extends Controller
             
             // Sync user permissions
             $user->permissions()->sync($permissions);
+            app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {

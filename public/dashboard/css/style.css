@@ -32,7 +32,9 @@ body {
 
 /* Sidebar */
 .sidebar {
-    position: fixed;
+    height: 100vh; /* Full viewport height */
+    overflow-y: auto; /* Make sidebar scrollable */
+    position: fixed; /* Keep sidebar fixed */
     top: 0;
     left: 0;
     bottom: 0;
@@ -295,6 +297,8 @@ body {
 .stat-box:nth-child(4) .icon i {
     color: #17a2b8;
 }
+
+
 
 
 /* Mobile view adjustments */
@@ -572,4 +576,6 @@ body {
         width: 100%; /* Makes the dropdown fill the screen width */
     }
 }
+
+
 
