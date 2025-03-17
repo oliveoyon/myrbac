@@ -8,6 +8,11 @@ class FormalController extends Controller
 {
     public function index()
     {
-        return view('dashboard.admin.formal');
+        return view('dashboard.admin.formal1');
+    }
+
+    public function courtPolicePrison(Request $request)
+    {
+        dd($request->all());
     }
 }

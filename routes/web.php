@@ -103,6 +103,7 @@ Route::get('role/{role}/edit-permissions', [RolePermissionController::class, 'ed
 Route::post('role/update-permissions/{roleId}', [RolePermissionController::class, 'updatePermissions'])->middleware('permission:Update Role Permissions');  
 
 Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index');  
+Route::post('formAction', [FormalController::class, 'courtPolicePrison'])->name('formaction');  
 
 
 
