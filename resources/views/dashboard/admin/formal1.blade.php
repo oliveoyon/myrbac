@@ -167,27 +167,27 @@
                             data-bs-parent="#caseFormAccordion">
                             <div class="accordion-body">
                                 <div class="row g-3">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="profile_no" class="form-label">Profile No./Central ID No</label>
                                         <input type="text" class="form-control" id="profile_no" name="profile_no">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="full_name" class="form-label">Full Name</label>
                                         <input type="text" class="form-control" id="full_name" name="full_name">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="nick_name" class="form-label">Nick Name</label>
                                         <input type="text" class="form-control" id="nick_name" name="nick_name">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="father_name" class="form-label">Father's Name</label>
                                         <input type="text" class="form-control" id="father_name" name="father_name">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="mother_name" class="form-label">Mother's Name</label>
                                         <input type="text" class="form-control" id="mother_name" name="mother_name">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="sex" class="form-label">Sex</label>
                                         <select class="form-select" id="sex" name="sex">
                                             <option value="">Select</option>
@@ -211,12 +211,12 @@
                                         <label for="nationality" class="form-label">Nationality</label>
                                         <input type="text" class="form-control" id="nationality" name="nationality">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="nid_passport" class="form-label">National ID/Passport No/Birth Certificate
                                             No</label>
                                         <input type="text" class="form-control" id="nid_passport" name="nid_passport">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="phone_number" class="form-label">Phone Number</label>
                                         <input type="text" class="form-control" id="phone_number" name="phone_number">
                                     </div>
@@ -313,6 +313,7 @@
                                         <label for="family_informed" class="form-label">Have family/relatives been
                                             informed?</label>
                                         <select class="form-select" id="family_informed" name="family_informed">
+                                            <option value="">Select</option>
                                             <option value="no">No</option>
                                             <option value="yes">Yes</option>
                                         </select>
@@ -328,6 +329,7 @@
                                                 accompanying the female prisoner?</label>
                                             <select class="form-select" id="children_with_prisoner"
                                                 name="children_with_prisoner">
+                                                <option value="">Select</option>
                                                 <option value="no">No</option>
                                                 <option value="yes">Yes</option>
                                             </select>
@@ -370,6 +372,7 @@
                                         <label for="has_guardian" class="form-label">Does the Justice Seeker/Prisoner have a
                                             local guardian?</label>
                                         <select class="form-select" id="has_guardian" name="has_guardian">
+                                            <option value="">Select</option>
                                             <option value="no">No</option>
                                             <option value="yes">Yes</option>
                                         </select>
@@ -401,6 +404,7 @@
                                         <label for="guardian_surety" class="form-label">Will the Guardian act as
                                             surety?</label>
                                         <select class="form-select" id="guardian_surety" name="guardian_surety">
+                                            <option value="">Select</option>
                                             <option value="no">No</option>
                                             <option value="yes">Yes</option>
                                         </select>
@@ -426,6 +430,7 @@
                                         <label for="has_lawyer" class="form-label">Does the Justice Seeker/Prisoner already
                                             have a lawyer?</label>
                                         <select class="form-select" id="has_lawyer" name="has_lawyer">
+                                            <option value="">Select</option>
                                             <option value="no">No</option>
                                             <option value="yes">Yes</option>
                                         </select>
@@ -651,6 +656,7 @@
                                     <div class="col-md-4">
                                         <label for="release_status" class="form-label">Released on</label>
                                         <select class="form-select" id="release_status" name="release_status">
+                                            <option value="">Select</option>
                                             <option value="bail">Bail</option>
                                             <option value="guilty_plea">Guilty Plea</option>
                                             <option value="fine">With Fine</option>
@@ -688,6 +694,7 @@
                                     <div class="col-md-4">
                                         <label for="application_mode" class="form-label">Mode of application</label>
                                         <select class="form-select" id="application_mode" name="application_mode">
+                                            <option value="">Select</option>
                                             <option value="online">Online</option>
                                             <option value="office">Office Application</option>
                                         </select>
@@ -700,6 +707,7 @@
                                     <div class="col-md-4">
                                         <label for="received_application" class="form-label">Application Received?</label>
                                         <select class="form-select" id="received_application" name="received_application">
+                                            <option value="">Select</option>
                                             <option value="no">No</option>
                                             <option value="yes">Yes</option>
                                         </select>
@@ -711,6 +719,7 @@
                                     <div class="col-md-4">
                                         <label for="type_of_service" class="form-label">Type of Service</label>
                                         <select class="form-select" id="type_of_service" name="type_of_service">
+                                            <option value="">Select</option>
                                             <option value="online">Legal Advice</option>
                                             <option value="adr">Alternate Dispute Resolution</option>
                                             <option value="new_filing">Filing New Lawsuit</option>
@@ -796,6 +805,7 @@
                                     <div class="col-md-4">
                                         <label for="case_transferred" class="form-label">Has the case transferred?</label>
                                         <select class="form-select" id="case_transferred" name="case_transferred">
+                                            <option value="">Select</option>
                                             <option value="no">No</option>
                                             <option value="yes">Yes</option>
                                         </select>
