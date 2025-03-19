@@ -45,7 +45,7 @@ class UserController extends Controller
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->password = Hash::make('defaultpassword'); // Default password
+        $user->password = Hash::make('12345678'); // Default password
         $user->district_id = $request->district_id;
         $user->pngo_id = $request->pngo_id;
         $user->status = $request->status;

@@ -152,7 +152,24 @@
 
     <section>
         <div class="container-fluid">
-            <form method="post" action="{{ route('formaction') }}">
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+
+            <form method="post" action="{{ route('formaction') }}" enctype="multipart/form-data">
                 @csrf
                 <h2>Court-Police-Prison Form</h2>
                 <div class="accordion" id="caseFormAccordion">
@@ -174,11 +191,18 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="full_name" class="form-label">Full Name</label>
-                                        <input type="text" class="form-control" id="full_name" name="full_name">
+                                        <input type="text" id="full_name" name="full_name"
+                                            class="form-control @error('full_name') is-invalid @enderror"
+                                            value="{{ old('full_name') }}">
+                                        @error('full_name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                     <div class="col-md-4">
                                         <label for="nick_name" class="form-label">Nick Name</label>
-                                        <input type="text" class="form-control" id="nick_name" name="nick_name">
+                                        <input type="text" class="form-control" id="nick_name" name="nick_name" value="{{ old('nick_name') }}">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="father_name" class="form-label">Father's Name</label>
@@ -213,13 +237,16 @@
                                         <input type="text" class="form-control" id="nationality" name="nationality">
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="nid_passport" class="form-label">National ID/Passport No/Birth Certificate
+                                        <label for="nid_passport" class="form-label">National ID/Passport No/Birth
+                                            Certificate
                                             No</label>
-                                        <input type="text" class="form-control" id="nid_passport" name="nid_passport">
+                                        <input type="text" class="form-control" id="nid_passport"
+                                            name="nid_passport">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="phone_number" class="form-label">Phone Number</label>
-                                        <input type="text" class="form-control" id="phone_number" name="phone_number">
+                                        <input type="text" class="form-control" id="phone_number"
+                                            name="phone_number">
                                     </div>
                                     <div class="col-md-12">
                                         <label for="address" class="form-label">Contact Address</label>
@@ -370,7 +397,8 @@
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-4">
-                                        <label for="has_guardian" class="form-label">Does the Justice Seeker/Prisoner have a
+                                        <label for="has_guardian" class="form-label">Does the Justice Seeker/Prisoner have
+                                            a
                                             local guardian?</label>
                                         <select class="form-select" id="has_guardian" name="has_guardian">
                                             <option value="">Select</option>
@@ -380,7 +408,8 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="guardian_name" class="form-label">Guardian’s Name</label>
-                                        <input type="text" class="form-control" id="guardian_name" name="guardian_name">
+                                        <input type="text" class="form-control" id="guardian_name"
+                                            name="guardian_name">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="guardian_phone" class="form-label">Guardian’s Phone Number</label>
@@ -428,7 +457,8 @@
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-4">
-                                        <label for="has_lawyer" class="form-label">Does the Justice Seeker/Prisoner already
+                                        <label for="has_lawyer" class="form-label">Does the Justice Seeker/Prisoner
+                                            already
                                             have a lawyer?</label>
                                         <select class="form-select" id="has_lawyer" name="has_lawyer">
                                             <option value="">Select</option>
@@ -452,13 +482,15 @@
                                         <input type="text" class="form-control" id="lawyer_name" name="lawyer_name">
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="lawyer_membership" class="form-label">Lawyer’s Membership Number</label>
+                                        <label for="lawyer_membership" class="form-label">Lawyer’s Membership
+                                            Number</label>
                                         <input type="text" class="form-control" id="lawyer_membership"
                                             name="lawyer_membership">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="lawyer_phone" class="form-label">Lawyer’s Phone Number</label>
-                                        <input type="text" class="form-control" id="lawyer_phone" name="lawyer_phone">
+                                        <input type="text" class="form-control" id="lawyer_phone"
+                                            name="lawyer_phone">
                                     </div>
                                 </div>
                             </div>
@@ -547,7 +579,8 @@
                                     <div class="col-md-4">
                                         <label for="legal_representation" class="form-label">Referred for legal
                                             representation</label>
-                                        <select class="form-select" id="legal_representation" name="legal_representation">
+                                        <select class="form-select" id="legal_representation"
+                                            name="legal_representation">
                                             <option value="">Select</option>
                                             <option value="District Legal Aid Office">District Legal Aid Office</option>
                                             <option value="District Project Officer">District Project Officer</option>
@@ -576,7 +609,8 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="identify_sureties" class="form-label">Identify sureties (With National ID
+                                        <label for="identify_sureties" class="form-label">Identify sureties (With National
+                                            ID
                                             and Phone No)</label>
                                         <input type="text" class="form-control" id="identify_sureties"
                                             name="identify_sureties">
@@ -597,21 +631,24 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="legal_assistance_date" class="form-label">Legal assistance to vulnerable
+                                        <label for="legal_assistance_date" class="form-label">Legal assistance to
+                                            vulnerable
                                             persons</label>
                                         <input type="date" class="form-control" id="legal_assistance_date"
                                             name="legal_assistance_date">
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="assistance_under_custody_date" class="form-label">Assistance under police
+                                        <label for="assistance_under_custody_date" class="form-label">Assistance under
+                                            police
                                             custody</label>
                                         <input type="date" class="form-control" id="assistance_under_custody_date"
                                             name="assistance_under_custody_date">
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="referral_service" class="form-label">Referral for other services</label>
+                                        <label for="referral_service" class="form-label">Referral for other
+                                            services</label>
                                         <select class="form-select" id="referral_service" name="referral_service">
                                             <option value="">Select</option>
                                             <option value="District Legal Aid Office">District Legal Aid Office</option>
@@ -707,7 +744,8 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="received_application" class="form-label">Application Received?</label>
-                                        <select class="form-select" id="received_application" name="received_application">
+                                        <select class="form-select" id="received_application"
+                                            name="received_application">
                                             <option value="">Select</option>
                                             <option value="No">No</option>
                                             <option value="Yes">Yes</option>
@@ -715,14 +753,16 @@
                                     </div>
                                     <div class="col-md-4" id="reference_no" style="display: none;">
                                         <label for="reference_no" class="form-label">Reference No</label>
-                                        <input type="number" class="form-control" id="reference_no" name="reference_no">
+                                        <input type="number" class="form-control" id="reference_no"
+                                            name="reference_no">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="type_of_service" class="form-label">Type of Service</label>
                                         <select class="form-select" id="type_of_service" name="type_of_service">
                                             <option value="">Select</option>
                                             <option value="Legal Advice">Legal Advice</option>
-                                            <option value="Alternate Dispute Resolution">Alternate Dispute Resolution</option>
+                                            <option value="Alternate Dispute Resolution">Alternate Dispute Resolution
+                                            </option>
                                             <option value="Filing New Lawsuit">Filing New Lawsuit</option>
                                             <option value="Legal Aid in Existing Case">Legal Aid in Existing Case</option>
                                         </select>
@@ -781,7 +821,8 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="prison_reg_no" class="form-label">Prison Registration Number</label>
-                                        <input type="text" class="form-control" id="prison_reg_no" name="prison_reg_no">
+                                        <input type="text" class="form-control" id="prison_reg_no"
+                                            name="prison_reg_no">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="case_no" class="form-label">Case Number(s)</label>
@@ -793,7 +834,8 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="present_court" class="form-label">Present Court’s Name</label>
-                                        <input type="text" class="form-control" id="present_court" name="present_court">
+                                        <input type="text" class="form-control" id="present_court"
+                                            name="present_court">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="lockup_no" class="form-label">Lock-Up Number (If applicable)</label>
@@ -813,15 +855,18 @@
                                     </div>
                                     <div class="col-md-4" id="current_court_name" style="display: none;">
                                         <label for="current_court" class="form-label">If Yes, Current Court’s Name</label>
-                                        <input type="text" class="form-control" id="current_court" name="current_court">
+                                        <input type="text" class="form-control" id="current_court"
+                                            name="current_court">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="case_status" class="form-label">Present Status of Case</label>
                                         <input type="text" class="form-control" id="case_status" name="case_status">
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="co_offenders" class="form-label">Number of Co-Offenders (If any)</label>
-                                        <input type="number" class="form-control" id="co_offenders" name="co_offenders">
+                                        <label for="co_offenders" class="form-label">Number of Co-Offenders (If
+                                            any)</label>
+                                        <input type="number" class="form-control" id="co_offenders"
+                                            name="co_offenders">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="next_court_date" class="form-label">Next Court Date</label>
@@ -841,7 +886,8 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingThirteen">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseThirteen" aria-expanded="false" aria-controls="collapseThirteen">
+                                data-bs-target="#collapseThirteen" aria-expanded="false"
+                                aria-controls="collapseThirteen">
                                 13. Imprisonment Information
                             </button>
                         </h2>
@@ -866,7 +912,8 @@
                                             <option value="Under Trial">Under Trial</option>
                                             <option value="Convicted">Convicted</option>
                                             <option value="Released">Released</option>
-                                            <option value="Sentenced but under trial for another offense">Sentenced but under trial for another offense
+                                            <option value="Sentenced but under trial for another offense">Sentenced but
+                                                under trial for another offense
                                             </option>
                                             <option value="foreigner">Foreigner</option>
                                         </select>
@@ -897,7 +944,8 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingFourteen">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseFourteen" aria-expanded="false" aria-controls="collapseFourteen">
+                                data-bs-target="#collapseFourteen" aria-expanded="false"
+                                aria-controls="collapseFourteen">
                                 14. Nature of Assistance in Prison
                             </button>
                         </h2>
@@ -950,14 +998,16 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="identify_sureties_prison_nid" class="form-label">Identify Sureties (With
+                                        <label for="identify_sureties_prison_nid" class="form-label">Identify Sureties
+                                            (With
                                             National ID)</label>
                                         <input type="text" class="form-control" id="identify_sureties_prison_nid"
                                             name="identify_sureties_prison_nid">
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="identify_sureties_prison_phone" class="form-label">Identify Sureties (With
+                                        <label for="identify_sureties_prison_phone" class="form-label">Identify Sureties
+                                            (With
                                             Phone Number)</label>
                                         <input type="text" class="form-control" id="identify_sureties_prison_phone"
                                             name="identify_sureties_prison_phone">
@@ -978,7 +1028,8 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="court_order_communication" class="form-label">Communicate with relevant
+                                        <label for="court_order_communication" class="form-label">Communicate with
+                                            relevant
                                             institutions for Court Orders</label>
                                         <input type="date" class="form-control" id="court_order_communication"
                                             name="court_order_communication">
@@ -998,14 +1049,16 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="ministerial_communication" class="form-label">Communicate with Ministries,
+                                        <label for="ministerial_communication" class="form-label">Communicate with
+                                            Ministries,
                                             Embassy, etc.</label>
                                         <input type="date" class="form-control" id="ministerial_communication"
                                             name="ministerial_communication">
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="other_legal_assistance" class="form-label">Other legal assistance</label>
+                                        <label for="other_legal_assistance" class="form-label">Other legal
+                                            assistance</label>
                                         <select class="form-select" id="other_legal_assistance"
                                             name="other_legal_assistance">
                                             <option value="">Select</option>
@@ -1028,7 +1081,8 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingFifteen">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseFifteen" aria-expanded="false" aria-controls="collapseFifteen">
+                                data-bs-target="#collapseFifteen" aria-expanded="false"
+                                aria-controls="collapseFifteen">
                                 15. Result
                             </button>
                         </h2>
@@ -1079,7 +1133,8 @@
                                             name="convicted_length">
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="convicted_sentence_expire" class="form-label">Convicted-Sentence Expire
+                                        <label for="convicted_sentence_expire" class="form-label">Convicted-Sentence
+                                            Expire
                                             on</label>
                                         <input type="date" class="form-control" id="convicted_sentence_expire"
                                             name="convicted_sentence_expire">
@@ -1095,7 +1150,8 @@
                                         </select>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="date_of_reliefe" class="form-label">Date of Released from Prison</label>
+                                        <label for="date_of_reliefe" class="form-label">Date of Released from
+                                            Prison</label>
                                         <input type="date" class="form-control" id="date_of_reliefe"
                                             name="date_of_reliefe">
                                     </div>
@@ -1107,7 +1163,8 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingSixteen">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseSixteen" aria-expanded="false" aria-controls="collapseSixteen">
+                                data-bs-target="#collapseSixteen" aria-expanded="false"
+                                aria-controls="collapseSixteen">
                                 16. Description of Service Provided
                             </button>
                         </h2>
@@ -1116,7 +1173,8 @@
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-12">
-                                        <label for="service_description" class="form-label">Description of Service</label>
+                                        <label for="service_description" class="form-label">Description of
+                                            Service</label>
                                         <textarea class="form-control" id="service_description" name="service_description" rows="6"></textarea>
                                     </div>
 
@@ -1133,17 +1191,19 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingSeventeen">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseSeventeen" aria-expanded="true" aria-controls="collapseSeventeen">
+                                data-bs-target="#collapseSeventeen" aria-expanded="true"
+                                aria-controls="collapseSeventeen">
                                 17. Upload Additional Documents
                             </button>
                         </h2>
-                        <div id="collapseSeventeen" class="accordion-collapse collapse show" aria-labelledby="headingSeventeen"
-                            data-bs-parent="#caseFormAccordion">
+                        <div id="collapseSeventeen" class="accordion-collapse collapse show"
+                            aria-labelledby="headingSeventeen" data-bs-parent="#caseFormAccordion">
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="fileUpload" class="form-label">Upload Files (Multiple)</label>
-                                        <input type="file" class="form-control" id="fileUpload" name="fileUpload[]" multiple>
+                                        <input type="file" class="form-control" id="fileUpload"
+                                            name="fileUpload[]" multiple>
                                     </div>
                                 </div>
                             </div>

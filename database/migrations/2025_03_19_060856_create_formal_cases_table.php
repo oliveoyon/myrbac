@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cases', function (Blueprint $table) {
+        Schema::create('formal_cases', function (Blueprint $table) {
             $table->id();
             $table->string('central_id')->nullable();
             $table->unsignedBigInteger('user_id');
-            $table->string('status')->nullable();
             $table->unsignedBigInteger('district_id');
             $table->unsignedBigInteger('pngo_id');
+            $table->string('status')->nullable();
             $table->string('profile_no')->nullable();
             $table->string('full_name')->nullable();
             $table->string('nick_name')->nullable();
@@ -131,6 +131,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cases');
+        Schema::dropIfExists('formal_cases');
     }
 };
