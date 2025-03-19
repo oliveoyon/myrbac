@@ -191,14 +191,8 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="full_name" class="form-label">Full Name</label>
-                                        <input type="text" id="full_name" name="full_name"
-                                            class="form-control @error('full_name') is-invalid @enderror"
-                                            value="{{ old('full_name') }}">
-                                        @error('full_name')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
+                                        <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}">
+                        <div class="error-message text-danger"></div> <!-- Placeholder for error messages -->
                                     </div>
                                     <div class="col-md-4">
                                         <label for="nick_name" class="form-label">Nick Name</label>
@@ -280,8 +274,13 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="interview_place" class="form-label">Place of Interview</label>
-                                        <input type="text" class="form-control" id="interview_place"
+                                        <input type="text" class="form-control @error('interview_place') is-invalid @enderror" id="interview_place"
                                             name="interview_place">
+                                            @error('interview_place')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -1312,5 +1311,60 @@
                 toggleDependentFields(toggle.id, toggle.targets, toggle.showValue, toggle.isParentColumn);
             });
         });
+
+
+
+
+        
+
+        document.querySelector('form').addEventListener('submit', function (e) {
+    e.preventDefault();  // Prevent default form submission
+
+    let formData = new FormData(this); // Collect form data
+
+    // Send the data using AJAX (using Fetch API in this case)
+    fetch('{{ route('validateAndReturn') }}', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.errors) {
+            // Loop through the errors and display them
+            Object.keys(data.errors).forEach(function(field) {
+                const errorMessages = data.errors[field];
+
+                // Find the input field by its name attribute
+                const fieldElement = document.querySelector(`[name="${field}"]`);
+                if (fieldElement) {
+                    const errorContainer = fieldElement.closest('.form-group').querySelector('.error-message');
+                    if (errorContainer) {
+                        // Dynamically display error messages
+                        errorContainer.innerHTML = errorMessages.join('<br>');
+                    }
+
+                    // Optionally, open the accordion section containing the error
+                    const accordionItem = fieldElement.closest('.accordion-item');
+                    if (accordionItem) {
+                        const collapseElement = accordionItem.querySelector('.accordion-collapse');
+                        if (collapseElement) {
+                            const bootstrapCollapse = new bootstrap.Collapse(collapseElement, {
+                                toggle: true
+                            });
+                        }
+                    }
+                }
+            });
+        } else {
+            // Handle form submission if no errors
+            this.submit();  // Optionally, manually submit the form if no validation errors
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+
+
     </script>
 @endpush

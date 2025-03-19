@@ -19,13 +19,15 @@ class FormalController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'full_name' => 'required|string|max:255',
+            'interview_place' => 'required|string|max:255',
         ]);
     
         // Check if the validation fails
         if ($validator->fails()) {
-            return redirect()->back()
-                             ->withErrors($validator)
-                             ->withInput();
+            // return redirect()->back()->withErrors($validator)->withInput();
+            return response()->json([
+                'errors' => $validator->errors(),
+            ]);
         }
         
         $districtName = (optional(auth()->user()->district)->name);
