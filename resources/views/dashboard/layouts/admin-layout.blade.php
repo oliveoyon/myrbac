@@ -49,6 +49,8 @@
                     <li><a href="{{ route('users.index') }}"><i class="fas fa-user"></i> Users</a></li>
                 </ul>
             </li>
+
+            <li><a href="{{ route('form.index') }}"><i class="fas fa-database"></i> Data Entry Forms</a></li>
         
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-file-alt"></i> Reports & Analytics</a>

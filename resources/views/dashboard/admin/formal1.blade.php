@@ -21,7 +21,8 @@
         }
 
         .accordion-button {
-            background-color: #4CAF50;
+            /* background-color: #4CAF50; */
+            background-color: #545b62;
             color: white;
             font-weight: bold;
             padding: 15px;
@@ -191,9 +192,9 @@
                                         <label for="sex" class="form-label">Sex</label>
                                         <select class="form-select" id="sex" name="sex">
                                             <option value="">Select</option>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
-                                            <option value="transgender">Transgender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Transgender">Transgender</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -203,8 +204,8 @@
                                     <div class="col-md-4">
                                         <label for="disability" class="form-label">Disability</label>
                                         <select class="form-select" id="disability" name="disability">
-                                            <option value="no">No</option>
-                                            <option value="yes">Yes</option>
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -276,10 +277,10 @@
                                         <label for="marital_status" class="form-label">Marital Status</label>
                                         <select class="form-select" id="marital_status" name="marital_status">
                                             <option value="">Select</option>
-                                            <option value="married">Married</option>
-                                            <option value="single">Single</option>
-                                            <option value="divorced">Divorced</option>
-                                            <option value="widowed">Widowed</option>
+                                            <option value="Married">Married</option>
+                                            <option value="Single">Single</option>
+                                            <option value="Divorced">Divorced</option>
+                                            <option value="Widowed">Widowed</option>
                                         </select>
                                     </div>
 
@@ -291,13 +292,13 @@
                                         <label for="education_level" class="form-label">Education Level</label>
                                         <select class="form-select" id="education_level" name="education_level">
                                             <option value="">Select</option>
-                                            <option value="illiterate">Illiterate</option>
-                                            <option value="can_sign">Can Sign</option>
-                                            <option value="primary">Primary</option>
-                                            <option value="secondary">Secondary</option>
-                                            <option value="higher_secondary">Higher Secondary</option>
-                                            <option value="graduate">Graduate</option>
-                                            <option value="postgraduate">Postgraduate</option>
+                                            <option value="Illiterate">Illiterate</option>
+                                            <option value="Can Sign">Can Sign</option>
+                                            <option value="Primary">Primary</option>
+                                            <option value="Secondary">Secondary</option>
+                                            <option value="Higher Secondary">Higher Secondary</option>
+                                            <option value="Graduate">Graduate</option>
+                                            <option value="Postgraduate">Postgraduate</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -314,8 +315,8 @@
                                             informed?</label>
                                         <select class="form-select" id="family_informed" name="family_informed">
                                             <option value="">Select</option>
-                                            <option value="no">No</option>
-                                            <option value="yes">Yes</option>
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
                                         </select>
                                     </div>
                                 </div>
@@ -330,8 +331,8 @@
                                             <select class="form-select" id="children_with_prisoner"
                                                 name="children_with_prisoner">
                                                 <option value="">Select</option>
-                                                <option value="no">No</option>
-                                                <option value="yes">Yes</option>
+                                                <option value="No">No</option>
+                                                <option value="Yes">Yes</option>
                                             </select>
                                         </div>
 
@@ -339,9 +340,9 @@
                                             <label for="child_sex" class="form-label">Child's Sex</label>
                                             <select class="form-select" id="child_sex" name="child_sex">
                                                 <option value="">Select</option>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                                <option value="transgender">Transgender</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Transgender">Transgender</option>
                                             </select>
                                         </div>
 
@@ -373,8 +374,8 @@
                                             local guardian?</label>
                                         <select class="form-select" id="has_guardian" name="has_guardian">
                                             <option value="">Select</option>
-                                            <option value="no">No</option>
-                                            <option value="yes">Yes</option>
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -394,10 +395,10 @@
                                         <label for="guardian_relation" class="form-label">Relation with Guardian</label>
                                         <select class="form-select" id="guardian_relation" name="guardian_relation">
                                             <option value="">Select</option>
-                                            <option value="family">Family Member</option>
-                                            <option value="relative">Relative</option>
-                                            <option value="neighbor">Neighbor</option>
-                                            <option value="other">Other</option>
+                                            <option value="Family Member">Family Member</option>
+                                            <option value="Relative">Relative</option>
+                                            <option value="Neighbor">Neighbor</option>
+                                            <option value="Other">Other</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -405,8 +406,8 @@
                                             surety?</label>
                                         <select class="form-select" id="guardian_surety" name="guardian_surety">
                                             <option value="">Select</option>
-                                            <option value="no">No</option>
-                                            <option value="yes">Yes</option>
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
                                         </select>
                                     </div>
                                 </div>
@@ -431,19 +432,19 @@
                                             have a lawyer?</label>
                                         <select class="form-select" id="has_lawyer" name="has_lawyer">
                                             <option value="">Select</option>
-                                            <option value="no">No</option>
-                                            <option value="yes">Yes</option>
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
                                         <label for="lawyer_type" class="form-label">Type of Lawyer</label>
                                         <select class="form-select" id="lawyer_type" name="lawyer_type">
                                             <option value="">Select</option>
-                                            <option value="personal">Personal</option>
-                                            <option value="ngo">NGO</option>
-                                            <option value="district_legal_aid">District Legal Aid</option>
-                                            <option value="state_defense">State Defense</option>
-                                            <option value="other">Other</option>
+                                            <option value="Personal">Personal</option>
+                                            <option value="NGO">NGO</option>
+                                            <option value="District Legal Aid">District Legal Aid</option>
+                                            <option value="State Defense">State Defense</option>
+                                            <option value="Other">Other</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -501,9 +502,9 @@
                                             custody?</label>
                                         <select class="form-select" id="custody_status" name="custody_status">
                                             <option value="">Select One</option>
-                                            <option value="police_custody">Police Custody</option>
-                                            <option value="court_custody">Court Custody</option>
-                                            <option value="not_applicable">Not Applicable</option>
+                                            <option value="Police Custody">Police Custody</option>
+                                            <option value="Court Custody">Court Custody</option>
+                                            <option value="Not Applicable">Not Applicable</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
@@ -548,10 +549,10 @@
                                             representation</label>
                                         <select class="form-select" id="legal_representation" name="legal_representation">
                                             <option value="">Select</option>
-                                            <option value="district_legal_aid">District Legal Aid Office</option>
-                                            <option value="dpo">District Project Officer</option>
-                                            <option value="ngo_panel_lawyer">NGO Panel Lawyer</option>
-                                            <option value="other">Other</option>
+                                            <option value="District Legal Aid Office">District Legal Aid Office</option>
+                                            <option value="District Project Officer">District Project Officer</option>
+                                            <option value="NGO Panel Lawyer">NGO Panel Lawyer</option>
+                                            <option value="Other">Other</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -613,10 +614,10 @@
                                         <label for="referral_service" class="form-label">Referral for other services</label>
                                         <select class="form-select" id="referral_service" name="referral_service">
                                             <option value="">Select</option>
-                                            <option value="district_legal_aid">District Legal Aid Office</option>
-                                            <option value="ngo">NGOs/RJ/Mediation</option>
-                                            <option value="village_court">Village Court</option>
-                                            <option value="safe_home">Safe Home</option>
+                                            <option value="District Legal Aid Office">District Legal Aid Office</option>
+                                            <option value="NGOs/RJ/Mediation">NGOs/RJ/Mediation</option>
+                                            <option value="Village Court">Village Court</option>
+                                            <option value="Safe Home">Safe Home</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -657,9 +658,9 @@
                                         <label for="release_status" class="form-label">Released on</label>
                                         <select class="form-select" id="release_status" name="release_status">
                                             <option value="">Select</option>
-                                            <option value="bail">Bail</option>
-                                            <option value="guilty_plea">Guilty Plea</option>
-                                            <option value="fine">With Fine</option>
+                                            <option value="Bail">Bail</option>
+                                            <option value="Guilty Plea">Guilty Plea</option>
+                                            <option value="With Fine">With Fine</option>
                                         </select>
                                     </div>
 
@@ -695,8 +696,8 @@
                                         <label for="application_mode" class="form-label">Mode of application</label>
                                         <select class="form-select" id="application_mode" name="application_mode">
                                             <option value="">Select</option>
-                                            <option value="online">Online</option>
-                                            <option value="office">Office Application</option>
+                                            <option value="Online">Online</option>
+                                            <option value="Office Application">Office Application</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -708,8 +709,8 @@
                                         <label for="received_application" class="form-label">Application Received?</label>
                                         <select class="form-select" id="received_application" name="received_application">
                                             <option value="">Select</option>
-                                            <option value="no">No</option>
-                                            <option value="yes">Yes</option>
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4" id="reference_no" style="display: none;">
@@ -720,10 +721,10 @@
                                         <label for="type_of_service" class="form-label">Type of Service</label>
                                         <select class="form-select" id="type_of_service" name="type_of_service">
                                             <option value="">Select</option>
-                                            <option value="online">Legal Advice</option>
-                                            <option value="adr">Alternate Dispute Resolution</option>
-                                            <option value="new_filing">Filing New Lawsuit</option>
-                                            <option value="legal_aid_existing_case">Legal Aid in Existing Case</option>
+                                            <option value="Legal Advice">Legal Advice</option>
+                                            <option value="Alternate Dispute Resolution">Alternate Dispute Resolution</option>
+                                            <option value="Filing New Lawsuit">Filing New Lawsuit</option>
+                                            <option value="Legal Aid in Existing Case">Legal Aid in Existing Case</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -772,10 +773,10 @@
                                         <label for="source_of_interview" class="form-label">Source of Interview</label>
                                         <select class="form-select" id="source_of_interview" name="source_of_interview">
                                             <option value="">Select</option>
-                                            <option value="prison_staff">Prison Staff</option>
-                                            <option value="case_file">Case File</option>
-                                            <option value="prison_register">Prison Register</option>
-                                            <option value="other">Other</option>
+                                            <option value="Prison Staff">Prison Staff</option>
+                                            <option value="Case File">Case File</option>
+                                            <option value="Prison Register">Prison Register</option>
+                                            <option value="Other">Other</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -806,8 +807,8 @@
                                         <label for="case_transferred" class="form-label">Has the case transferred?</label>
                                         <select class="form-select" id="case_transferred" name="case_transferred">
                                             <option value="">Select</option>
-                                            <option value="no">No</option>
-                                            <option value="yes">Yes</option>
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4" id="current_court_name" style="display: none;">
@@ -853,19 +854,19 @@
                                         <select class="form-select" id="imprisonment_condition"
                                             name="imprisonment_condition">
                                             <option value="">Select One</option>
-                                            <option value="regular">Regular</option>
-                                            <option value="on_call">On Call</option>
-                                            <option value="safe_custody">Safe Custody</option>
+                                            <option value="Regular">Regular</option>
+                                            <option value="On Call">On Call</option>
+                                            <option value="Safe Custody">Safe Custody</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
                                         <label for="imprisonment_status" class="form-label">Status of Imprisonment</label>
                                         <select class="form-select" id="imprisonment_status" name="imprisonment_status">
                                             <option value="">Select One</option>
-                                            <option value="under_trial">Under Trial</option>
-                                            <option value="convicted">Convicted</option>
-                                            <option value="released">Released</option>
-                                            <option value="sentenced_other_case">Sentenced but under trial for another offense
+                                            <option value="Under Trial">Under Trial</option>
+                                            <option value="Convicted">Convicted</option>
+                                            <option value="Released">Released</option>
+                                            <option value="Sentenced but under trial for another offense">Sentenced but under trial for another offense
                                             </option>
                                             <option value="foreigner">Foreigner</option>
                                         </select>
@@ -874,9 +875,9 @@
                                         <label for="special_condition" class="form-label">Special Condition</label>
                                         <select class="form-select" id="special_condition" name="special_condition">
                                             <option value="">Select</option>
-                                            <option value="critical_ill">Critical Ill</option>
-                                            <option value="disabled">Disabled</option>
-                                            <option value="other">Other</option>
+                                            <option value="Critical Ill">Critical Ill</option>
+                                            <option value="Disabled">Disabled</option>
+                                            <option value="Other">Other</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -917,10 +918,10 @@
                                         <select class="form-select" id="prison_legal_representation"
                                             name="prison_legal_representation">
                                             <option value="">Select</option>
-                                            <option value="district_legal_aid">District Legal Aid Office</option>
-                                            <option value="dpo">District Project Officer</option>
-                                            <option value="ngo_panel_lawyer">NGO Panel Lawyer</option>
-                                            <option value="other">Other</option>
+                                            <option value="District Legal Aid Offic">District Legal Aid Office</option>
+                                            <option value="District Project Officer">District Project Officer</option>
+                                            <option value="NGO Panel Lawyer">NGO Panel Lawyer</option>
+                                            <option value="Other">Other</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -1039,12 +1040,12 @@
                                         <label for="released_on" class="form-label">Released on</label>
                                         <select class="form-select" id="released_on" name="released_on">
                                             <option value="">Select</option>
-                                            <option value="bail">Bail</option>
-                                            <option value="discharged">Discharged</option>
-                                            <option value="acquitted">Acquitted</option>
-                                            <option value="guilty_plea">Guilty Plea</option>
-                                            <option value="safe_custody">Released from Safe Custody</option>
-                                            <option value="foreign_prisoner">Foreign Prisoner</option>
+                                            <option value="Bail">Bail</option>
+                                            <option value="Discharged">Discharged</option>
+                                            <option value="Acquitted">Acquitted</option>
+                                            <option value="Guilty Plea">Guilty Plea</option>
+                                            <option value="Released from Safe Custody">Released from Safe Custody</option>
+                                            <option value="Foreign Prisoner">Foreign Prisoner</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -1057,13 +1058,13 @@
                                         <label for="send_to" class="form-label">Send to</label>
                                         <select class="form-select" id="send_to" name="send_to">
                                             <option value="">Select</option>
-                                            <option value="safe_home">Safe Home</option>
-                                            <option value="legal_guardian">Legal Guardian</option>
-                                            <option value="own_custody">Own Custody</option>
-                                            <option value="ngo_shelter">NGO Shelter</option>
-                                            <option value="child_centre">Child Development Centre</option>
-                                            <option value="victim_support">Victim Support Centre</option>
-                                            <option value="other">Other</option>
+                                            <option value="Safe Home">Safe Home</option>
+                                            <option value="Legal Guardian">Legal Guardian</option>
+                                            <option value="Own Custody">Own Custody</option>
+                                            <option value="NGO Shelter">NGO Shelter</option>
+                                            <option value="Child Development Centre">Child Development Centre</option>
+                                            <option value="Victim Support Centre">Victim Support Centre</option>
+                                            <option value="Other">Other</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -1087,10 +1088,10 @@
                                         <label for="result_of_appeal" class="form-label">Result of Appeal</label>
                                         <select class="form-select" id="result_of_appeal" name="result_of_appeal">
                                             <option value="">Select</option>
-                                            <option value="sentence_upheld">Sentence Upheld</option>
-                                            <option value="acquitted">Acquitted</option>
-                                            <option value="sentence_reduced">Sentence Reduced</option>
-                                            <option value="sentence_enhanced">Sentence Enhanced</option>
+                                            <option value="Sentence Upheld">Sentence Upheld</option>
+                                            <option value="Acquitted">Acquitted</option>
+                                            <option value="Sentence Reduced">Sentence Reduced</option>
+                                            <option value="Sentence Enhanced">Sentence Enhanced</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -1129,8 +1130,28 @@
                         </div>
                     </div>
 
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingSeventeen">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseSeventeen" aria-expanded="true" aria-controls="collapseSeventeen">
+                                17. Upload Additional Documents
+                            </button>
+                        </h2>
+                        <div id="collapseSeventeen" class="accordion-collapse collapse show" aria-labelledby="headingSeventeen"
+                            data-bs-parent="#caseFormAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="fileUpload" class="form-label">Upload Files (Multiple)</label>
+                                        <input type="file" class="form-control" id="fileUpload" name="fileUpload[]" multiple>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mt-3">
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="submit" class="btnCustom btn btn-primary">Submit</button>
                     </div>
                 </div>
             </form>
@@ -1182,31 +1203,31 @@
             const fieldToggles = [{
                     id: "marital_status",
                     targets: ["spouse_field"],
-                    showValue: "married"
+                    showValue: "Married"
                 },
                 {
                     id: "children_with_prisoner",
                     targets: ["child_sex", "child_age"],
-                    showValue: "yes"
+                    showValue: "Yes"
                 },
                 {
                     id: "has_guardian",
                     targets: ["guardian_name", "guardian_phone", "guardian_address", "guardian_relation",
                         "guardian_surety"
                     ],
-                    showValue: "yes",
+                    showValue: "Yes",
                     isParentColumn: true
                 },
                 {
                     id: "has_lawyer",
                     targets: ["lawyer_type", "lawyer_name", "lawyer_membership", "lawyer_phone"],
-                    showValue: "yes",
+                    showValue: "Yes",
                     isParentColumn: true
                 },
                 {
                     id: "custody_status",
                     targets: ["charges_details", "arrest_date", "case_no"],
-                    showValue: ["police_custody", "court_custody", "not_applicable"],
+                    showValue: ["Police Custody", "Court Custody", "Not Applicable"],
                     isParentColumn: true
                 },
                 {
@@ -1217,12 +1238,12 @@
                 {
                     id: "received_application",
                     targets: ["reference_no"],
-                    showValue: "yes"
+                    showValue: "Yes"
                 },
                 {
                     id: "case_transferred",
                     targets: ["current_court_name"],
-                    showValue: "yes"
+                    showValue: "Yes"
                 },
             ];
 

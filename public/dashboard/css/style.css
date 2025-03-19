@@ -478,6 +478,15 @@ body {
     background-color: #545b62;
 }
 
+.btnCustom {
+    background-color: #c30f08;
+    border: none;
+}
+
+.btnCustom:hover {
+    background-color: #9d0c06;
+}
+
 /* Responsive Modal */
 @media (max-width: 576px) {
     .modal-dialog {
