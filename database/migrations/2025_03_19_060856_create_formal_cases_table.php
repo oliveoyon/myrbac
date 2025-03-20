@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('formal_cases', function (Blueprint $table) {
             $table->id();
+            $table->string('institute')->nullable();
             $table->string('central_id')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('district_id');
             $table->unsignedBigInteger('pngo_id');
             $table->string('status')->nullable();
-            $table->string('profile_no')->nullable();
             $table->string('full_name')->nullable();
             $table->string('nick_name')->nullable();
             $table->string('father_name')->nullable();
@@ -62,7 +62,7 @@ return new class extends Migration
             $table->string('legal_representation')->nullable();
             $table->date('legal_representation_date')->nullable();
             $table->date('collected_vokalatnama_date')->nullable();
-            $table->text('collected_case_doc')->nullable();
+            $table->date('collected_case_doc')->nullable();
             $table->text('identify_sureties')->nullable();
             $table->date('witness_communication_date')->nullable();
             $table->date('medical_report_date')->nullable();

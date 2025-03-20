@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class FormalCase extends Model
 {
     protected $fillable = [
-        'central_id', 'user_id', 'district_id', 'pngo_id', 'status', 'profile_no',
+        'institute','central_id', 'user_id', 'district_id', 'pngo_id', 'status', 'profile_no',
         'full_name', 'nick_name', 'father_name', 'mother_name', 'sex', 'age', 
         'disability', 'nationality', 'nid_passport', 'phone_number', 'address',
         'interview_date', 'interview_time', 'interview_place', 'marital_status', 

@@ -9,6 +9,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\FormalController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -104,6 +105,12 @@ Route::post('role/update-permissions/{roleId}', [RolePermissionController::class
 
 Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index');  
 Route::post('formAction', [FormalController::class, 'courtPolicePrison'])->name('formaction');  
+
+Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view');
+Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store');
+
+Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+Route::get('/report1', [ReportController::class, 'showCaseAssistanceData'])->name('report.index1');
 
 
 

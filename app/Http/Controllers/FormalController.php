@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Imports\FormalCaseImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class FormalController extends Controller
 {
@@ -24,10 +27,10 @@ class FormalController extends Controller
     
         // Check if the validation fails
         if ($validator->fails()) {
-            // return redirect()->back()->withErrors($validator)->withInput();
-            return response()->json([
-                'errors' => $validator->errors(),
-            ]);
+            return redirect()->back()->withErrors($validator)->withInput();
+            // return response()->json([
+            //     'errors' => $validator->errors(),
+            // ]);
         }
         
         $districtName = (optional(auth()->user()->district)->name);
@@ -172,6 +175,174 @@ class FormalController extends Controller
         // dd($case);
     
         return redirect()->route('form.index')->with('success', 'Case has been successfully created.');
+    }
+
+    public function importView()
+    {
+        return view('dashboard.admin.import');
+    }
+
+    public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+    ]);
+
+    // Process the uploaded file and loop through the rows
+    $data = Excel::toArray(new FormalCaseImport, $request->file('file'))[0];
+
+    foreach ($data as $row) {
+        // Ensure that child_age is null if empty
+        $row['child_age'] = !empty($row['child_age']) && is_numeric($row['child_age']) ? $row['child_age'] : null;
+
+        // Convert dates to proper format (if necessary) and handle missing dates collected_case_doc
+        $row['interview_date'] = $this->convertToDateFormat($row['interview_date']);
+        $row['arrest_date'] = $this->convertToDateFormat($row['arrest_date']);
+        $row['legal_representation_date'] = $this->convertToDateFormat($row['legal_representation_date']);
+        $row['collected_vokalatnama_date'] = $this->convertToDateFormat($row['collected_vokalatnama_date']);
+        $row['family_communication_date'] = $this->convertToDateFormat($row['family_communication_date']);
+        $row['witness_communication_date'] = $this->convertToDateFormat($row['witness_communication_date']);
+        $row['medical_report_date'] = $this->convertToDateFormat($row['medical_report_date']);
+        $row['legal_assistance_date'] = $this->convertToDateFormat($row['legal_assistance_date']);
+        $row['assistance_under_custody_date'] = $this->convertToDateFormat($row['assistance_under_custody_date']);
+        $row['referral_service_date'] = $this->convertToDateFormat($row['referral_service_date']);
+        $row['resolved_dispute_date'] = $this->convertToDateFormat($row['resolved_dispute_date']);
+        $row['appoint_lawyer_date'] = $this->convertToDateFormat($row['appoint_lawyer_date']);
+        $row['release_status_date'] = $this->convertToDateFormat($row['release_status_date']);
+        $row['application_mode_date'] = $this->convertToDateFormat($row['application_mode_date']);
+        $row['type_of_service_date'] = $this->convertToDateFormat($row['type_of_service_date']);
+        $row['collected_case_doc'] = $this->convertToDateFormat($row['collected_case_doc']);
+        $row['entry_date'] = $this->convertToDateFormat($row['entry_date']);
+        $row['next_court_date'] = $this->convertToDateFormat($row['next_court_date']);
+        $row['surrender_date'] = $this->convertToDateFormat($row['surrender_date']);
+        $row['prison_family_communication'] = $this->convertToDateFormat($row['prison_family_communication']);
+        $row['prison_legal_representation'] = $this->convertToDateFormat($row['prison_legal_representation']);
+        $row['prison_legal_representation_date'] = $this->convertToDateFormat($row['prison_legal_representation_date']);
+        $row['next_court_collection_date'] = $this->convertToDateFormat($row['next_court_collection_date']);
+        $row['witness_communication_prison'] = $this->convertToDateFormat($row['witness_communication_prison']);
+        $row['bail_bond_submission'] = $this->convertToDateFormat($row['bail_bond_submission']);
+        $row['court_order_communication'] = $this->convertToDateFormat($row['court_order_communication']);
+        $row['application_certified_copies'] = $this->convertToDateFormat($row['application_certified_copies']);
+        $row['other_legal_assistance_date'] = $this->convertToDateFormat($row['other_legal_assistance_date']);
+        $row['released_on'] = $this->convertToDateFormat($row['released_on']);
+        $row['released_on_date'] = $this->convertToDateFormat($row['released_on_date']);
+        $row['send_to_date'] = $this->convertToDateFormat($row['send_to_date']);
+        $row['convicted_sentence_expire'] = $this->convertToDateFormat($row['convicted_sentence_expire']);
+        $row['date_of_reliefe'] = $this->convertToDateFormat($row['date_of_reliefe']);
+        $row['file_closure_date'] = $this->convertToDateFormat($row['file_closure_date']);
+
+        
+        // Insert the row into the database
+        FormalCase::create([
+            'institute' => $row['institute'],
+            'central_id' => $row['central_id'],
+            'user_id' => auth()->id(),
+            'district_id' => Auth::user()->district_id,
+            'pngo_id' => Auth::user()->pngo_id,
+            'status' => $row['status'],
+            'full_name' => $row['full_name'],
+            'nick_name' => $row['nick_name'],
+            'father_name' => $row['father_name'],
+            'mother_name' => $row['mother_name'],
+            'sex' => $row['sex'],
+            'age' => $row['age'],
+            'disability' => $row['disability'],
+            'nationality' => $row['nationality'],
+            'nid_passport' => $row['nid_passport'],
+            'phone_number' => $row['phone_number'],
+            'address' => $row['address'],
+            'interview_date' => $row['interview_date'],
+            'interview_time' => $row['interview_time'],
+            'interview_place' => $row['interview_place'],
+            'marital_status' => $row['marital_status'],
+            'spouse_name' => $row['spouse_name'],
+            'education_level' => $row['education_level'],
+            'occupation' => $row['occupation'],
+            'monthly_income' => $row['monthly_income'],
+            'family_informed' => $row['family_informed'],
+            'children_with_prisoner' => $row['children_with_prisoner'],
+            'child_sex' => $row['child_sex'],
+            'child_age' => $row['child_age'],  // Now null if empty
+            'has_guardian' => $row['has_guardian'],
+            'guardian_name' => $row['guardian_name'],
+            'guardian_phone' => $row['guardian_phone'],
+            'guardian_address' => $row['guardian_address'],
+            'guardian_relation' => $row['guardian_relation'],
+            'guardian_surety' => $row['guardian_surety'],
+            'has_lawyer' => $row['has_lawyer'],
+            'lawyer_type' => $row['lawyer_type'],
+            'lawyer_name' => $row['lawyer_name'],
+            'lawyer_membership' => $row['lawyer_membership'],
+            'lawyer_phone' => $row['lawyer_phone'],
+            'incident_details' => $row['incident_details'],
+            'custody_status' => $row['custody_status'],
+            'charges_details' => $row['charges_details'],
+            'arrest_date' => $row['arrest_date'],
+            'case_no' => $row['case_no'],
+            'family_communication_date' => $row['family_communication_date'],
+            'legal_representation' => $row['legal_representation'],
+            'legal_representation_date' => $row['legal_representation_date'],
+            'collected_vokalatnama_date' => $row['collected_vokalatnama_date'],
+            'collected_case_doc' => $row['collected_case_doc'],
+            'identify_sureties' => $row['identify_sureties'],
+            'witness_communication_date' => $row['witness_communication_date'],
+            'medical_report_date' => $row['medical_report_date'],
+            'legal_assistance_date' => $row['legal_assistance_date'],
+            'assistance_under_custody_date' => $row['assistance_under_custody_date'],
+            'referral_service' => $row['referral_service'],
+            'referral_service_date' => $row['referral_service_date'],
+            'resolved_dispute_date' => $row['resolved_dispute_date'],
+            'appoint_lawyer_date' => $row['appoint_lawyer_date'],
+            'release_status' => $row['release_status'],
+            'fine_amount' => $row['fine_amount'],
+            'release_status_date' => $row['release_status_date'],
+            'application_mode' => $row['application_mode'],
+            'application_mode_date' => $row['application_mode_date'],
+            'received_application' => $row['received_application'],
+            'reference_no' => $row['reference_no'],
+            'type_of_service' => $row['type_of_service'],
+            'type_of_service_date' => $row['type_of_service_date'],
+            'service_description' => $row['service_description'],
+            'source_of_interview' => $row['source_of_interview'],
+            'prison_reg_no' => $row['prison_reg_no'],
+            'entry_date' => $row['entry_date'],
+            'case_transferred' => $row['case_transferred'],
+            'current_court' => $row['current_court'],
+            'case_status' => $row['case_status'],
+            'next_court_date' => $row['next_court_date'],
+            'facts_of_case' => $row['facts_of_case'],
+            'imprisonment_condition' => $row['imprisonment_condition'],
+            'special_condition' => $row['special_condition'],
+            'surrender_date' => $row['surrender_date'],
+            'released_on' => $row['released_on'],
+            'result_of_appeal' => $row['result_of_appeal'],
+            'date_of_reliefe' => $row['date_of_reliefe'],
+            'file_closure_date' => $row['file_closure_date'],
+        ]);
+    }
+
+    return redirect()->back()->with('success', 'Data Imported Successfully.');
+}
+
+// Function to convert date format to 'Y-m-d' using Carbon
+private function convertToDateFormat($date)
+{
+    if ($date) {
+        // Here, we'll try to convert different formats
+        try {
+            return Carbon::createFromFormat('d-M-y', $date)->format('Y-m-d');  // Example: 15-Jul-24 => 2024-07-15
+        } catch (\Exception $e) {
+            return null;  // Return null if the format is incorrect
+        }
+    }
+    return null;
+}
+
+
+    // Function to read Excel
+    private function readExcel($file)
+    {
+        return Excel::toArray([], $file)[0]; // Read the first sheet
     }
     
 
