@@ -73,9 +73,12 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/report', [ReportController::class, 'index'])->name('report.index');
     Route::get('/report1', [ReportController::class, 'showCaseAssistanceData'])->name('report.index1');
     Route::get('/report2', [ReportController::class, 'showCaseAssistanceData1'])->name('report.report2');
+
+    Route::get('district-list-report', [ReportController::class, 'district_report'])->name('district-list-report');
+    Route::post('/generate-pdf', [ReportController::class, 'generatePdf'])->name('generate-pdf');
     
 
-    Route::get('/generate-pdf', [PDFController::class, 'generatePDF']);
+    // Route::get('/generate-pdfs', [PDFController::class, 'generatePDF']);
 
 
 

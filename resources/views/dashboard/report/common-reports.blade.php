@@ -8,36 +8,25 @@
     <style>
         body {
             font-family: bangla;
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
         }
 
         .container {
             width: 100%;
             margin: 0 auto;
+            padding-bottom: 50px; /* Extra space to prevent content overlapping footer */
         }
 
         .header {
             margin-bottom: 30px;
         }
 
-        .photo {
-            float: left;
-            width: 15%;
-        }
-
         .school_info {
-            float: left;
             text-align: center;
-            width: 70%;
+            width: 100%;
         }
-
-        .right {
-            float: right;
-            width: 15%;
-            text-align: right;
-            padding-top: -90px;
-            /* Adjust as needed to vertically align the barcode with the logo */
-        }
-
 
         h1,
         h2 {
@@ -55,7 +44,6 @@
         h2 {
             font-size: 20px;
         }
-
 
         table {
             width: 100%;
@@ -95,25 +83,13 @@
 
 <body>
     <div class="container">
-        @php
-        $gs = \App\Models\Admin\GeneralSetting::find(1);
-        @endphp
         <!--mpdf
         <htmlpageheader name="myheader">
             <div class="header">
-                <div class="photo">
-                    <img src="{{ public_path('storage/img/logo/'.$gs->school_logo) }}" alt="School Logo">
-                </div>
                 <div class="school_info">
-                    <h1>{{$gs->school_title}}</h1>
-                    <p>{{$gs->school_address}}, Phone: {{$gs->school_phone}}, {{$gs->school_phone1}}</p>
-                    <p>Email: {{$gs->school_email}}, Web: {{url('/')}}</p>
-                </div>
-                <div class="right">
-                    <?php
-                    $barcodeImage = 'data:image/png;base64,' . DNS2D::getBarcodePNG('https://shalikhaschool.edu.bd/', 'QRCODE');
-                    echo '<img width="80%"  src="' . $barcodeImage . '" alt="barcode"  />';
-                    ?>
+                    <h1>GIZ Bangladesh</h1>
+                    <p>Dhaka, Phone: 01712105580, 01258457854</p>
+                    <p>Email: arifur@gmail.com, Web: {{url('/')}}</p>
                 </div>
             </div>
         </htmlpageheader>
@@ -121,8 +97,16 @@
         <sethtmlpageheader name="myheader" value="on" show-this-page="1" />
         mpdf-->
 
+        <!--mpdf
+    <htmlpagefooter name="myfooter">
+        <div style="text-align: center; font-size: 10px; padding: 10px 0; border-top: 1px solid #000;">
+            <p>Page {PAGENO} of {nbpg}</p>
+            <p>Powered by GIZ | © {{ date('Y') }} GIZ</p>
+        </div>
+    </htmlpagefooter>
 
-
+    <sethtmlpagefooter name="myfooter" value="on" />
+    mpdf-->
 
         <h2 style="text-align: center; margin-top: 0px; padding-top: 0px;">{!! $title !!}</h2>
 
@@ -130,8 +114,8 @@
 
         {!! $data !!}
 
-
     </div>
+    
 </body>
 
 </html>
