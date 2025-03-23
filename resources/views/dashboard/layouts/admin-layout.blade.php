@@ -27,7 +27,7 @@
         <div class="logo">DigiTrack</div>
         
         <ul>
-            @can('Dashboard')
+            @can('Admin Dashboard')
             <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             @endcan
         
@@ -151,62 +151,7 @@
             }
         });
     </script>
-
-    <script>
-        // District-wise Bar Chart
-        const districtBarCtx = document.getElementById('districtBarChart').getContext('2d');
-        new Chart(districtBarCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Dhaka', 'Chattogram', 'Khulna'],
-                datasets: [{
-                        label: 'Total Cases',
-                        data: [120, 100, 80],
-                        backgroundColor: '#007bff',
-                    },
-                    {
-                        label: 'Resolved',
-                        data: [90, 70, 50],
-                        backgroundColor: '#28a745',
-                    },
-                    {
-                        label: 'Pending',
-                        data: [30, 30, 30],
-                        backgroundColor: '#ffc107',
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                },
-            },
-        });
-
-        // PNGO-wise Doughnut Chart
-        const pngoDoughnutCtx = document.getElementById('pngoDoughnutChart').getContext('2d');
-        new Chart(pngoDoughnutCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['PNGO A', 'PNGO B', 'PNGO C'],
-                datasets: [{
-                    data: [100, 80, 70],
-                    backgroundColor: ['#007bff', '#28a745', '#ffc107'],
-                }],
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    },
-                },
-            },
-        });
-    </script>
+    
 </body>
 
 </html>

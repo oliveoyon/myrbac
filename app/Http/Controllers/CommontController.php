@@ -8,27 +8,10 @@ use App\Models\District;
 use App\Models\Pngo;
 use Illuminate\Support\Facades\DB;
 
-class ReportController extends Controller
+class CommontController extends Controller
 {
-    public function index()
-    {
-        $sexCounts = FormalCase::selectRaw('sex, count(*) as count')
-            ->whereIn('sex', ['Male', 'Female', 'Transgender'])
-            ->groupBy('sex')
-            ->get();
-
-        // Access the counts like this:
-        $maleCount = $sexCounts->where('sex', 'Male')->first()->count ?? 0;
-        $femaleCount = $sexCounts->where('sex', 'Female')->first()->count ?? 0;
-        $transgenderCount = $sexCounts->where('sex', 'Transgender')->first()->count ?? 0;
-
-        $below18Count = FormalCase::where('age', '<', 18)->count();
-
-
-        echo 'Male-'. $maleCount. ' Female-'. $femaleCount. ' Transgender- '. $transgenderCount.' Bellow 18-'. $below18Count;
-    }
-
-    public function showCaseAssistanceData()
+    
+    public function showCaseAssistanceData($did=Null, $pid=Null, $st=NULL)
     {
 
         // $districtId = $request->input('district_id', 1);
@@ -37,16 +20,13 @@ class ReportController extends Controller
         // $districtName = District::where('id', FormalCase::first()->district_id)->value('name');
         // $pngoName = Pngo::where('id', FormalCase::first()->pngo_id)->value('name');
 
-        $districtId = 1;
-        $pngoId = 1;
-        $status = 1;
-        
-        
+        $districtId = $did;
+        $pngoId = $pid;
+        $status = $st;
         $districtName = District::where('id', $districtId)->value('name');
         $pngoName = Pngo::where('id', $pngoId)->value('name');
 
         
-
         $data = FormalCase::select(
             'institute',
             DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
@@ -61,8 +41,7 @@ class ReportController extends Controller
         ->groupBy('institute')
         ->get();
         
-        
-        return view('dashboard.report.caseassisted', compact('data', 'districtName', 'pngoName'));
+        return $data;
     }
 
     private function buildCondition()

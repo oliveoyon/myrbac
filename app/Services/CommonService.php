@@ -1,34 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+// app/Services/CommonService.php
 
+namespace App\Services;
 use Illuminate\Http\Request;
 use App\Models\FormalCase;
 use App\Models\District;
 use App\Models\Pngo;
 use Illuminate\Support\Facades\DB;
 
-class ReportController extends Controller
+class CommonService
 {
-    public function index()
-    {
-        $sexCounts = FormalCase::selectRaw('sex, count(*) as count')
-            ->whereIn('sex', ['Male', 'Female', 'Transgender'])
-            ->groupBy('sex')
-            ->get();
-
-        // Access the counts like this:
-        $maleCount = $sexCounts->where('sex', 'Male')->first()->count ?? 0;
-        $femaleCount = $sexCounts->where('sex', 'Female')->first()->count ?? 0;
-        $transgenderCount = $sexCounts->where('sex', 'Transgender')->first()->count ?? 0;
-
-        $below18Count = FormalCase::where('age', '<', 18)->count();
-
-
-        echo 'Male-'. $maleCount. ' Female-'. $femaleCount. ' Transgender- '. $transgenderCount.' Bellow 18-'. $below18Count;
-    }
-
-    public function showCaseAssistanceData()
+    public function showCaseAssistanceData($did=Null, $pid=Null, $st=NULL)
     {
 
         // $districtId = $request->input('district_id', 1);
@@ -37,16 +20,16 @@ class ReportController extends Controller
         // $districtName = District::where('id', FormalCase::first()->district_id)->value('name');
         // $pngoName = Pngo::where('id', FormalCase::first()->pngo_id)->value('name');
 
-        $districtId = 1;
-        $pngoId = 1;
-        $status = 1;
-        
-        
+        $filter = ['district_id' => $did, 'pngo_id' => $pid, 'status' => $st];
+        $whr = array_filter($filter);
+
+        $districtId = $did;
+        $pngoId = $pid;
+        $status = $st;
         $districtName = District::where('id', $districtId)->value('name');
         $pngoName = Pngo::where('id', $pngoId)->value('name');
 
         
-
         $data = FormalCase::select(
             'institute',
             DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
@@ -55,14 +38,14 @@ class ReportController extends Controller
             DB::raw('COUNT(CASE WHEN age < 18 AND (' . $this->buildCondition() . ') THEN 1 END) as under_18'),
             DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
         )
-        ->where('district_id', $districtId)
-        ->where('pngo_id', $pngoId)
-        ->where('status', $status)
+        // ->where('district_id', $districtId)
+        // ->where('pngo_id', $pngoId)
+        // ->where('status', $status)
+        ->where($whr)
         ->groupBy('institute')
         ->get();
         
-        
-        return view('dashboard.report.caseassisted', compact('data', 'districtName', 'pngoName'));
+        return $data;
     }
 
     private function buildCondition()
@@ -107,39 +90,34 @@ class ReportController extends Controller
                 OR (institute = 'Police Station' AND ($policeCondition))";
     }
 
-
-    public function showCaseAssistanceData1()
+    public function showCaseAssistanceDistrictWise()
     {
+        // Define status value
         $status = 1;
 
-        // Fetch all districts and pngo_ids dynamically
-        $districts = District::all();
-        $pngos = Pngo::all();
-
-        // Fetch the data and group it by district_id and pngo_id
+        // Fetch the district data grouped by district_id
         $data = FormalCase::select(
             'district_id',
-            'pngo_id',
-            'institute',
             DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
             DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
             DB::raw('COUNT(CASE WHEN sex = "Transgender" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as transgender'),
             DB::raw('COUNT(CASE WHEN age < 18 AND (' . $this->buildCondition() . ') THEN 1 END) as under_18'),
             DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
         )
+        // Add condition to filter by status (if required)
         ->where('status', $status)
-        ->groupBy('district_id', 'pngo_id', 'institute')
+        ->groupBy('district_id') // Group by district only, not by institute
         ->get();
 
-        // Prepare data to display district and PNGO names for each result
-        $resultData = $data->map(function ($row) use ($districts, $pngos) {
+        // Fetch district names based on district_id
+        $districts = District::all();
+
+        // Map the data with district names
+        $resultData = $data->map(function ($row) use ($districts) {
             $districtName = $districts->where('id', $row->district_id)->first()->name ?? 'Unknown';
-            $pngoName = $pngos->where('id', $row->pngo_id)->first()->name ?? 'Unknown';
-            
+
             return [
                 'district_name' => $districtName,
-                'pngo_name' => $pngoName,
-                'institute' => $row->institute,
                 'male' => $row->male,
                 'female' => $row->female,
                 'transgender' => $row->transgender,
@@ -148,48 +126,47 @@ class ReportController extends Controller
             ];
         });
 
-        dd($resultData);
+        return $resultData;
+  
+    }
 
+    public function showCaseAssistancePngoWise()
+    {
+        // Define status value
+        $status = 1;
 
-        // Return the view with the processed data
-        return view('dashboard.report.caseassisted', compact('resultData'));
+        // Fetch the case data grouped by pngo_id
+        $data = FormalCase::select(
+            'pngo_id',
+            DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
+            DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
+            DB::raw('COUNT(CASE WHEN sex = "Transgender" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as transgender'),
+            DB::raw('COUNT(CASE WHEN age < 18 AND (' . $this->buildCondition() . ') THEN 1 END) as under_18'),
+            DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
+        )
+        ->where('status', $status)
+        ->groupBy('pngo_id') // Group by pngo_id instead of district_id
+        ->get();
+
+        // Fetch PNGO names based on pngo_id
+        $pngos = Pngo::all(); 
+
+        // Map the data with PNGO names
+        $resultData = $data->map(function ($row) use ($pngos) {
+            $pngoName = $pngos->where('id', $row->pngo_id)->first()->name ?? 'Unknown';
+
+            return [
+                'pngo_name' => $pngoName,
+                'male' => $row->male,
+                'female' => $row->female,
+                'transgender' => $row->transgender,
+                'under_18' => $row->under_18,
+                'total' => $row->total
+            ];
+        });
+
+        return $resultData;
     }
 
 
-
 }
-
-
-
-
-
-        // $data = FormalCase::select('institute', 
-        //             DB::raw('COUNT(*) as total'),
-        //             DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 THEN 1 END) as male'),
-        //             DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 THEN 1 END) as female'),
-        //             DB::raw('COUNT(CASE WHEN sex = "Transgender" AND age >= 18 THEN 1 END) as transgender'),
-        //             DB::raw('COUNT(CASE WHEN age < 18 THEN 1 END) as under_18')
-        //         )
-        //         ->groupBy('institute')
-        //         ->get();
-        
-        // Data only be counted when institute is court, and one of some of column are filled. will be following prison and police
-        
-        // $data = FormalCase::select('institute', 
-        //     DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
-        //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as male'),
-        //     DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
-        //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as female'),
-        //     DB::raw('COUNT(CASE WHEN sex = "Transgender" AND age >= 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
-        //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as transgender'),
-        //     DB::raw('COUNT(CASE WHEN age < 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
-        //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as under_18'),
-        //     DB::raw('COUNT(CASE WHEN (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
-        //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as total')
-        //     )->groupBy('institute')->get();
-

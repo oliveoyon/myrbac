@@ -1,0 +1,1 @@
+UPDATE `formal_cases` SET `pngo_id` = FLOOR(RAND() * 2) + 1;

@@ -7,12 +7,19 @@ use App\Models\District;
 use App\Models\Pngo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Services\CommonService;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        return view('dashboard.admin.dashboard');
+        $commonService = new CommonService();
+        // $data = $commonService->showCaseAssistanceData(Null,Null,Null);
+        $districtWise = $commonService->showCaseAssistanceDistrictWise();
+        $pngoWise = $commonService->showCaseAssistancePngoWise();
+        // dd($pngoWise);
+
+        return view('dashboard.admin.dashboard', compact('districtWise', 'pngoWise'));
     }
 
     public function districts()
