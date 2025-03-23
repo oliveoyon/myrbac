@@ -10,6 +10,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\FormalController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\PDFController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -68,9 +69,13 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view');
     Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store');
 
+    // Reporting purpose
     Route::get('/report', [ReportController::class, 'index'])->name('report.index');
     Route::get('/report1', [ReportController::class, 'showCaseAssistanceData'])->name('report.index1');
     Route::get('/report2', [ReportController::class, 'showCaseAssistanceData1'])->name('report.report2');
+    
+
+    Route::get('/generate-pdf', [PDFController::class, 'generatePDF']);
 
 
 
