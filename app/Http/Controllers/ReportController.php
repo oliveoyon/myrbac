@@ -160,12 +160,11 @@ class ReportController extends Controller
     {
         $send['data'] = $request->input('pdf_data');
         $send['title'] = $request->input('title');
+        $fname = $request->input('fname');
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4',
             'orientation' => $request->input('orientation'),
-            // 'margin_left' => 5,
-            // 'margin_right' => 5,
             'margin_top' => 35,
             'margin_bottom' => 5,
             'margin_header' => 5,
@@ -174,18 +173,18 @@ class ReportController extends Controller
         $mpdf->setAutoBottomMargin = 'stretch';
 
         $mpdf->SetAutoPageBreak(true);
-        $mpdf->SetAuthor('IconBangla');
+        $mpdf->SetAuthor('GIZ');
 
         $bladeViewPath = 'dashboard.report.common-reports';
         $html = view($bladeViewPath, $send)->render();
         $mpdf->WriteHTML($html);
 
         // Save the PDF file in the public folder
-        $pdfFilePath = public_path('invoice.pdf');
+        $pdfFilePath = public_path($fname);
         $mpdf->Output($pdfFilePath, 'F');
 
         // Construct the public URL of the saved PDF
-        $pdfUrl = url('invoice.pdf');
+        $pdfUrl = url($fname);
 
         // Return a JSON response with the PDF URL and a success message
         return response()->json(['pdf_url' => $pdfUrl, 'message' => 'PDF generated successfully']);
@@ -194,7 +193,7 @@ class ReportController extends Controller
 
     public function district_report()
     {
-        $send['districts'] = FormalCase::get();
+        $send['districts'] = District::get();
         return view('dashboard.report.district-list', $send);
     }
 

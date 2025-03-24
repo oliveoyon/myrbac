@@ -1197,14 +1197,55 @@
 
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingSeventeen">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseSeventeen" aria-expanded="true"
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseSeventeen" aria-expanded="false"
                                 aria-controls="collapseSeventeen">
-                                17. Upload Additional Documents
+                                17. Follow-Up Intervention Details
                             </button>
                         </h2>
-                        <div id="collapseSeventeen" class="accordion-collapse collapse show"
-                            aria-labelledby="headingSeventeen" data-bs-parent="#caseFormAccordion">
+                        <div id="collapseSeventeen" class="accordion-collapse collapse" aria-labelledby="headingSeventeen"
+                            data-bs-parent="#caseFormAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-3">
+                                    <!-- Intervention Taken -->
+                                    <div class="col-md-12">
+                                        <label for="intervention_taken" class="form-label">Intervention Taken</label>
+                                        <textarea class="form-control" id="intervention_taken" name="intervention_taken" rows="4"></textarea>
+                                    </div>
+                    
+                                    <!-- Intervention Taken Date -->
+                                    <div class="col-md-4">
+                                        <label for="intervention_taken_date" class="form-label">Intervention Taken Date</label>
+                                        <input type="date" class="form-control" id="intervention_taken_date" name="intervention_taken_date">
+                                    </div>
+                    
+                                    <!-- Intervention To Be Taken -->
+                                    <div class="col-md-12">
+                                        <label for="intervention_to_be_taken" class="form-label">Intervention To Be Taken</label>
+                                        <textarea class="form-control" id="intervention_to_be_taken" name="intervention_to_be_taken" rows="4"></textarea>
+                                    </div>
+                    
+                                    <!-- To Be Taken Date -->
+                                    <div class="col-md-4">
+                                        <label for="to_be_taken_date" class="form-label">To Be Taken Date</label>
+                                        <input type="date" class="form-control" id="to_be_taken_date" name="to_be_taken_date">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingEighteen">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseEighteen" aria-expanded="true"
+                                aria-controls="collapseSeventeen">
+                                18. Upload Additional Documents
+                            </button>
+                        </h2>
+                        <div id="collapseEighteen" class="accordion-collapse collapse show"
+                            aria-labelledby="headingEighteen" data-bs-parent="#caseFormAccordion">
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-6">
@@ -1216,6 +1257,7 @@
                             </div>
                         </div>
                     </div>
+                    
 
                     <div class="mt-3">
                         <button type="submit" class="btnCustom btn btn-primary">Submit</button>

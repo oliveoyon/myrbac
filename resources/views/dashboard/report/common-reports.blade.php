@@ -108,7 +108,7 @@
     <sethtmlpagefooter name="myfooter" value="on" />
     mpdf-->
 
-        <h2 style="text-align: center; margin-top: 0px; padding-top: 0px;">{!! $title !!}</h2>
+        <h2 style="text-align: center; margin-top: 0px; padding-top: 0px; font-family: SolaimanLipi">{!! $title !!}</h2>
 
         <div style="clear: both;"></div> <!-- Clear the float -->
 

@@ -12,10 +12,14 @@ class PDFController extends Controller
         try {
             $mpdf = new Mpdf();
 
-            $html = '<h1>Laravel mPDF Example</h1>
-                     <p>This is a sample PDF generated using mPDF in Laravel.</p>';
+            $bladeViewPath = 'dashboard.report.formtest';
+            $html = view($bladeViewPath)->render();
 
             $mpdf->WriteHTML($html);
+
+            // $pdfFilePath = public_path('hello.pdf');
+            // $mpdf->Output($pdfFilePath, 'F');
+
             $mpdf->Output('sample.pdf', 'D'); // 'D' forces download; use 'I' for inline view
 
         } catch (\Exception $e) {

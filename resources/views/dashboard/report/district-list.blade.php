@@ -80,13 +80,13 @@
                             <table class="table table-bordered table-striped table-hover table-sm" id="class-table">
                                 <thead style="border-top: 1px solid #b4b4b4">
                                     <th style="width: 10px">#</th>
-                                    <th>District Name</th>
+                                    <th style="font-family: SolaimanLipi">District Name  প্রোফাইল নম্বর</th>
                                 </thead>
                                 <tbody>
                                     @foreach ($districts as $district)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td class="font-weight-bold">{{ $district->central_id }}</td>
+                                            <td class="font-weight-bold">{{ $district->name }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -117,6 +117,7 @@
                 pdf_data: data,
                 title: 'District List',
                 orientation: 'P',
+                fname: 'District List.pdf',
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

@@ -78,7 +78,7 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::post('/generate-pdf', [ReportController::class, 'generatePdf'])->name('generate-pdf');
     
 
-    // Route::get('/generate-pdfs', [PDFController::class, 'generatePDF']);
+    Route::get('/generate-pdfs', [PDFController::class, 'generatePDF']);
 
 
 
