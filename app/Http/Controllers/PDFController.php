@@ -20,7 +20,7 @@ class PDFController extends Controller
             // $pdfFilePath = public_path('hello.pdf');
             // $mpdf->Output($pdfFilePath, 'F');
 
-            $mpdf->Output('sample.pdf', 'D'); // 'D' forces download; use 'I' for inline view
+            $mpdf->Output('sample.pdf', 'I'); // 'D' forces download; use 'I' for inline view
 
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()]);
