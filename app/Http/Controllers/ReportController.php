@@ -247,6 +247,101 @@ class ReportController extends Controller
         return response()->json(['pdf_url' => $pdfUrl, 'message' => 'PDF generated successfully']);
     }
 
+    public function getFormalCaseStats()
+    {
+        $fields = [
+            'family_communication_date',
+            'legal_representation',
+            'legal_representation_date',
+            'collected_vokalatnama_date',
+            'collected_case_doc',
+            'identify_sureties',
+            'witness_communication_date',
+            'medical_report_date',
+            'legal_assistance_date',
+            'assistance_under_custody_date',
+            'referral_service',
+            'referral_service_date',
+        ];
+
+        $districtId = 1; // Set your district ID
+        $pngoId = 1; // Set your PNGO ID
+
+        $results = collect($fields)->map(function ($field) use ($districtId, $pngoId) {
+            return FormalCase::selectRaw("
+                '$field' AS field,
+                SUM(CASE WHEN sex = 'Male' AND age >= 18 THEN 1 ELSE 0 END) AS adult_males,
+                SUM(CASE WHEN sex = 'Female' AND age >= 18 THEN 1 ELSE 0 END) AS adult_females,
+                SUM(CASE WHEN sex = 'Transgender' AND age >= 18 THEN 1 ELSE 0 END) AS adult_transgenders,
+                SUM(CASE WHEN age < 18 THEN 1 ELSE 0 END) AS under_18,
+                COUNT(*) AS total
+            ")
+            ->whereNotNull($field)
+            // ->where('district_id', $districtId)
+            // ->where('pngo_id', $pngoId)
+            ->first();
+        });
+
+        dd($results);
+
+        return response()->json($results);
+    }
+    
+    public function customReport()
+    {
+        $fields = include(app_path('Services/DbFields.php'));
+        return view('dashboard.report.custom-report', compact('fields'));
+    }
+
+    public function generateCustomReport(Request $request)
+    {
+        $fields = $request->input('fields', []); // 'fields' is the name of the checkbox array in your form
+        $flatFields = collect($fields)->flatMap(function ($fieldGroup) {
+            return is_array($fieldGroup) ? $fieldGroup : [$fieldGroup];
+        })->all(); 
+        if (empty($flatFields)) {
+            return redirect()->back()->with('error', 'No fields selected');
+        }
+
+        $fields = [
+            'family_communication_date',
+            'legal_representation',
+            'legal_representation_date',
+            'collected_vokalatnama_date',
+            'collected_case_doc',
+            'identify_sureties',
+            'witness_communication_date',
+            'medical_report_date',
+            'legal_assistance_date',
+            'assistance_under_custody_date',
+            'referral_service',
+            'referral_service_date',
+        ];
+
+        $districtId = 1; // Set your district ID
+        $pngoId = 1; // Set your PNGO ID
+
+        $results = collect($flatFields)->map(function ($field) use ($districtId, $pngoId) {
+            return FormalCase::selectRaw("
+                '$field' AS field,
+                SUM(CASE WHEN sex = 'Male' AND age >= 18 THEN 1 ELSE 0 END) AS adult_males,
+                SUM(CASE WHEN sex = 'Female' AND age >= 18 THEN 1 ELSE 0 END) AS adult_females,
+                SUM(CASE WHEN sex = 'Transgender' AND age >= 18 THEN 1 ELSE 0 END) AS adult_transgenders,
+                SUM(CASE WHEN age < 18 THEN 1 ELSE 0 END) AS under_18,
+                COUNT(*) AS total
+            ")
+            ->whereNotNull($field)
+            // ->where('district_id', $districtId)
+            // ->where('pngo_id', $pngoId)
+            ->first();
+        });
+
+        dd($results);
+    }
+
+
+
+
 
 
 }
