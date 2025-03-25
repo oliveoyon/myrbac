@@ -76,6 +76,13 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
 
     Route::get('district-list-report', [ReportController::class, 'district_report'])->name('district-list-report');
     Route::post('/generate-pdf', [ReportController::class, 'generatePdf'])->name('generate-pdf');
+
+    Route::get('case-list', [ReportController::class, 'districtWiseCaselist'])->name('case_list');
+    Route::post('/case-list', [ReportController::class, 'districtWiseCaselistDetail'])->name('case_list1');
+
+
+    Route::post('/generate-form', [ReportController::class, 'generateForm'])->name('generate-form');
+
     
 
     Route::get('/generate-pdfs', [PDFController::class, 'generatePDF']);

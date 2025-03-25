@@ -197,6 +197,56 @@ class ReportController extends Controller
         return view('dashboard.report.district-list', $send);
     }
 
+    public function districtWiseCaselist()
+    {
+        $districts = District::all();
+        $pngos = Pngo::all();
+        return view('dashboard.report.case_list', compact('districts', 'pngos'));
+    }
+
+    public function districtWiseCaselistDetail(Request $request)
+    {
+        $whr = ['district_id' => $request->district_id,'pngo_id' => $request->pngo_id,];
+        $whr = array_filter($whr);
+        $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])->where($whr)->get();
+        return response()->json(['cases' => $cases]);
+    }
+
+    public function generateForm(Request $request)
+    {
+        $send['details'] = FormalCase::find($request->id);
+        $send['data'] = $request->input('pdf_data');
+        $send['title'] = $request->input('title');
+        $fname = $request->input('fname');
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'orientation' => $request->input('orientation'),
+            'margin_top' => 5,
+            'margin_bottom' => 5,
+            'margin_header' => 5,
+        ]);
+
+        $mpdf->setAutoBottomMargin = 'stretch';
+
+        $mpdf->SetAutoPageBreak(true);
+        $mpdf->SetAuthor('GIZ');
+
+        $bladeViewPath = 'dashboard.report.formtest';
+        $html = view($bladeViewPath, $send)->render();
+        $mpdf->WriteHTML($html);
+
+        // Save the PDF file in the public folder
+        $pdfFilePath = public_path($fname);
+        $mpdf->Output($pdfFilePath, 'F');
+
+        // Construct the public URL of the saved PDF
+        $pdfUrl = url($fname);
+
+        // Return a JSON response with the PDF URL and a success message
+        return response()->json(['pdf_url' => $pdfUrl, 'message' => 'PDF generated successfully']);
+    }
+
 
 
 }

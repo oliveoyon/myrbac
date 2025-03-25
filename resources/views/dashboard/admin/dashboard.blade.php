@@ -60,7 +60,7 @@
             <!-- District-wise Data -->
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header text-bg-secondary">
                         <h5>District-wise Data Overview</h5>
                     </div>
                     <div class="card-body">
@@ -104,7 +104,7 @@
             <!-- PNGO-wise Data -->
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header text-bg-secondary">
                         <h5>PNGO-wise Contributions</h5>
                     </div>
                     <div class="card-body">
@@ -147,7 +147,7 @@
         </div>
 
         <!-- Progress Section -->
-        <div class="row mt-4">
+        {{-- <div class="row mt-4">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
@@ -254,7 +254,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 </section>
 

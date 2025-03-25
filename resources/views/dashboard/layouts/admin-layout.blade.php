@@ -52,11 +52,12 @@
             </li>
 
             <li><a href="{{ route('form.index') }}"><i class="fas fa-database"></i> Data Entry Forms</a></li>
+            <li><a href="{{ route('import.view') }}"><i class="fas fa-database"></i> Bulk Data Entry</a></li>
         
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-file-alt"></i> Reports & Analytics</a>
                 <ul class="submenu">
-                    <li><a href="#"><i class="fas fa-chart-bar"></i> User Activity Report</a></li>
+                    <li><a href="{{ route('case_list') }}"><i class="fas fa-chart-bar"></i> Case List</a></li>
                     <li><a href="#"><i class="fas fa-user-clock"></i> Login History</a></li>
                     <li><a href="#"><i class="fas fa-lock"></i> Access Logs</a></li>
                 </ul>

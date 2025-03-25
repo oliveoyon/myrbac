@@ -66,11 +66,11 @@
         line-height: 12px;
     }
 </style>
-    </head>
+    </head> 
     <body>
         <div class="font">
             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:108%; font-size:14pt;"><strong><span style="font-family:Arial;">&nbsp;&nbsp;&nbsp;&nbsp;</span></strong></p>
-            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:108%; font-size:14pt;"><strong><span style="font-family:Arial;">SUPPORT IN</span></strong><strong><span style="font-family:Arial;">&nbsp; </span></strong><input type="checkbox" name="Check83" checked="checked"><strong><span style="font-family:Arial;">&nbsp;COURT&nbsp;</span></strong><input type="checkbox" name="Check83"><strong><span style="font-family:Arial;">&nbsp;POLICE STATION&nbsp;</span></strong><input type="checkbox" name="Check83"><strong><span style="font-family:Arial;">&nbsp;PRISON</span></strong></p>
+            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:108%; font-size:14pt;"><strong><span style="font-family:Arial;">SUPPORT IN</span></strong><strong><span style="font-family:Arial;">&nbsp; </span></strong><input type="checkbox" name="Check83" <?php echo ($details->institute == 'Court') ? 'checked="checked"' : ''; ?>><strong><span style="font-family:Arial;">&nbsp;COURT&nbsp;</span></strong><input type="checkbox" name="Check83" <?php echo ($details->institute == 'Police Station') ? 'checked="checked"' : ''; ?>><strong><span style="font-family:Arial;">&nbsp;POLICE STATION&nbsp;</span></strong><input type="checkbox" name="Check83" <?php echo ($details->institute == 'Prison') ? 'checked="checked"' : ''; ?>><strong><span style="font-family:Arial;">&nbsp;PRISON</span></strong></p>
             <p style="margin-top:0pt; margin-bottom:0pt; line-height:108%; font-size:7pt;"><span style="font-family:Arial;">&nbsp;</span></p>
             <ol type="A" style="margin:0pt; padding-left:0pt;">
                 <li style="margin-left:102.5pt; text-align:center; line-height:normal; padding-left:1pt; font-family:Arial; font-size:12pt; font-weight:bold;"><span style="font-size:11pt;">&nbsp;</span><u><span style="font-family: bangla, sans-serif;">প্রোফাইল তথ্য </span></u><u>(PROFILE INFORMATION)</u></li>
@@ -84,7 +84,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><strong><span style="font-family:bangla;">প্রোফাইল নম্বর /সেন্ট্রাল আইডি নং</span></strong><strong><span style="font-family:Arial;"> </span></strong><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;">(</span></strong><strong><span style="line-height:115%; font-family:Arial; font-size:9pt;">PROFILE NO/ CENTRAL ID NO) </span></strong></p>
                         </td>
                         <td style="width:259.2pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span>{{ $details->central_id }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -92,7 +92,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><strong><span style="font-family:bangla;">জেলা </span></strong><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;">(District) </span></strong></p>
                         </td>
                         <td style="width:259.2pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span>{{ $details->district->name; }}</p>
                         </td>
                     </tr>
                 </tbody>
@@ -119,10 +119,10 @@
                     </tr>
                     <tr style="height:6pt;">
                         <td colspan="3" style="width:178.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">Arifur Rahman</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">{{ $details->full_name; }}</span></p>
                         </td>
                         <td colspan="3" style="width:128.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span>{{ $details->nick_name; }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -133,7 +133,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">পিতার নাম&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Father&rsquo;s Name)</span></p>
                         </td>
                         <td colspan="6" style="width:317.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;"></span>{{ $details->father_name; }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -144,7 +144,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">মাতার নাম&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Mother&rsquo;s Name)</span></p>
                         </td>
                         <td colspan="6" style="width:317.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;"></span>{{ $details->mother_name; }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -157,16 +157,15 @@
                         <td colspan="6" style="width:317.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                         <?php $sex = 'Female'; ?>
                         <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;">
-    <input type="checkbox" name="Check83" <?php echo ($sex == 'Male') ? 'checked="checked"' : ''; ?>>
-    <span style="font-family:bangla;">পুরুষ</span> (Male) &nbsp;&nbsp;
+                            <input type="checkbox" name="Check83" <?php echo ($details->sex == 'Male') ? 'checked="checked"' : ''; ?>>
+                            <span style="font-family:bangla;">পুরুষ</span> (Male) &nbsp;&nbsp;
 
-    <input type="checkbox" name="Check83" <?php echo ($sex == 'Female') ? 'checked="checked"' : ''; ?>>
-    <span style="font-family:bangla;">নারী</span> (Female) &nbsp;&nbsp;
+                            <input type="checkbox" name="Check83" <?php echo ($details->sex == 'Female') ? 'checked="checked"' : ''; ?>>
+                            <span style="font-family:bangla;">নারী</span> (Female) &nbsp;&nbsp;
 
-    <input type="checkbox" name="Check83" <?php echo ($sex == 'Transgender Person') ? 'checked="checked"' : ''; ?>>
-    <span style="font-family:bangla;">ট্রান্সজেন্ডার পার্সন</span> (Transgender Person)
-</p>
-
+                            <input type="checkbox" name="Check83" <?php echo ($details->sex == 'Transgender') ? 'checked="checked"' : ''; ?>>
+                            <span style="font-family:bangla;">ট্রান্সজেন্ডার পার্সন</span> (Transgender Person)
+                        </p> 
                         </td>
                     </tr>
                     <tr>
@@ -177,7 +176,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">বয়স</span><span style="line-height:115%; font-family:bangla; font-size:10pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Age)</span><span style="line-height:115%; font-family:SutonnyMJ; font-size:10pt;">&nbsp;</span></p>
                         </td>
                         <td colspan="6" style="width:317.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span>{{ $details->age }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -188,10 +187,10 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">প্রতিবন্ধিতা</span><span style="line-height:115%; font-family:bangla; font-size:10pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Disability)</span></p>
                         </td>
                         <td colspan="2" style="width:92.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check90"><span style="line-height:115%; font-family:bangla; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">&nbsp;</span><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check90" <?php echo ($details->disability == 'Yes') ? 'checked="checked"' : ''; ?>><span style="line-height:115%; font-family:bangla; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">&nbsp;</span><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span></p>
                         </td>
                         <td colspan="4" style="width:214.2pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="line-height:115%; font-family:'Times New Roman'; font-size:10pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><input type="checkbox" name="Check90"><span style="line-height:115%; font-family:'Times New Roman'; font-size:10pt;">&nbsp;</span><span style="font-family:'Times New Roman';">&nbsp;</span><span style="font-family:bangla;">না</span><span style="font-family:'Times New Roman';">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="line-height:115%; font-family:'Times New Roman'; font-size:10pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><input type="checkbox" name="Check90" <?php echo ($details->disability == 'No') ? 'checked="checked"' : ''; ?>><span style="line-height:115%; font-family:'Times New Roman'; font-size:10pt;">&nbsp;</span><span style="font-family:'Times New Roman';">&nbsp;</span><span style="font-family:bangla;">না</span><span style="font-family:'Times New Roman';">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
                         </td>
                     </tr>
                     <tr>
@@ -202,7 +201,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">জাতীয়তা</span><span style="line-height:115%; font-family:bangla; font-size:10pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Nationality)</span></p>
                         </td>
                         <td colspan="6" style="width:317.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;"></span>{{ $details->nationality }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -213,7 +212,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">জাতীয় পরিচয়পত্র/ পাসপোর্ট নং/ জন্ম নিবন্ধন নং&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">[National ID/ Passport No/ Birth Certificate No.]</span></p>
                         </td>
                         <td colspan="6" style="width:317.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">{{ $details->nid_passport }}</span></p>
                         </td>
                     </tr>
                     <tr>
@@ -229,7 +228,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">বাসা/ গ্রাম&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(House/ Village)</span></p>
                         </td>
                         <td style="width:2.7pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">:</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">:</span>{{ $details->address }}</p>
                         </td>
                         <td style="width:79.2pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
@@ -292,7 +291,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">ফোন নাম্বার&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Phone Number)</span></p>
                         </td>
                         <td colspan="6" style="width:317.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">(</span><span style="font-family:bangla;">১</span><span style="font-family:Arial;">)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">(</span><span style="font-family:bangla;">১</span><span style="font-family:Arial;">)</span>&nbsp; {{ $details->phone_number }}</p>
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:1pt;"><span style="font-family:Arial;">&nbsp;</span></p>
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">(</span><span style="font-family:bangla;">২</span><span style="font-family:Arial;">)</span></p>
                         </td>
@@ -332,7 +331,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">সাক্ষাৎকার গ্রহণের তারিখ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Date of Interview)</span></p>
                         </td>
                         <td style="width:142.2pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><strong><span style="font-family:Arial;">&nbsp;</span></strong></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><strong><span style="font-family:Arial;"></span></strong>{{ \Carbon\Carbon::parse($details->interview_date)->format('j M Y') }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -343,7 +342,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">সাক্ষাৎকার গ্রহণের সময়&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Time of Interview)</span></p>
                         </td>
                         <td style="width:142.2pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><strong><span style="font-family:Arial;">&nbsp;</span></strong></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><strong><span style="font-family:Arial;">{{ \Carbon\Carbon::parse($details->interview_time)->format('g:i A') }}</span></strong></p>
                         </td>
                     </tr>
                     <tr>
@@ -354,7 +353,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="line-height:115%; font-family:bangla; font-size:10.5pt;">সাক্ষাৎকার গ্রহণের স্থান, থানা/ আদালত/ কারাগারের নাম</span><span style="font-family:bangla;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Place of Interview, Name of police station/court/ prison)</span></p>
                         </td>
                         <td style="width:142.2pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><strong><span style="font-family:Arial;">&nbsp;</span></strong></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><strong><span style="font-family:Arial;"></span></strong>{{ $details->interview_place }}</p>
                         </td>
                     </tr>
                 </tbody>
@@ -377,12 +376,12 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">বৈবাহিক অবস্থা&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Marital Status)</span></p>
                         </td>
                         <td style="width:119.7pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><span style="font-family:bangla;">&nbsp;বিবাহিত</span><strong><span style="font-family:'Nirmala UI';"> </span></strong><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Married)</span></p>
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><span style="font-family:bangla;">&nbsp;অবিবাহিত&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Single)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->marital_status == 'Married') ? 'checked="checked"' : ''; ?>><span style="font-family:bangla;">&nbsp;বিবাহিত</span><strong><span style="font-family:'Nirmala UI';"> </span></strong><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Married)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->marital_status == 'Single') ? 'checked="checked"' : ''; ?>><span style="font-family:bangla;">&nbsp;অবিবাহিত&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Single)</span></p>
                         </td>
                         <td style="width:142.2pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><span style="font-family:bangla;">&nbsp;তালাকপ্রাপ্ত&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Divorced)</span></p>
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><span style="font-family:bangla;">&nbsp;বিধবা/ বিপত্নীক&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Widow)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->marital_status == 'Devorced') ? 'checked="checked"' : ''; ?>><span style="font-family:bangla;">&nbsp;তালাকপ্রাপ্ত&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Divorced)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->marital_status == 'Widowed') ? 'checked="checked"' : ''; ?>><span style="font-family:bangla;">&nbsp;বিধবা/ বিপত্নীক&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Widow)</span></p>
                         </td>
                     </tr>
                     <tr>
@@ -393,7 +392,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">যদি বিবাহিত হয় তবে, স্বামী/ স্ত্রীর নাম&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(If married then, Spouse Name)</span></p>
                         </td>
                         <td colspan="2" style="width:272.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">{{ $details->spouse_name }}</span></p>
                         </td>
                     </tr>
                     <tr style="height:6.45pt;">
@@ -404,31 +403,31 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">শিক্ষাগত যোগ্যতা&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Level of education)</span></p>
                         </td>
                         <td style="width:119.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">নিরক্ষর&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Illiterate)</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">&nbsp;&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83" <?php echo ($details->education_level == 'Illiterate') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">নিরক্ষর&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Illiterate)</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">&nbsp;&nbsp;</span></p>
                         </td>
                         <td style="width:142.2pt; border-top-style:solid; border-top-width:0.75pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">উচ্চ ম্যাধমিক</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Higher Secondary)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83" <?php echo ($details->education_level == 'Higher Secondary') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">উচ্চ ম্যাধমিক</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Higher Secondary)</span></p>
                         </td>
                     </tr>
                     <tr style="height:6.35pt;">
                         <td style="width:119.7pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">স্বাক্ষরজ্ঞান সম্পন্ন</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Can sign)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83" <?php echo ($details->education_level == 'Can Sign') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">স্বাক্ষরজ্ঞান সম্পন্ন</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Can sign)</span></p>
                         </td>
                         <td style="width:142.2pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83"><strong><span style="font-family:Arial;"> </span></strong><span style="font-family:bangla;">স্নাতক</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Graduate)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83" <?php echo ($details->education_level == 'Graduate') ? 'selected="selected"' : ''; ?>><strong><span style="font-family:Arial;"> </span></strong><span style="font-family:bangla;">স্নাতক</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Graduate)</span></p>
                         </td>
                     </tr>
                     <tr style="height:6.35pt;">
                         <td style="width:119.7pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">প্রাথমিক</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Primary)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83" <?php echo ($details->education_level == 'Primary') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">প্রাথমিক</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Primary)</span></p>
                         </td>
                         <td style="width:142.2pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">স্নাতকত্তোর</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Postgraduate)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83" <?php echo ($details->education_level == 'Postgraduate') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">স্নাতকত্তোর</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Postgraduate)</span></p>
                         </td>
                     </tr>
                     <tr style="height:6.35pt;">
                         <td style="width:119.7pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">ম্যাধমিক</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Secondary)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10.5pt;"><input type="checkbox" name="Check83" <?php echo ($details->education_level == 'Secondary') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:9.5pt;"> </span></strong><span style="font-family:bangla;">ম্যাধমিক</span><span style="line-height:115%; font-family:bangla; font-size:9.5pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:9.5pt;">(Secondary)</span></p>
                         </td>
                         <td style="width:142.2pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:9.5pt;"><strong><span style="font-family:Arial;">&nbsp;</span></strong></p>
@@ -442,7 +441,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><span style="font-family:bangla;">পেশা&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(Occupation)</span><span style="font-family:bangla;">&nbsp;</span><span style="font-family:Arial;">[</span><span style="font-family:bangla;">কারাবন্দীর ক্ষেত্রে গ্রেফতারের সময় পেশা&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(Occupation at time of arrest)</span><span style="font-family:Arial;">]</span></p>
                         </td>
                         <td colspan="2" style="width:272.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->occupation }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -453,7 +452,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><span style="font-family:bangla;">সর্বশেষ মাসিক আয়&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(Last monthly income)</span><span style="font-family:bangla; font-size:10pt;">&nbsp;</span><span style="font-family:Arial;">[</span><span style="font-family:bangla;">কারাবন্দীর ক্ষেত্রে গ্রেফতারের সময়&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(Income at time of arrest)</span><span style="font-family:Arial;">]</span></p>
                         </td>
                         <td colspan="2" style="width:272.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->monthly_income }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -464,7 +463,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><span style="font-family:bangla;">পরিবার/আত্মীয়রা কেউ তার বিরোধ/মামলা/গ্রেফতারের বিষয়ে জানে কি না?&nbsp;</span><span style="font-family:Arial; font-size:9.5pt;">(Have family/relative been informed about his/her dispute/case/arrest?)</span></p>
                         </td>
                         <td colspan="2" style="width:272.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="font-family:bangla;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->family_informed == 'Yes') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="font-family:bangla;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83" <?php echo ($details->family_informed == 'No') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
                         </td>
                     </tr>
                 </tbody>
@@ -482,7 +481,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">নারী বন্দীর সাথে কি শিশু (এক বা একাধিক) কারাগারে অবস্থান করছে?&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">[Are there children (one or more) accompanying with the female prisoner?]</span></p>
                         </td>
                         <td colspan="3" style="width:185.25pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="font-family:bangla;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->children_with_prisoner == 'Yes') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="font-family:bangla;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83"<?php echo ($details->children_with_prisoner == 'No') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
                         </td>
                     </tr>
                     <tr style="height:17.15pt;">
@@ -496,13 +495,13 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">Sex</span></p>
                         </td>
                         <td colspan="2" style="width:204.15pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><input type="checkbox" name="Check83"><span style="font-family:Arial;">&nbsp;Male&nbsp;</span><input type="checkbox" name="Check83"><span style="font-family:Arial;">&nbsp;Female&nbsp;</span><input type="checkbox" name="Check83"><span style="font-family:Arial;">&nbsp;Transgender Person</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><input type="checkbox" name="Check83" <?php echo ($details->child_sex == 'Male') ? 'selected="selected"' : ''; ?>><span style="font-family:Arial;">&nbsp;Male&nbsp;</span><input type="checkbox" name="Check83" <?php echo ($details->child_sex == 'Female') ? 'selected="selected"' : ''; ?>><span style="font-family:Arial;">&nbsp;Female&nbsp;</span><input type="checkbox" name="Check83" <?php echo ($details->child_sex == 'Transgender') ? 'selected="selected"' : ''; ?>><span style="font-family:Arial;">&nbsp;Transgender Person</span></p>
                         </td>
                         <td style="width:16.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">Age</span></p>
                         </td>
                         <td style="width:34.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:Arial;"></span>{{ $details->child_age }}</p>
                         </td>
                     </tr>
                     <tr style="height:12pt;">

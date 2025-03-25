@@ -36,4 +36,15 @@ class FormalCase extends Model
         'released_on_date', 'send_to', 'send_to_date', 'convicted_length', 
         'convicted_sentence_expire', 'result_of_appeal', 'date_of_reliefe', 'file_closure_date'
     ];
+
+    public function district()
+    {
+        return $this->belongsTo(District::class, 'district_id');
+    }
+
+    public function pngo()
+    {
+        return $this->belongsTo(Pngo::class, 'pngo_id');
+    }
+
 }
