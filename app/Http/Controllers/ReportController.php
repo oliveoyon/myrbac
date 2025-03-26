@@ -165,7 +165,7 @@ class ReportController extends Controller
             'mode' => 'utf-8',
             'format' => 'A4',
             'orientation' => $request->input('orientation'),
-            'margin_top' => 35,
+            'margin_top' => 30,
             'margin_bottom' => 5,
             'margin_header' => 5,
         ]);
@@ -289,8 +289,10 @@ class ReportController extends Controller
     
     public function customReport()
     {
+        $districts = District::all();
+        $pngos = Pngo::all();
         $fields = include(app_path('Services/DbFields.php'));
-        return view('dashboard.report.custom-report', compact('fields'));
+        return view('dashboard.report.custom-report', compact('fields', 'districts', 'pngos'));
     }
 
     public function generateCustomReport(Request $request)
@@ -299,29 +301,20 @@ class ReportController extends Controller
         $flatFields = collect($fields)->flatMap(function ($fieldGroup) {
             return is_array($fieldGroup) ? $fieldGroup : [$fieldGroup];
         })->all(); 
+
         if (empty($flatFields)) {
             return redirect()->back()->with('error', 'No fields selected');
         }
 
-        $fields = [
-            'family_communication_date',
-            'legal_representation',
-            'legal_representation_date',
-            'collected_vokalatnama_date',
-            'collected_case_doc',
-            'identify_sureties',
-            'witness_communication_date',
-            'medical_report_date',
-            'legal_assistance_date',
-            'assistance_under_custody_date',
-            'referral_service',
-            'referral_service_date',
+        // Fix: Define $whr properly
+        $whr = [
+            'district_id' => $request->district_id,
+            'pngo_id' => $request->pngo_id,
         ];
+        $whr = array_filter($whr); // Remove null/empty values
 
-        $districtId = 1; // Set your district ID
-        $pngoId = 1; // Set your PNGO ID
-
-        $results = collect($flatFields)->map(function ($field) use ($districtId, $pngoId) {
+        // Fix: Pass $whr inside the closure
+        $results = collect($flatFields)->map(function ($field) use ($whr) {
             return FormalCase::selectRaw("
                 '$field' AS field,
                 SUM(CASE WHEN sex = 'Male' AND age >= 18 THEN 1 ELSE 0 END) AS adult_males,
@@ -330,14 +323,22 @@ class ReportController extends Controller
                 SUM(CASE WHEN age < 18 THEN 1 ELSE 0 END) AS under_18,
                 COUNT(*) AS total
             ")
-            ->whereNotNull($field)
-            // ->where('district_id', $districtId)
-            // ->where('pngo_id', $pngoId)
+            ->whereNotNull($field) 
+            ->where($whr)  // Correctly passing $whr
             ->first();
         });
 
-        dd($results);
+        // Load field names
+        $allfields = include(app_path('Services/DbFields.php'));
+        $flattenedFields = [];
+
+        foreach ($allfields as $category) {
+            $flattenedFields = array_merge($flattenedFields, $category);
+        }
+
+        return view('dashboard.report.result-custom-report', compact('results', 'flattenedFields'));
     }
+
 
 
 

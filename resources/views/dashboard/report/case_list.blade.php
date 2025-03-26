@@ -26,7 +26,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <select class="form-control form-control-sm district_id" name="district_id" id="district_id">
-                                                <option value="">Districts</option>
+                                                <option value="">All Districts</option>
                                                 @foreach ($districts as $district)
                                                     <option value="{{ $district->id }}">{{ $district->name }}</option>
                                                 @endforeach
@@ -36,7 +36,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <select class="form-control form-control-sm pngo_id" name="pngo_id" id="pngo_id">
-                                                <option value="">PNGO</option>
+                                                <option value="">All PNGO</option>
                                                 @foreach ($pngos as $pngo)
                                                     <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
                                                 @endforeach

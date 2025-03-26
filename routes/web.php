@@ -86,7 +86,6 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     
     Route::get('/customReport', [ReportController::class, 'customReport'])->name('customReport');
     Route::post('/custom-report', [ReportController::class, 'generateCustomReport'])->name('custom.report.generate');
-
     Route::get('/getFormalCaseStats', [ReportController::class, 'getFormalCaseStats'])->name('getFormalCaseStats');
 
     

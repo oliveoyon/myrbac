@@ -98,18 +98,19 @@
         mpdf-->
 
         <!--mpdf
-    <htmlpagefooter name="myfooter">
-        <div style="text-align: center; font-size: 10px; padding: 10px 0; border-top: 1px solid #000;">
-            <p>Page {PAGENO} of {nbpg}</p>
-            <p>Powered by GIZ | © {{ date('Y') }} GIZ</p>
-        </div>
-    </htmlpagefooter>
+        <htmlpagefooter name="myfooter">
+            <div style="text-align: center; font-size: 10px; padding: 10px 0; border-top: 1px solid #000;">
+                <p>Page {PAGENO} of {nbpg}</p>
+                <p>Powered by GIZ | © {{ date('Y') }} GIZ</p>
+            </div>
+        </htmlpagefooter>
+
 
     <sethtmlpagefooter name="myfooter" value="on" />
     mpdf-->
 
         <h2 style="text-align: center; margin-top: 0px; padding-top: 0px; font-family: SolaimanLipi">{!! $title !!}</h2>
-
+        <p style="font-size:10px; font-style:italic">Report Printed on: {{ date('F j, Y') }}</p>
         <div style="clear: both;"></div> <!-- Clear the float -->
 
         {!! $data !!}
