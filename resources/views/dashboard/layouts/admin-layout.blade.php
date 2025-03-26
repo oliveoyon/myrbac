@@ -26,7 +26,11 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="logo">DigiTrack</div>
-        
+        <form action="{{ route('dashboard.search') }}" method="POST" class="search-form">
+            @csrf
+            <input type="text" name="query" placeholder="Central ID..." required>
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
         <ul>
             @can('Admin Dashboard')
             <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -50,20 +54,23 @@
                     <li><a href="{{ route('users.index') }}"><i class="fas fa-user"></i> Users</a></li>
                 </ul>
             </li>
-
-            <li><a href="{{ route('form.index') }}"><i class="fas fa-database"></i> Data Entry Forms</a></li>
-            <li><a href="{{ route('import.view') }}"><i class="fas fa-database"></i> Bulk Data Entry</a></li>
-        
+            
+            <li class="has-submenu">
+                <a href="#"><i class="fas fa-cogs"></i> Manage Data Entry</a>
+                <ul class="submenu">
+                    <li><a href="{{ route('form.index') }}"><i class="fas fa-database"></i> Data Entry Forms</a></li>
+                    <li><a href="{{ route('import.view') }}"><i class="fas fa-database"></i> Bulk Data Entry</a></li>
+                </ul>
+            </li>
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-file-alt"></i> Reports & Analytics</a>
                 <ul class="submenu">
                     <li><a href="{{ route('case_list') }}"><i class="fas fa-chart-bar"></i> Case List</a></li>
-                    <li><a href="#"><i class="fas fa-user-clock"></i> Login History</a></li>
-                    <li><a href="#"><i class="fas fa-lock"></i> Access Logs</a></li>
+                    <li><a href="{{ route('customReport') }}"><i class="fas fa-chart-bar"></i> Intervention Report</a></li>
+                    <li><a href="{{ route('district.summery') }}"><i class="fas fa-user-clock"></i> District Summery</a></li>
+                    <li><a href="{{ route('pngo.summery') }}"><i class="fas fa-lock"></i> PNGO Summery</a></li>
                 </ul>
             </li>
-        
-            <li><a href="#"><i class="fas fa-database"></i> Data Entry Management</a></li>
         
             <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
         

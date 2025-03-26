@@ -15,41 +15,73 @@
                     @csrf
                     <div class="card">
                         <div class="card-header text-bg-secondary d-flex justify-content-between align-items-center">
-                            <h4 class="card-title">Case Detail</h4>
+                            <h6 class="card-title">Case Details Filter: District, PNGO, and Date Range</h6>
                             <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#caseCardBody">
                                 <i class="fas fa-minus"></i>
                             </button>
                         </div>
                         <div class="collapse show" id="caseCardBody">
-                            <div class="card-body">
-                                <div class="row align-items-end">
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <select class="form-control form-control-sm district_id" name="district_id" id="district_id">
-                                                <option value="">All Districts</option>
-                                                @foreach ($districts as $district)
-                                                    <option value="{{ $district->id }}">{{ $district->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-end">
+                                <!-- Institute Filter -->
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <select class="form-control form-control-sm institute" name="institute" id="institute">
+                                            <option value="">All Institute</option>
+                                            <option value="Court">Court</option>
+                                            <option value="Prison">Prison</option>
+                                            <option value="Police Station">Police Station</option>
+                                        </select>
                                     </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <select class="form-control form-control-sm pngo_id" name="pngo_id" id="pngo_id">
-                                                <option value="">All PNGO</option>
-                                                @foreach ($pngos as $pngo)
-                                                    <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                </div>
+                                <!-- District Filter -->
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <select class="form-control form-control-sm district_id" name="district_id" id="district_id">
+                                            <option value="">All Districts</option>
+                                            @foreach ($districts as $district)
+                                                <option value="{{ $district->id }}">{{ $district->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-primary btn-sm btn-block">Submit</button>
-                                        </div>
+                                </div>
+
+                                <!-- PNGO Filter -->
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <select class="form-control form-control-sm pngo_id" name="pngo_id" id="pngo_id">
+                                            <option value="">All PNGO</option>
+                                            @foreach ($pngos as $pngo)
+                                                <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                </div> <!-- row -->
-                            </div>
+                                </div>
+
+                                <!-- From Date Filter -->
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <input type="date" class="form-control form-control-sm" name="from_date" id="from_date" placeholder="From Date">
+                                    </div>
+                                </div>
+
+                                <!-- To Date Filter -->
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <input type="date" class="form-control form-control-sm" name="to_date" id="to_date" placeholder="To Date">
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary btn-sm btn-block">Submit</button>
+                                    </div>
+                                </div>
+                            </div> <!-- row -->
+                        </div>
+
+
                         </div> <!-- collapse -->
                     </div>
                 </form>
@@ -64,10 +96,10 @@
             <div class="col-md-12">
                 <div class="card card-outline">
                     <div class="card-header text-bg-dark d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">
+                        <h6 class="card-title">
                             <i class="fas fa-chalkboard-teacher mr-1"></i>
                             Case List
-                        </h4>
+                        </h6>
                         <button class="btn btn-success btn-sm" id="printButton">
                             <i class="fas fa-print mr-1"></i> Print Report
                         </button>
@@ -81,7 +113,8 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">#</th>
-                                        <th>Case</th>
+                                        <th>Central ID</th>
+                                        <th>Institute</th>
                                         <th>Name</th>
                                         <th>Phone</th>
                                         <th>Date of Interview</th>
@@ -172,6 +205,7 @@
                             var row = `<tr>
                                 <td>${serialNumber}</td>
                                 <td>${caseData.central_id || 'N/A'}</td>
+                                <td>${caseData.institute || 'N/A'}</td>
                                 <td>${caseData.full_name || 'N/A'}</td>
                                 <td>${caseData.phone_number || 'N/A'}</td>
                                 <td>${caseData.legal_representation_date ? new Date(caseData.legal_representation_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}</td>
@@ -362,5 +396,35 @@ function isValidUrl(url) {
     return /^https?:\/\/.+/.test(url);
 }
 
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get the 'from_date' and 'to_date' inputs
+        const fromDateInput = document.getElementById("from_date");
+        const toDateInput = document.getElementById("to_date");
+
+        // Enable 'to_date' when 'from_date' is selected
+        fromDateInput.addEventListener("change", function () {
+            if (fromDateInput.value) {
+                toDateInput.disabled = false;
+            } else {
+                toDateInput.disabled = true;
+                toDateInput.value = "";  // Reset 'to_date' if 'from_date' is empty
+            }
+        });
+
+        // Ensure 'to_date' is not earlier than 'from_date'
+        toDateInput.addEventListener("change", function () {
+            const fromDate = new Date(fromDateInput.value);
+            const toDate = new Date(toDateInput.value);
+
+            // If 'to_date' is earlier than 'from_date', set 'to_date' to 'from_date'
+            if (toDate < fromDate) {
+                alert("To date cannot be earlier than From date.");
+                toDateInput.value = fromDateInput.value;  // Set 'to_date' to 'from_date'
+            }
+        });
+    });
 </script>
 @endpush

@@ -116,30 +116,29 @@
                         <div class="mt-4">
                             <h6>PNGO Breakdown</h6>
                             <table class="table table-bordered table-striped">
-                                <table class="table table-bordered table-striped">
-                                    <thead>
+                                <thead>
+                                    <tr>
+                                        <th>PNGO</th>
+                                        <th>Male</th>
+                                        <th>Female</th>
+                                        <th>Transgender</th>
+                                        <th>Under 18</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($pngoWise as $row)
                                         <tr>
-                                            <th>PNGO</th>
-                                            <th>Male</th>
-                                            <th>Female</th>
-                                            <th>Transgender</th>
-                                            <th>Under 18</th>
-                                            <th>Total</th>
+                                            <td>{{ $row['pngo_name'] }}</td>
+                                            <td>{{ $row['male'] }}</td>
+                                            <td>{{ $row['female'] }}</td>
+                                            <td>{{ $row['transgender'] }}</td>
+                                            <td>{{ $row['under_18'] }}</td>
+                                            <td>{{ $row['total'] }}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($pngoWise as $row)
-                                            <tr>
-                                                <td>{{ $row['pngo_name'] }}</td>
-                                                <td>{{ $row['male'] }}</td>
-                                                <td>{{ $row['female'] }}</td>
-                                                <td>{{ $row['transgender'] }}</td>
-                                                <td>{{ $row['under_18'] }}</td>
-                                                <td>{{ $row['total'] }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

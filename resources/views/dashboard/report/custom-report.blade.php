@@ -183,7 +183,7 @@
                 @endforeach
 
                 <!-- Submit button -->
-                <button type="submit" class="btn btn-primary mt-4">Generate Report</button>
+                    <button type="submit" class="btn btn-success">Generate Report</button>
             
         </div>
     </div>

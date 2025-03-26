@@ -23,14 +23,21 @@ class FormalController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'full_name' => 'required|string|max:255',
+            'intervention_taken' => 'required|string|max:255',
+        ], [
+            'full_name.required' => 'The full name is required. Please enter your name.',
+            'full_name.string' => 'The full name must be a valid text.',
+            'full_name.max' => 'The full name should not exceed 255 characters.',
+            
+            'intervention_taken.required' => 'Please specify the intervention taken.',
+            'intervention_taken.string' => 'Intervention details must be in text format.',
+            'intervention_taken.max' => 'Intervention details should not exceed 255 characters.',
         ]);
     
         // Check if the validation fails
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
-            // return response()->json([
-            //     'errors' => $validator->errors(),
-            // ]);
+          
         }
         
         $districtName = (optional(auth()->user()->district)->name);
@@ -46,7 +53,7 @@ class FormalController extends Controller
         $lastNumber = isset($matches[1]) ? $matches[1] : null;
         $nextNumber = $lastNumber ? $lastNumber + 1 : 1;
 
-        $centralId = $districtName . '-' . $nextNumber;
+        $centralId = strtoupper(substr($districtName, 0, 3)) . '-LA-' . $nextNumber;
         // Create a new FormalCase object
         $case = new FormalCase();
         $case->central_id = $centralId;

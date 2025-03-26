@@ -16,9 +16,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
-
-
 // Route::get('/dashboards', [DashboardController::class, 'index'])->name('dashboard.index');
 
 Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
@@ -69,27 +66,27 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view');
     Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store');
 
+    Route::post('/dashboard/search', [DashboardController::class, 'search'])->name('dashboard.search');
+
+
     // Reporting purpose
-    Route::get('/report', [ReportController::class, 'index'])->name('report.index');
-    Route::get('/report1', [ReportController::class, 'showCaseAssistanceData'])->name('report.index1');
-    Route::get('/report2', [ReportController::class, 'showCaseAssistanceData1'])->name('report.report2');
+    
 
     Route::get('district-list-report', [ReportController::class, 'district_report'])->name('district-list-report');
     Route::post('/generate-pdf', [ReportController::class, 'generatePdf'])->name('generate-pdf');
+    Route::post('/generate-pdf-chart', [ReportController::class, 'generatePdfChart'])->name('generate-pdf-chart');
+    Route::post('/generate-form', [ReportController::class, 'generateForm'])->name('generate-form');
 
     Route::get('case-list', [ReportController::class, 'districtWiseCaselist'])->name('case_list');
     Route::post('/case-list', [ReportController::class, 'districtWiseCaselistDetail'])->name('case_list1');
-
-
-    Route::post('/generate-form', [ReportController::class, 'generateForm'])->name('generate-form');
     
-    
-    Route::get('/customReport', [ReportController::class, 'customReport'])->name('customReport');
+    Route::get('/intervention-report', [ReportController::class, 'customReport'])->name('customReport');
     Route::post('/custom-report', [ReportController::class, 'generateCustomReport'])->name('custom.report.generate');
     Route::get('/getFormalCaseStats', [ReportController::class, 'getFormalCaseStats'])->name('getFormalCaseStats');
-
+    Route::get('/district-summery', [ReportController::class, 'districtSummery'])->name('district.summery');
+    Route::get('/pngo-summery', [ReportController::class, 'pngoSummery'])->name('pngo.summery');
     
-
+    
     Route::get('/generate-pdfs', [PDFController::class, 'generatePDF']);
 
 
