@@ -545,7 +545,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">বিচারপ্রার্থী/ কারাবন্দির স্থানীয় অভিভাবক আছে কিনা?&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Does the Justice seeker/ prisoner have local guardian?)&nbsp;</span></p>
                         </td>
                         <td colspan="4" style="width:208.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->has_guardian == 'Yes') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83" <?php echo ($details->has_guardian == 'No') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
                         </td>
                     </tr>
                     <tr style="height:28.85pt;">
@@ -561,7 +561,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">&nbsp;</span><span style="font-family:bangla;">অভিভাবকের নাম&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Guardian&rsquo;s Name)</span></p>
                         </td>
                         <td colspan="4" style="width:208.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->guardian_name }}</p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
                         </td>
                     </tr>
                     <tr style="height:2.85pt;">
@@ -577,7 +577,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">বাসা/ গ্রাম&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(House/ Village)</span></p>
                         </td>
                         <td style="width:1pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">:</span>{{ $details-> }}</p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">:</span></p>
                         </td>
                         <td colspan="2" style="width:73pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
@@ -640,7 +640,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><span style="font-family:bangla;">ফোন নাম্বার&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(Phone Number)</span></p>
                         </td>
                         <td colspan="6" style="width:300.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->guardian_phone }}</p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
                         </td>
                     </tr>
                     <tr style="height:22.45pt;">
@@ -651,12 +651,12 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">অভিভাবকের সাথে সর্ম্পক&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Relation with Guardian)</span></p>
                         </td>
                         <td colspan="5" style="width:175.1pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->guardian_relation == 'Family Member') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">পরিবারের সদস্য&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Family Member) &hellip;&hellip;..</span></p>
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->guardian_relation == 'Relative') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">আত্মীয়&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Relative) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">পরিবারের সদস্য&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Family Member) &hellip;&hellip;..</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">আত্মীয়&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Relative) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</span></p>
                         </td>
                         <td style="width:114.8pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->guardian_relation == 'Neighbor') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">প্রতিবেশী&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Neighbor)&nbsp;</span></p>
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->guardian_relation == 'Other') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">অন্যান্য&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Other) &hellip;&hellip;.......</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">প্রতিবেশী&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Neighbor)&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">অন্যান্য&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Other) &hellip;&hellip;.......</span></p>
                         </td>
                     </tr>
                     <tr>
@@ -667,7 +667,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">অভিভাবক কি জামিনদার হবেন?&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Will the Guardian act as surety?)&nbsp;</span></p>
                         </td>
                         <td colspan="4" style="width:208.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"<input type="checkbox" name="Check83" <?php echo ($details->guardian_surety == 'Yes') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83" <?php echo ($details->guardian_surety == 'No') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
                         </td>
                     </tr>
                     <tr style="height:0pt;">
@@ -698,7 +698,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">বিচারপ্রার্থী/ কারাবন্দির আইনজীবি আছে কিনা?&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Does the Justice seeker/ prisoner already have a lawyer?)</span></p>
                         </td>
                         <td colspan="2" style="width:302.8pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->has_lawyer == 'Yes') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="font-family:bangla;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83" <?php echo ($details->has_lawyer == 'No') ? 'selected="selected"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="font-family:bangla;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
                         </td>
                     </tr>
                     <tr style="height:29.75pt;">
@@ -715,23 +715,23 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">আইনজীবীর ধরণ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Type of Lawyer)</span></p>
                         </td>
                         <td style="width:181.3pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->lawyer_type == 'Personal') ? 'selected="selected"' : ''; ?>><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">ব্যক্তিগত</span><span style="font-family:Arial; font-size:10pt;">&nbsp;(Personal)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">ব্যক্তিগত</span><span style="font-family:Arial; font-size:10pt;">&nbsp;(Personal)</span></p>
                         </td>
                         <td style="width:110.7pt; border-top-style:solid; border-top-width:0.75pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->lawyer_type == 'NGO') ? 'selected="selected"' : ''; ?>><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">এন.জি.ও</span><span style="font-family:bangla; font-size:10pt;">&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(NGO)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">এন.জি.ও</span><span style="font-family:bangla; font-size:10pt;">&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(NGO)</span></p>
                         </td>
                     </tr>
                     <tr style="height:4pt;">
                         <td style="width:181.3pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->lawyer_type == 'District Legal Aid') ? 'selected="selected"' : ''; ?>><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">জেলা লিগ্যাল এইড&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(District Legal Aid)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">জেলা লিগ্যাল এইড&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(District Legal Aid)</span></p>
                         </td>
                         <td style="width:110.7pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->lawyer_type == 'Other') ? 'selected="selected"' : ''; ?>><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">অন্যান্য&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(Other) &hellip;&hellip;&hellip;..</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">অন্যান্য&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(Other) &hellip;&hellip;&hellip;..</span></p>
                         </td>
                     </tr>
                     <tr style="height:4pt;">
                         <td style="width:181.3pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->lawyer_type == 'State Defense') ? 'selected="selected"' : ''; ?>><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">রাষ্ট্র নি্যুক্ত আইনজীবী&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(State Defense)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">রাষ্ট্র নি্যুক্ত আইনজীবী&nbsp;</span><span style="font-family:Arial; font-size:10pt;">(State Defense)</span></p>
                         </td>
                         <td style="width:110.7pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
@@ -745,7 +745,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">আইনজীবীর নাম&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Lawyer&rsquo;s Name)</span></p>
                         </td>
                         <td colspan="2" style="width:302.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">{{ $details->lawyer_name }}</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
                         </td>
                     </tr>
                     <tr style="height:15.35pt;">
@@ -756,7 +756,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">আইনজীবীর সদস্য নাম্বার&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Membership number of Lawyer)</span></p>
                         </td>
                         <td colspan="2" style="width:302.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">{{ $details->lawyer_membership }}</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
                         </td>
                     </tr>
                     <tr>
@@ -767,7 +767,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">ফোন নাম্বার&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Phone Number)</span></p>
                         </td>
                         <td colspan="2" style="width:302.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:12pt;"><span style="font-family:Arial;">{{ $details->lawyer_phone }}</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:12pt;"><span style="font-family:Arial;">&nbsp;</span></p>
                         </td>
                     </tr>
                 </tbody>
@@ -785,7 +785,11 @@
                         </td>
                         <td style="width:479.7pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">ঘটনার সংক্ষিপ্ত বিবরণ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Brief of Incident)</span></p>
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">{{ $details->incident_details }}</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
@@ -2027,12 +2031,11 @@
         </td>
         <td style="width:53.25pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; padding-top:10px; padding-bottom:10px;">
             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;">
-                <span style="font-family:Arial;">&nbsp;</span>{{ $f->to_be_taken_date }}
+                <span style="font-family:Arial;">&nbsp;</span>{{ $f->to_be_taken }}
             </p>
         </td>
     </tr>
 @endforeach
-
 
 
                    
