@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\FormalCase;
 use App\Models\District;
+use App\Models\FollowUpIntervention;
 use App\Models\Pngo;
 use Illuminate\Support\Facades\DB;
 use Mpdf\Mpdf;
@@ -147,6 +148,8 @@ class ReportController extends Controller
     public function generateForm(Request $request)
     {
         $send['details'] = FormalCase::find($request->id);
+        $send['followups'] = FollowUpIntervention::where('central_id', $request->id)->get();
+        // dd($send['followups']);
         $send['data'] = $request->input('pdf_data');
         $send['title'] = $request->input('title');
         $fname = $request->input('fname');

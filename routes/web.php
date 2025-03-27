@@ -62,6 +62,10 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
 
     Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index');  
     Route::post('formAction', [FormalController::class, 'courtPolicePrison'])->name('formaction');  
+    
+    Route::post('/edit-case', [FormalController::class, 'editCase'])->name('edit-case.post'); // AJAX POST route
+    Route::get('/edit-case', [FormalController::class, 'editCaseForm'])->name('edit-case.get'); // GET route for the form view
+    Route::post('editformaction', [FormalController::class, 'editCourtPolicePrison'])->name('editformaction');  
 
     Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view');
     Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store');

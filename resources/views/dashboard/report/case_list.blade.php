@@ -1,7 +1,22 @@
 @extends('dashboard.layouts.admin-layout')
 @section('title', 'Case List')
 @push('styles')
+<style>
+    a::after {
+    content: none !important;
+}
+td a {
+    display: inline-block;
+    margin-right: 5px; /* Adjust as needed */
+}
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
 
+
+</style>
 @endpush
 
 @section('content')
@@ -120,6 +135,7 @@
                                         <th>Date of Interview</th>
                                         <th>District</th>
                                         <th>PNGO</th>
+                                        <th class="no-print">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="result-table-body">
@@ -177,144 +193,146 @@
 
 
 
-    $(document).ready(function() {
+    $(document).ready(function () {
+    $('#get-case-list').submit(function (e) {
+        e.preventDefault();
 
-        $('#get-case-list').submit(function(e) {
-            e.preventDefault();
-
-            // Disable the submit button to prevent double-clicking
-            $(this).find(':submit').prop('disabled', true);
-
-            // Show the loader overlay
-            $('#loader-overlay').show();
-
-            var form = this;
-
-            $.ajax({
-                url: $(form).attr('action'),
-                method: $(form).attr('method'),
-                data: $(form).serialize(),
-                success: function(response) {
-                    console.log(response); // Debugging
-                    var tableBody = $('#result-table-body');
-                    tableBody.empty(); // Clear existing rows
-
-                    if (response && response.cases && Array.isArray(response.cases)) {
-                        let serialNumber = 1;
-                        response.cases.forEach(function(caseData) {
-                            var row = `<tr>
-                                <td>${serialNumber}</td>
-                                <td>${caseData.central_id || 'N/A'}</td>
-                                <td>${caseData.institute || 'N/A'}</td>
-                                <td>${caseData.full_name || 'N/A'}</td>
-                                <td>${caseData.phone_number || 'N/A'}</td>
-                                <td>${caseData.legal_representation_date ? new Date(caseData.legal_representation_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}</td>
-                                <td>${caseData.district.name || 'N/A'}</td>
-                                <td><a href="javascript:void(0);" class="pngo-link" data-pngo-id="${caseData.id}">${caseData.pngo.name || 'N/A'}</a></td>
-                            </tr>`;
-
-                            tableBody.append(row);
-                            serialNumber++;
-                        });
-
-                        $('.contents').removeClass('d-none'); // Show results section
-                    } else {
-                        console.error("Invalid response format:", response);
-                        $('#errorAlert').show().text('No cases found.');
-                    }
-                },
-
-                error: function(error) {
-                    // Handle errors if needed
-                    console.log(error);
-                },
-                complete: function() {
-                    // Enable the submit button and hide the loader overlay
-                    $(form).find(':submit').prop('disabled', false);
-                    $('#loader-overlay').hide();
-                }
-            });
-        });
-
-
-    });
-</script>
-
-<script>
-    $('#printButton').click(function() {
-        var data = $('#reportDiv').html();
+        // Disable the submit button to prevent double-clicking
+        $(this).find(':submit').prop('disabled', true);
 
         // Show the loader overlay
         $('#loader-overlay').show();
 
+        var form = this;
+
         $.ajax({
-            url: '/mne/generate-pdf',
-            method: 'POST',
-            data: {
-                pdf_data: data,
-                title: 'Case List',
-                orientation: 'L',
-                fname: 'Case List.pdf',
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                if (response.pdf_url && isValidUrl(response.pdf_url)) {
-                    // Create a modal element
-                    var modalContent =
-                        '<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">';
-                    modalContent +=
-                        '<div class="modal-dialog modal-dialog-centered modal-fullscreen">'; // Changed to Bootstrap 5 class
-                    modalContent += '<div class="modal-content">';
-                    modalContent += '<div class="modal-header">';
-                    modalContent += '<h5 class="modal-title" id="pdfModalLabel">Generated Report</h5>';
-                    modalContent +=
-                        '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'; // Updated close button
-                    modalContent += '</div>';
-                    modalContent += '<div class="modal-body">';
-                    modalContent +=
-                        '<div id="pdfLoaderOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center;">';
-                    modalContent += '<img src="/path/to/loader.gif" alt="Loader">';
-                    modalContent += '</div>';
-                    modalContent += '<iframe id="pdfIframe" src="' + response.pdf_url +
-                        '" style="width: 100%; height: 80vh; display: none;"></iframe>';
-                    modalContent += '</div>';
-                    modalContent += '</div>';
-                    modalContent += '</div>';
-                    modalContent += '</div>';
+            url: $(form).attr('action'),
+            method: $(form).attr('method'),
+            data: $(form).serialize(),
+            success: function (response) {
+                console.log(response); // Debugging
 
-                    // Append modal to the body and show it
-                    $('body').append(modalContent);
-                    $('#pdfModal').modal('show');
+                var tableBody = $('#result-table-body');
+                tableBody.empty(); // Clear existing rows
 
-                    // Hide the loader overlay when the PDF is loaded
-                    $('#pdfIframe').on('load', function() {
-                        $('#pdfLoaderOverlay').hide();
-                        $('#pdfIframe').show();
+                if (response && response.cases && Array.isArray(response.cases) && response.cases.length > 0) {
+                    let serialNumber = 1;
+                    response.cases.forEach(function (caseData) {
+                        var row = `<tr>
+                            <td>${serialNumber}</td>
+                            <td>${caseData.central_id || 'N/A'}</td>
+                            <td>${caseData.institute || 'N/A'}</td>
+                            <td>${caseData.full_name || 'N/A'}</td>
+                            <td>${caseData.phone_number || 'N/A'}</td>
+                            <td>${caseData.legal_representation_date 
+                                ? new Date(caseData.legal_representation_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) 
+                                : 'N/A'}</td>
+                            <td>${caseData.district?.name || 'N/A'}</td>
+                            <td>${caseData.pngo?.name || 'N/A'}</td>
+                            <td class="no-print">
+                                <a href="javascript:void(0);" class="pngo-link" data-pngo-id="${caseData.id}">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                                <a href="javascript:void(0);" class="edit-link" data-edit-id="${caseData.id}">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>`;
+
+                        tableBody.append(row);
+                        serialNumber++;
                     });
 
-                    console.log('PDF generated successfully');
+                    $('.contents').removeClass('d-none'); // Show results section
+                    $('#errorAlert').hide(); // Hide error alert if successful
                 } else {
-                    console.error('Invalid PDF response:', response);
-                    alert('Error generating PDF. Please try again.');
+                    console.warn("No cases found in response:", response);
+                    $('#errorAlert').show().text('No cases found.');
                 }
             },
-            error: function(xhr, status, error) {
-                console.error('AJAX request failed:', error);
-                alert('Error generating PDF. Please try again.');
+
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                $('#errorAlert').show().text('An error occurred while fetching data.');
             },
-            complete: function() {
-                // Hide the loader overlay when the request is complete
+
+            complete: function () {
+                // Enable the submit button and hide the loader overlay
+                $(form).find(':submit').prop('disabled', false);
                 $('#loader-overlay').hide();
             }
         });
     });
+});
 
-    function isValidUrl(url) {
-        // Implement a function to check if the URL is valid based on your requirements
-        return /^https?:\/\/.+/.test(url);
-    }
+</script>
+
+<script>
+    $('#printButton').click(function() {
+    var data = $('#reportDiv').clone(); // Clone to keep original structure
+    data.find('.no-print').remove(); // Remove unwanted elements
+
+    $('#loader-overlay').show(); // Show loader
+
+    $.ajax({
+        url: '/mne/generate-pdf',
+        method: 'POST',
+        data: {
+            pdf_data: data.html(), // Send modified HTML
+            title: 'Case List',
+            orientation: 'L',
+            fname: 'Case List.pdf',
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            if (response.pdf_url && isValidUrl(response.pdf_url)) {
+                $('#pdfModal').remove(); // Remove existing modal before adding a new one
+
+                var modalContent = `
+                    <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="pdfModalLabel">Generated Report</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="pdfLoaderOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center;">
+                                        <img src="/path/to/loader.gif" alt="Loading...">
+                                    </div>
+                                    <iframe id="pdfIframe" src="${response.pdf_url}" style="width: 100%; height: 80vh; display: none;"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+
+                $('body').append(modalContent); // Append modal
+                $('#pdfModal').modal('show'); // Show modal
+
+                $('#pdfIframe').on('load', function() {
+                    $('#pdfLoaderOverlay').hide(); // Hide loader when PDF loads
+                    $('#pdfIframe').show();
+                });
+
+            } else {
+                alert('Error generating PDF. Please try again.');
+            }
+        },
+        error: function(xhr, status, error) {
+            alert('Error generating PDF. Please try again.');
+        },
+        complete: function() {
+            $('#loader-overlay').hide(); // Hide main loader
+        }
+    });
+});
+
+// URL Validation Function
+function isValidUrl(url) {
+    return /^https?:\/\/.+/.test(url);
+}
 
 
 
@@ -426,5 +444,31 @@ function isValidUrl(url) {
             }
         });
     });
+</script>
+
+<script>
+$(document).on("click", ".edit-link", function (event) {
+    event.preventDefault();
+
+    var editId = $(this).data("edit-id"); // Get the edit ID
+
+    $.ajax({
+        url: "/mne/edit-case",
+        type: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            edit_id: editId
+        },
+        success: function (response) {
+            if (response.success) {
+                window.location.href = response.redirect_url; // Redirect to edit form
+            }
+        },
+        error: function (xhr) {
+            console.error("AJAX request failed", xhr);
+        }
+    });
+});
+
 </script>
 @endpush
