@@ -1202,8 +1202,8 @@
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-12">
-                                        <label for="service_description" class="form-label">Description of Service</label>
-                                        <textarea class="form-control" id="service_description" name="service_description" rows="6">{{ old('service_description', $caseData->service_description ?? '') }}</textarea>
+                                        <label for="result_description" class="form-label">Description of Service</label>
+                                        <textarea class="form-control" id="result_description" name="result_description" rows="6">{{ old('result_description', $caseData->result_description ?? '') }}</textarea>
                                         @error('service_description')
                                             <div class="text-danger">{{ $message }}</div>
                                         @enderror

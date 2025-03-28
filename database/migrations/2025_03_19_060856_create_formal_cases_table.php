@@ -152,6 +152,7 @@ return new class extends Migration
             $table->date('convicted_sentence_expire')->nullable();
             $table->text('result_of_appeal')->nullable();
             $table->date('date_of_reliefe')->nullable();
+            $table->text('result_description')->nullable();
             // Result of Assistance in Prison end
             $table->date('file_closure_date')->nullable();
             $table->timestamps();

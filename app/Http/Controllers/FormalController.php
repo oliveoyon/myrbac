@@ -164,6 +164,7 @@ class FormalController extends Controller
         $case->convicted_sentence_expire = $request->convicted_sentence_expire;
         $case->result_of_appeal = $request->result_of_appeal;
         $case->date_of_reliefe = $request->date_of_reliefe;
+        $case->result_description = $request->result_description;
         $case->file_closure_date = $request->file_closure_date;
     
         // Save the case
@@ -322,6 +323,7 @@ class FormalController extends Controller
         $case->convicted_sentence_expire = $request->convicted_sentence_expire;
         $case->result_of_appeal = $request->result_of_appeal;
         $case->date_of_reliefe = $request->date_of_reliefe;
+        $case->result_description = $request->result_description;
         $case->file_closure_date = $request->file_closure_date;
 
         // Save the case

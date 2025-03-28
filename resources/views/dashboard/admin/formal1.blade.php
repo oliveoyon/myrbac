@@ -1180,9 +1180,9 @@
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-12">
-                                        <label for="service_description" class="form-label">Description of
+                                        <label for="result_description" class="form-label">Description of
                                             Service</label>
-                                        <textarea class="form-control" id="service_description" name="service_description" rows="6"></textarea>
+                                        <textarea class="form-control" id="result_description" name="result_description" rows="6"></textarea>
                                     </div>
 
                                     <div class="col-md-4">
