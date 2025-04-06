@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
+
 class UserController extends Controller
 {
     // Display a listing of the users
@@ -32,8 +33,8 @@ class UserController extends Controller
             'name' => 'required|unique:users,name',
             'email' => 'required|email|unique:users,email',
             'status' => 'required',
-            'district_id' => 'required|exists:districts,id', 
-            'pngo_id' => 'required|exists:pngos,id',
+            // 'district_id' => 'required|exists:districts,id', 
+            // 'pngo_id' => 'required|exists:pngos,id',
             'role_name' => 'required|array',
             'role_name.*' => 'exists:roles,name'
         ]);

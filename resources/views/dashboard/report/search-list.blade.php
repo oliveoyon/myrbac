@@ -22,90 +22,8 @@ td a {
 @section('content')
 
     
-<section>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <form action="{{ route('case_list1') }}" method="POST" autocomplete="off" id="get-case-list">
-                    @csrf
-                    <div class="card">
-                        <div class="card-header text-bg-secondary d-flex justify-content-between align-items-center">
-                            <h6 class="card-title">Case Details Filter: District, PNGO, and Date Range</h6>
-                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#caseCardBody">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                        <div class="collapse show" id="caseCardBody">
-                        <div class="card-body">
-                            <div class="row align-items-end">
-                                <!-- Institute Filter -->
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <select class="form-control form-control-sm institute" name="institute" id="institute">
-                                            <option value="">All Institute</option>
-                                            <option value="Court">Court</option>
-                                            <option value="Prison">Prison</option>
-                                            <option value="Police Station">Police Station</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <!-- District Filter -->
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <select class="form-control form-control-sm district_id" name="district_id" id="district_id">
-                                            <option value="">All Districts</option>
-                                            @foreach ($districts as $district)
-                                                <option value="{{ $district->id }}">{{ $district->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
 
-                                <!-- PNGO Filter -->
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <select class="form-control form-control-sm pngo_id" name="pngo_id" id="pngo_id">
-                                            <option value="">All PNGO</option>
-                                            @foreach ($pngos as $pngo)
-                                                <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- From Date Filter -->
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <input type="date" class="form-control form-control-sm" name="from_date" id="from_date" placeholder="From Date">
-                                    </div>
-                                </div>
-
-                                <!-- To Date Filter -->
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <input type="date" class="form-control form-control-sm" name="to_date" id="to_date" placeholder="To Date">
-                                    </div>
-                                </div>
-
-                                <!-- Submit Button -->
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary btn-sm btn-block">Submit</button>
-                                    </div>
-                                </div>
-                            </div> <!-- row -->
-                        </div>
-
-
-                        </div> <!-- collapse -->
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="contents d-none mt-3">
+<section class="contents mt-3">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
@@ -115,9 +33,7 @@ td a {
                             <i class="fas fa-chalkboard-teacher mr-1"></i>
                             Case List
                         </h6>
-                        <button class="btn btn-success btn-sm" id="printButton">
-                            <i class="fas fa-print mr-1"></i> Print Report
-                        </button>
+                        
                     </div>
                     <div class="card-body table-responsive">
                         <div class="alert alert-danger" id="errorAlert" style="display: none;">
@@ -139,7 +55,37 @@ td a {
                                     </tr>
                                 </thead>
                                 <tbody id="result-table-body">
-                                    <!-- Rows will be dynamically populated here -->
+                                    @php $serial = 1; @endphp
+                                    @foreach ($cases as $caseData)
+                                    <tr>
+                                        <td>{{ $serial++ }}</td>
+                                        <td>{{ $caseData->central_id ?? 'N/A' }}</td>
+                                        <td>{{ $caseData->institute ?? 'N/A' }}</td>
+                                        <td>{{ $caseData->full_name ?? 'N/A' }}</td>
+                                        <td>{{ $caseData->phone_number ?? 'N/A' }}</td>
+                                        <td>
+                                            @if ($caseData->legal_representation_date)
+                                                {{ \Carbon\Carbon::parse($caseData->legal_representation_date)->translatedFormat('d F, Y') }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>{{ $caseData->district->name ?? 'N/A' }}</td>
+                                        <td>{{ $caseData->pngo->name ?? 'N/A' }}</td>
+                                        <td class="no-print">
+                                            <a href="javascript:void(0);" class="pngo-link" data-pngo-id="{{ $caseData->id }}">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <a href="javascript:void(0);" class="edit-link" data-edit-id="{{ $caseData->id }}">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a href="javascript:void(0);" class="file-link" data-file-id="{{ $caseData->id }}">
+                                                <i class="fa fa-paperclip"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+
                                 </tbody>
                             </table>
                         </div>
@@ -190,83 +136,6 @@ td a {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-
-
-
-    $(document).ready(function () {
-    $('#get-case-list').submit(function (e) {
-        e.preventDefault();
-
-        // Disable the submit button to prevent double-clicking
-        $(this).find(':submit').prop('disabled', true);
-
-        // Show the loader overlay
-        $('#loader-overlay').show();
-
-        var form = this;
-
-        $.ajax({
-            url: $(form).attr('action'),
-            method: $(form).attr('method'),
-            data: $(form).serialize(),
-            success: function (response) {
-                console.log(response); // Debugging
-
-                var tableBody = $('#result-table-body');
-                tableBody.empty(); // Clear existing rows
-
-                if (response && response.cases && Array.isArray(response.cases) && response.cases.length > 0) {
-                    let serialNumber = 1;
-                    response.cases.forEach(function (caseData) {
-                        var row = `<tr>
-                            <td>${serialNumber}</td>
-                            <td>${caseData.central_id || 'N/A'}</td>
-                            <td>${caseData.institute || 'N/A'}</td>
-                            <td>${caseData.full_name || 'N/A'}</td>
-                            <td>${caseData.phone_number || 'N/A'}</td>
-                            <td>${caseData.legal_representation_date 
-                                ? new Date(caseData.legal_representation_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) 
-                                : 'N/A'}</td>
-                            <td>${caseData.district?.name || 'N/A'}</td>
-                            <td>${caseData.pngo?.name || 'N/A'}</td>
-                            <td class="no-print">
-                                <a href="javascript:void(0);" class="pngo-link" data-pngo-id="${caseData.id}">
-                                    <i class="fa fa-eye"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="edit-link" data-edit-id="${caseData.id}">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="file-link" data-file-id="${caseData.id}">
-                                    <i class="fa fa-paperclip"></i>
-                                </a>
-                            </td>
-                        </tr>`;
-
-                        tableBody.append(row);
-                        serialNumber++;
-                    });
-
-                    $('.contents').removeClass('d-none'); // Show results section
-                    $('#errorAlert').hide(); // Hide error alert if successful
-                } else {
-                    console.warn("No cases found in response:", response);
-                    $('#errorAlert').show().text('No cases found.');
-                }
-            },
-
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                $('#errorAlert').show().text('An error occurred while fetching data.');
-            },
-
-            complete: function () {
-                // Enable the submit button and hide the loader overlay
-                $(form).find(':submit').prop('disabled', false);
-                $('#loader-overlay').hide();
-            }
-        });
-    });
-});
 
 </script>
 

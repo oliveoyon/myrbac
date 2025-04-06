@@ -62,18 +62,15 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
 
     Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index');  
     Route::post('formAction', [FormalController::class, 'courtPolicePrison'])->name('formaction');  
-    
-    Route::post('/edit-case', [FormalController::class, 'editCase'])->name('edit-case.post'); // AJAX POST route
-    Route::get('/edit-case', [FormalController::class, 'editCaseForm'])->name('edit-case.get'); // GET route for the form view
+    Route::post('/edit-case', [FormalController::class, 'editCase'])->name('edit-case.post');
+    Route::get('/edit-case', [FormalController::class, 'editCaseForm'])->name('edit-case.get');
     Route::post('editformaction', [FormalController::class, 'editCourtPolicePrison'])->name('editformaction');  
-
     Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view');
     Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store');
-
-    Route::post('/dashboard/search', [DashboardController::class, 'search'])->name('dashboard.search');
-
-    Route::post('/edit-file', [FormalController::class, 'fileCase'])->name('edit-file.post'); // AJAX POST route
-    Route::get('/edit-file', [FormalController::class, 'fileCaseForm'])->name('edit-file.get'); // GET route for the form view
+    Route::post('/dashboard/search', [ReportController::class, 'search'])->name('dashboard.search');
+    Route::post('/edit-file', [FormalController::class, 'fileCase'])->name('edit-file.post');
+    Route::get('/edit-file', [FormalController::class, 'fileCaseForm'])->name('edit-file.get');
+    Route::get('/formal-cases/export', [ReportController::class, 'exportExcel'])->name('formal.cases.export');
 
 
     // Reporting purpose

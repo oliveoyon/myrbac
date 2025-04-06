@@ -186,6 +186,15 @@
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-4">
+                                        <label for="Institute" class="form-label">Institute</label>
+                                        <select class="form-select" id="sex" name="institute">
+                                            <option value="">Select</option>
+                                            <option value="Court">Court</option>
+                                            <option value="Prison">Prison</option>
+                                            <option value="Police Station">Police Station</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
                                         <label for="profile_no" class="form-label">Profile No./Central ID No</label>
                                         <input type="text" class="form-control" id="profile_no" name="profile_no">
                                     </div>

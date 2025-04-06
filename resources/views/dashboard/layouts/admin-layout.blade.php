@@ -69,6 +69,8 @@
                     <li><a href="{{ route('customReport') }}"><i class="fas fa-chart-bar"></i> Intervention Report</a></li>
                     <li><a href="{{ route('district.summery') }}"><i class="fas fa-user-clock"></i> District Summery</a></li>
                     <li><a href="{{ route('pngo.summery') }}"><i class="fas fa-lock"></i> PNGO Summery</a></li>
+                    <li><a href="{{ route('formal.cases.export') }}"><i class="fa fa-download"></i> Download Excel</a></li>
+
                 </ul>
             </li>
         

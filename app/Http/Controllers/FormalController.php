@@ -24,9 +24,14 @@ class FormalController extends Controller
     public function courtPolicePrison(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'institute' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
             'intervention_taken' => 'required|string|max:255',
         ], [
+            'institute.required' => 'Institute is required. Please enter your name.',
+            'institute.string' => 'Institute must be a valid text.',
+            'institute.max' => 'Institute should not exceed 255 characters.',
+
             'full_name.required' => 'The full name is required. Please enter your name.',
             'full_name.string' => 'The full name must be a valid text.',
             'full_name.max' => 'The full name should not exceed 255 characters.',
@@ -66,6 +71,7 @@ class FormalController extends Controller
         $case->district_id = $districtId;
         $case->pngo_id = $pngoId;
         $case->status = 1;
+        $case->institute = $request->institute;
         $case->full_name = $request->full_name;
         $case->nick_name = $request->nick_name;
         $case->father_name = $request->father_name;
@@ -211,9 +217,14 @@ class FormalController extends Controller
     public function editCourtPolicePrison(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'institute' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
             'intervention_taken' => 'required|string|max:255',
         ], [
+            'institute.required' => 'Institute is required. Please enter your name.',
+            'institute.string' => 'Institute must be a valid text.',
+            'institute.max' => 'Institute should not exceed 255 characters.',
+            
             'full_name.required' => 'The full name is required. Please enter your name.',
             'full_name.string' => 'The full name must be a valid text.',
             'full_name.max' => 'The full name should not exceed 255 characters.',
@@ -232,6 +243,7 @@ class FormalController extends Controller
         $case = FormalCase::find($id);
         
         $case->status = 2;
+        $case->institute = $request->institute;
         $case->full_name = $request->full_name;
         $case->nick_name = $request->nick_name;
         $case->father_name = $request->father_name;

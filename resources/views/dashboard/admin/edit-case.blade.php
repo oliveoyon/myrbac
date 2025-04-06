@@ -187,6 +187,20 @@
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-4">
+                                        <label for="Institute" class="form-label">Institute</label>
+                                        <select class="form-select" id="sex" name="institute">
+                                            <option value="">Select</option>
+                                            <option value="Court" {{ old('institute', $caseData->institute ?? '') == 'Court' ? 'selected' : '' }}>Court</option>
+                                            <option value="Prison" {{ old('institute', $caseData->institute ?? '') == 'Prison' ? 'selected' : '' }}>Prison</option>
+                                            <option value="Police Station" {{ old('institute', $caseData->institute ?? '') == 'Police Station' ? 'selected' : '' }}>Police Station</option>
+                                        </select>
+                                        @error('institute')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-4">
                                         <label for="central_id" class="form-label">Profile No./Central ID No</label>
                                         <input type="text" class="form-control" id="central_id" name="central_id" value="{{ $caseData->central_id }}" disabled>
                                     </div>

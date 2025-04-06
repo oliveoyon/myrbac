@@ -10,6 +10,9 @@ use App\Models\Pngo;
 use Illuminate\Support\Facades\DB;
 use Mpdf\Mpdf;
 use App\Services\CommonService;
+use App\Exports\FormalCaseExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
@@ -287,6 +290,32 @@ class ReportController extends Controller
         $pngoWise = $commonService->showCaseAssistancePngoWise();
         return view('dashboard.report.pngo-summery', compact('pngoWise'));
     }
+
+    public function search(Request $request)
+    {
+        $districtId = Auth::user()->district_id;
+        $pngoId = Auth::user()->pngo_id;
+        $whr = ['district_id' => $districtId,'pngo_id' => $pngoId];
+        $whr = array_filter($whr);
+        
+        $query = $request->input('query');
+        $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])
+            ->where(function ($q) use ($query) {
+                $q->where('central_id', 'like', "%{$query}%")
+                ->orWhere('full_name', 'like', "%{$query}%")
+                ->orWhere('phone_number', 'like', "%{$query}%");
+            })
+            ->where($whr)
+            ->get();
+        return view('dashboard.report.search-list', compact('cases'));
+        // return response()->json(['cases' => $cases1]);
+    }
+    
+    public function exportExcel()
+    {
+        return Excel::download(new FormalCaseExport, 'formal_cases.xlsx');
+    }
+
 
 
 
