@@ -667,7 +667,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">অভিভাবক কি জামিনদার হবেন?&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Will the Guardian act as surety?)&nbsp;</span></p>
                         </td>
                         <td colspan="4" style="width:208.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->guardian_surety == 'Yes') ? 'checked="checked"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83" <?php echo ($details->guardian_surety == 'Yes') ? 'checked="No"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" <?php echo ($details->guardian_surety == 'Yes') ? 'checked="checked"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">হ্যাঁ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Yes)</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;&nbsp;</span><input type="checkbox" name="Check83" <?php echo ($details->guardian_surety == 'No') ? 'checked="No"' : ''; ?>><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">না&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(No)</span></p>
                         </td>
                     </tr>
                     <tr style="height:0pt;">
@@ -856,7 +856,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">মামলা নং&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Case Number)</span></p>
                         </td>
                         <td style="width:97.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:16pt;"><span style="font-family:Arial;">{{ $details->arrest_datecase_no }}</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:16pt;"><span style="font-family:Arial;"></span>{{ $details->case_no }}</p>
                         </td>
                     </tr>
                     <tr style="height:0pt;">
@@ -1151,7 +1151,7 @@
                     </tr>
                     <tr style="height:19.3pt;">
                         <td style="width:376.1pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"  {{ ($details->release_status == 'With Fine') ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">জরিমানাসহ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(With fine) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"  {{ ($details->release_status == 'With Fine') ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">জরিমানাসহ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(With fine) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;{{ ($details->release_status == 'With Fine') ? $details->fine_amount : '' }}&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.</span></p>
                         </td>
                         <td style="width:92.8pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.</span></p>
@@ -1524,7 +1524,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:11pt;"><span style="font-family:bangla;">গ্রেফতারের তারিখ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Date of arrest)</span></p>
                         </td>
                         <td style="width:227.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span>{{ $details->prison_arrest_date }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -1569,7 +1569,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">14.1</span></p>
                         </td>
                         <td style="width:377.6pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83"><span style="font-family:bangla;">&nbsp;পরিবারের সাথে যোগাযোগ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Communicate with families/ relatives)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->prison_family_communication) ? 'checked="checked"' : '' }}><span style="font-family:bangla;">&nbsp;পরিবারের সাথে যোগাযোগ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Communicate with families/ relatives)</span></p>
                         </td>
                         <td style="width:92.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:150%; font-size:10pt;"><strong><span style="font-family:bangla;">&nbsp;</span></strong>{{ $details->prison_family_communication }}</p>
@@ -1618,7 +1618,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
                         </td>
                         <td style="width:377.6pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:12pt;"><input type="checkbox" name="Check83"><span style="line-height:150%; font-family:bangla; font-size:11pt;">&nbsp;&lsquo;তলবমতে বন্দীর আদালত থেকে পরবর্তী তারিখ সংগ্রহ</span><span style="font-family:bangla;">&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Collect next court date for &ldquo;On&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:12pt;"><input type="checkbox" name="Check83" {{ ($details->next_court_collection_date) ? 'checked="checked"' : '' }}><span style="line-height:150%; font-family:bangla; font-size:11pt;">&nbsp;&lsquo;তলবমতে বন্দীর আদালত থেকে পরবর্তী তারিখ সংগ্রহ</span><span style="font-family:bangla;">&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Collect next court date for &ldquo;On&nbsp;</span></p>
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:Arial;">Call&rdquo; prisoners from court)</span></p>
                         </td>
                         <td style="width:92.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
@@ -1632,7 +1632,7 @@
                             </ol>
                         </td>
                         <td style="width:92.8pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->next_court_collection_date }}</p>
                         </td>
                     </tr>
                     <tr style="height:8.75pt;">
@@ -1642,7 +1642,7 @@
                             </ol>
                         </td>
                         <td style="width:92.8pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">{{ $details->next_court_collection_date }}</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->prison_next_court_date }}</p>
                         </td>
                     </tr>
                     <tr style="height:8.75pt;">
@@ -1650,7 +1650,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">14.4</span></p>
                         </td>
                         <td style="width:377.6pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83"><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">আদালত হতে মামলার নথি সংগ্রহ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">[Collected case document (FIR, CS, Police&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->collected_case_doc_prison) ? 'checked="checked"' : '' }}><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">আদালত হতে মামলার নথি সংগ্রহ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">[Collected case document (FIR, CS, Police&nbsp;</span></p>
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:Arial;">forwarding, judgment etc.) from Courts and other places]&nbsp;</span></p>
                         </td>
                         <td style="width:92.8pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
@@ -1663,7 +1663,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
                         </td>
                         <td style="width:377.6pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83"><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">জামিনদার খুঁজে দেয়া, জাতীয় পরিচয়পত্র ও ফোন নং সহ বিস্তারিত লিখুন&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">[Identify sureties (details&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->identify_sureties_prison_nid) ? 'checked="checked"' : '' }}><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">জামিনদার খুঁজে দেয়া, জাতীয় পরিচয়পত্র ও ফোন নং সহ বিস্তারিত লিখুন&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">[Identify sureties (details&nbsp;</span></p>
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:Arial;">with National ID and Phone No.)]</span></p>
                         </td>
                         <td rowspan="3" style="width:92.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
@@ -2019,7 +2019,7 @@
         </td>
         <td style="width:53.25pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; padding-top:10px; padding-bottom:10px;">
             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;">
-                <span style="font-family:Arial;">&nbsp;</span>{{ $f->to_be_taken }}
+                <span style="font-family:Arial;">&nbsp;</span>{{ $f->to_be_taken_date }}
             </p>
         </td>
     </tr>

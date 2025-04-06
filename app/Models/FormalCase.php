@@ -47,4 +47,10 @@ class FormalCase extends Model
         return $this->belongsTo(Pngo::class, 'pngo_id');
     }
 
+    public function fileUploads()
+    {
+        return $this->hasMany(FileUpload::class, 'case_id');
+    }
+
+
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FormalCase;
 use App\Models\FollowUpIntervention;
+use App\Models\FileUpload; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -46,15 +47,18 @@ class FormalController extends Controller
         $districtId = Auth::user()->district_id;
         $pngoId = Auth::user()->pngo_id;
         $existingCentralIds = FormalCase::where('district_id', $districtId)
-                                ->where('pngo_id', $pngoId)
-                                ->get();
+        ->where('pngo_id', $pngoId)
+        ->orderByDesc('id')
+        ->first();
+                            
 
-        $highestCentralId = $existingCentralIds->max('central_id');
+        $highestCentralId = $existingCentralIds->central_id;
         preg_match('/(\d+)$/', $highestCentralId, $matches);
         $lastNumber = isset($matches[1]) ? $matches[1] : null;
         $nextNumber = $lastNumber ? $lastNumber + 1 : 1;
 
         $centralId = strtoupper(substr($districtName, 0, 3)) . '-LA-' . $nextNumber;
+
         // Create a new FormalCase object
         $case = new FormalCase();
         $case->central_id = $centralId;
@@ -127,6 +131,7 @@ class FormalController extends Controller
         $case->service_description = $request->service_description;
         $case->source_of_interview = $request->source_of_interview;
         $case->prison_reg_no = $request->prison_reg_no;
+        $case->prison_case_no = $request->prison_case_no;
         $case->section_no = $request->section_no;
         $case->present_court = $request->present_court;
         $case->lockup_no = $request->lockup_no;
@@ -140,11 +145,13 @@ class FormalController extends Controller
         $case->imprisonment_condition = $request->imprisonment_condition;
         $case->imprisonment_status = $request->imprisonment_status;
         $case->special_condition = $request->special_condition;
+        $case->prison_arrest_date = $request->prison_arrest_date;
         $case->surrender_date = $request->surrender_date;
         $case->prison_family_communication = $request->prison_family_communication;
         $case->prison_legal_representation = $request->prison_legal_representation;
         $case->prison_legal_representation_date = $request->prison_legal_representation_date;
         $case->next_court_collection_date = $request->next_court_collection_date;
+        $case->prison_next_court_date = $request->prison_next_court_date;
         $case->collected_case_doc_prison = $request->collected_case_doc_prison;
         $case->identify_sureties_prison_nid = $request->identify_sureties_prison_nid;
         $case->identify_sureties_prison_phone = $request->identify_sureties_prison_phone;
@@ -180,16 +187,20 @@ class FormalController extends Controller
         $followup->save();
 
         if ($request->hasFile('fileUpload')) {
-            $uploadedFiles = [];
             foreach ($request->file('fileUpload') as $file) {
                 $originalName = $file->getClientOriginalName();
                 $extension = $file->getClientOriginalExtension();
-                $newFileName = $centralId . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
-                $filePath = $file->storeAs('uploads/formal_cases', $newFileName, 'public');
-                $uploadedFiles[] = $filePath;
+                $newFileName = $case->id . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
+        
+                // Store the file
+                $file->storeAs('uploads/formal_cases', $newFileName, 'public');
+        
+                // Save to database
+                FileUpload::create([
+                    'case_id' => $case->id,
+                    'file_name' => $newFileName,
+                ]);
             }
-            // You can save the uploaded files here if necessary
-            // $case->update(['fileUpload' => json_encode($uploadedFiles)]);
         }
     
         // dd($case);
@@ -286,6 +297,7 @@ class FormalController extends Controller
         $case->service_description = $request->service_description;
         $case->source_of_interview = $request->source_of_interview;
         $case->prison_reg_no = $request->prison_reg_no;
+        $case->prison_case_no = $request->prison_case_no;
         $case->section_no = $request->section_no;
         $case->present_court = $request->present_court;
         $case->lockup_no = $request->lockup_no;
@@ -299,11 +311,13 @@ class FormalController extends Controller
         $case->imprisonment_condition = $request->imprisonment_condition;
         $case->imprisonment_status = $request->imprisonment_status;
         $case->special_condition = $request->special_condition;
+        $case->prison_arrest_date = $request->prison_arrest_date;
         $case->surrender_date = $request->surrender_date;
         $case->prison_family_communication = $request->prison_family_communication;
         $case->prison_legal_representation = $request->prison_legal_representation;
         $case->prison_legal_representation_date = $request->prison_legal_representation_date;
         $case->next_court_collection_date = $request->next_court_collection_date;
+        $case->prison_next_court_date = $request->prison_next_court_date;
         $case->collected_case_doc_prison = $request->collected_case_doc_prison;
         $case->identify_sureties_prison_nid = $request->identify_sureties_prison_nid;
         $case->identify_sureties_prison_phone = $request->identify_sureties_prison_phone;
@@ -339,16 +353,20 @@ class FormalController extends Controller
         $followup->save();
 
         if ($request->hasFile('fileUpload')) {
-            $uploadedFiles = [];
             foreach ($request->file('fileUpload') as $file) {
                 $originalName = $file->getClientOriginalName();
                 $extension = $file->getClientOriginalExtension();
-                $newFileName = $request->central_id . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
-                $filePath = $file->storeAs('uploads/formal_cases', $newFileName, 'public');
-                $uploadedFiles[] = $filePath;
+                $newFileName = $case->id . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
+        
+                // Store the file
+                $file->storeAs('uploads/formal_cases', $newFileName, 'public');
+        
+                // Save to database
+                FileUpload::create([
+                    'case_id' => $case->id,
+                    'file_name' => $newFileName,
+                ]);
             }
-            // You can save the uploaded files here if necessary
-            // $case->update(['fileUpload' => json_encode($uploadedFiles)]);
         }
 
         // dd($case);
@@ -372,6 +390,24 @@ class FormalController extends Controller
         $caseData = FormalCase::find($editId);
 
         return view('dashboard.admin.edit-case', compact('caseData'));
+    }
+
+    public function fileCase(Request $request)
+    {
+        Session::put('file_id', $request->file_id);
+        return response()->json(['success' => true, 'redirect_url' => route('edit-file.get')]);
+    }
+    public function fileCaseForm(Request $request)
+    {
+        $caseId = Session::get('file_id');
+        // Session::forget('edit_id');
+
+        if (!$caseId) {
+            return redirect()->route('case_list');
+        }
+        $caseFiles = FileUpload::where('case_id', $caseId)->orderBy('id', 'asc')->get();
+
+        return view('dashboard.admin.get-file', compact('caseFiles'));
     }
 
     public function importView()
@@ -415,7 +451,7 @@ class FormalController extends Controller
             $row['prison_family_communication'] = $this->convertToDateFormat($row['prison_family_communication']);
             $row['prison_legal_representation'] = $this->convertToDateFormat($row['prison_legal_representation']);
             $row['prison_legal_representation_date'] = $this->convertToDateFormat($row['prison_legal_representation_date']);
-            $row['next_court_collection_date'] = $this->convertToDateFormat($row['next_court_collection_date']);
+            $row['prison_next_court_date'] = $this->convertToDateFormat($row['prison_next_court_date']);
             $row['witness_communication_prison'] = $this->convertToDateFormat($row['witness_communication_prison']);
             $row['bail_bond_submission'] = $this->convertToDateFormat($row['bail_bond_submission']);
             $row['court_order_communication'] = $this->convertToDateFormat($row['court_order_communication']);
@@ -502,6 +538,7 @@ class FormalController extends Controller
                 'service_description' => $row['service_description'],
                 'source_of_interview' => $row['source_of_interview'],
                 'prison_reg_no' => $row['prison_reg_no'],
+                'prison_case_no' => $row['prison_case_no'],
                 'entry_date' => $row['entry_date'],
                 'case_transferred' => $row['case_transferred'],
                 'current_court' => $row['current_court'],
@@ -510,6 +547,7 @@ class FormalController extends Controller
                 'facts_of_case' => $row['facts_of_case'],
                 'imprisonment_condition' => $row['imprisonment_condition'],
                 'special_condition' => $row['special_condition'],
+                'prison_arrest_date' => $row['prison_arrest_date'],
                 'surrender_date' => $row['surrender_date'],
                 'released_on' => $row['released_on'],
                 'result_of_appeal' => $row['result_of_appeal'],

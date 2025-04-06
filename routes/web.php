@@ -72,6 +72,9 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/dashboard/search', [DashboardController::class, 'search'])->name('dashboard.search');
 
+    Route::post('/edit-file', [FormalController::class, 'fileCase'])->name('edit-file.post'); // AJAX POST route
+    Route::get('/edit-file', [FormalController::class, 'fileCaseForm'])->name('edit-file.get'); // GET route for the form view
+
 
     // Reporting purpose
     

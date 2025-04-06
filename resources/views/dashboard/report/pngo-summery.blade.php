@@ -45,6 +45,19 @@
         .modal.modal-fullscreen .modal-body {
             overflow-y: auto;
         }
+
+        .chart-wrapper {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #pngoBarChart {
+            width: 100% !important;
+            height: auto !important;
+        }
     </style>
 @endpush
 
@@ -70,40 +83,47 @@
                         <div class="alert alert-danger" id="errorAlert" style="display: none;">
                             <ul id="errorList"></ul>
                         </div>
-                        <div id="reportDiv">
-                            <div class="col-md-12">
-                                <div class="chart-container">
-                                    <canvas id="pngoBarChart"></canvas>
+                        <div id="reportDiv" class="container-fluid">
+                            <div class="row">
+                                <!-- Chart Section -->
+                                <div class="col-12 mb-4">
+                                    <div class="chart-wrapper">
+                                        <canvas id="pngoBarChart"></canvas>
+                                    </div>
                                 </div>
-                                <!-- Summary Table -->
-                                <div class="mt-4 table-responsive">
-                                <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>PNGO</th>
-                                                <th>Male</th>
-                                                <th>Female</th>
-                                                <th>Transgender</th>
-                                                <th>Under 18</th>
-                                                <th>Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($pngoWise as $row)
+                        
+                                <!-- Table Section -->
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
                                                 <tr>
-                                                    <td>{{ $row['pngo_name'] }}</td>
-                                                    <td>{{ $row['male'] }}</td>
-                                                    <td>{{ $row['female'] }}</td>
-                                                    <td>{{ $row['transgender'] }}</td>
-                                                    <td>{{ $row['under_18'] }}</td>
-                                                    <td>{{ $row['total'] }}</td>
+                                                    <th>PNGO</th>
+                                                    <th>Male</th>
+                                                    <th>Female</th>
+                                                    <th>Transgender</th>
+                                                    <th>Under 18</th>
+                                                    <th>Total</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($pngoWise as $row)
+                                                    <tr>
+                                                        <td>{{ $row['pngo_name'] }}</td>
+                                                        <td>{{ $row['male'] }}</td>
+                                                        <td>{{ $row['female'] }}</td>
+                                                        <td>{{ $row['transgender'] }}</td>
+                                                        <td>{{ $row['under_18'] }}</td>
+                                                        <td>{{ $row['total'] }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>

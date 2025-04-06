@@ -832,8 +832,8 @@
                                             name="prison_reg_no">
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="case_no" class="form-label">Case Number(s)</label>
-                                        <input type="text" class="form-control" id="case_no" name="case_no">
+                                        <label for="prison_case_no" class="form-label">Case Number(s)</label>
+                                        <input type="text" class="form-control" id="prison_case_no" name="prison_case_no">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="section_no" class="form-label">Section Number</label>
@@ -992,9 +992,9 @@
                                             name="next_court_collection_date">
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="next_court_date" class="form-label">Next Court Date</label>
-                                        <input type="date" class="form-control" id="next_court_date"
-                                            name="next_court_date">
+                                        <label for="prison_next_court_date" class="form-label">Next Court Date</label>
+                                        <input type="date" class="form-control" id="prison_next_court_date"
+                                            name="prison_next_court_date">
                                     </div>
 
                                     <div class="col-md-4">
@@ -1342,7 +1342,7 @@
                 {
                     id: "release_status",
                     targets: ["fine_field"],
-                    showValue: "fine"
+                    showValue: "With Fine"
                 },
                 {
                     id: "received_application",

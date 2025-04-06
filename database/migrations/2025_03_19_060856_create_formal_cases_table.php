@@ -30,9 +30,9 @@ return new class extends Migration
             $table->string('nationality')->nullable();
             $table->string('nid_passport')->nullable();
             $table->string('phone_number')->nullable();
+            $table->text('address')->nullable();
             // Primary info end
             // 2. Session Info starts
-            $table->text('address')->nullable();
             $table->date('interview_date')->nullable();
             $table->time('interview_time')->nullable();
             $table->string('interview_place')->nullable();
@@ -92,10 +92,11 @@ return new class extends Migration
             $table->date('resolved_dispute_date')->nullable();
             $table->date('appoint_lawyer_date')->nullable();
             $table->string('release_status')->nullable();
-            // 9. Result of Assistance end
-            // 10. Legal aid office information starts
             $table->decimal('fine_amount', 10, 2)->nullable();
             $table->date('release_status_date')->nullable();
+            // 9. Result of Assistance end
+            // 10. Legal aid office information starts
+
             $table->string('application_mode')->nullable();
             $table->date('application_mode_date')->nullable();
             $table->string('received_application')->nullable();
@@ -109,6 +110,7 @@ return new class extends Migration
             // 12. Support in prison starts
             $table->string('source_of_interview')->nullable();
             $table->string('prison_reg_no')->nullable();
+            $table->string('prison_case_no')->nullable();
             $table->string('section_no')->nullable();
             $table->string('present_court')->nullable();
             $table->string('lockup_no')->nullable();
@@ -124,13 +126,15 @@ return new class extends Migration
             $table->text('imprisonment_condition')->nullable();
             $table->string('imprisonment_status')->nullable();
             $table->text('special_condition')->nullable();
+            $table->date('prison_arrest_date')->nullable();
             $table->date('surrender_date')->nullable();
             // Imprisonment Information end
             // 14. Support in prison
             $table->date('prison_family_communication')->nullable();
-            $table->date('prison_legal_representation')->nullable();
+            $table->string('prison_legal_representation')->nullable();
             $table->date('prison_legal_representation_date')->nullable();
             $table->date('next_court_collection_date')->nullable();
+            $table->date('prison_next_court_date')->nullable();
             $table->text('collected_case_doc_prison')->nullable();
             $table->string('identify_sureties_prison_nid')->nullable();
             $table->string('identify_sureties_prison_phone')->nullable();
@@ -144,11 +148,11 @@ return new class extends Migration
             $table->date('other_legal_assistance_date')->nullable();
             // Support in prison end
             // 15. Result of Assistance in Prison
-            $table->date('released_on')->nullable();
+            $table->string('released_on')->nullable();
             $table->date('released_on_date')->nullable();
             $table->text('send_to')->nullable();
             $table->date('send_to_date')->nullable();
-            $table->integer('convicted_length')->nullable();
+            $table->string('convicted_length')->nullable();
             $table->date('convicted_sentence_expire')->nullable();
             $table->text('result_of_appeal')->nullable();
             $table->date('date_of_reliefe')->nullable();

@@ -236,6 +236,9 @@ td a {
                                 <a href="javascript:void(0);" class="edit-link" data-edit-id="${caseData.id}">
                                     <i class="fa fa-edit"></i>
                                 </a>
+                                <a href="javascript:void(0);" class="file-link" data-file-id="${caseData.id}">
+                                    <i class="fa fa-edit"></i>
+                                </a>
                             </td>
                         </tr>`;
 
@@ -458,6 +461,29 @@ $(document).on("click", ".edit-link", function (event) {
         data: {
             _token: $('meta[name="csrf-token"]').attr('content'),
             edit_id: editId
+        },
+        success: function (response) {
+            if (response.success) {
+                window.location.href = response.redirect_url; // Redirect to edit form
+            }
+        },
+        error: function (xhr) {
+            console.error("AJAX request failed", xhr);
+        }
+    });
+});
+
+$(document).on("click", ".file-link", function (event) {
+    event.preventDefault();
+
+    var fileId = $(this).data("file-id"); // Get the edit ID
+
+    $.ajax({
+        url: "/mne/edit-file",
+        type: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            file_id: fileId
         },
         success: function (response) {
             if (response.success) {

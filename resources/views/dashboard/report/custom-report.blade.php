@@ -5,7 +5,7 @@
 @push('styles')
 <style>
     .category {
-        border: 2px solid #870093; /* Blue border for better visibility */
+        border: 2px solid #005e17; /* Blue border for better visibility */
         border-radius: 8px;
         padding: 15px;
         margin-bottom: 20px;
@@ -16,7 +16,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #870093;
+        background-color: #005e17;
         color: #fff;
         padding: 10px;
         border-radius: 6px;
@@ -109,7 +109,7 @@
         <div class="row">
             <div class="col-12">
                 
-                    <div class="card mb-3" style="border: 2px solid #870093;">
+                    <div class="card mb-3" style="border: 2px solid #005e17;">
                         <div class="card-header text-bg-dark d-flex justify-content-between align-items-center">
                             <h5 class="card-title ">Select Interventions</h5>
                             <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#caseCardBody">
