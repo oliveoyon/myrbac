@@ -60,7 +60,7 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::get('role/{role}/edit-permissions', [RolePermissionController::class, 'editPermissions'])->middleware('permission:Edit Role Permissions');  
     Route::post('role/update-permissions/{roleId}', [RolePermissionController::class, 'updatePermissions'])->middleware('permission:Update Role Permissions');  
 
-    Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index')->middleware('permission:View Formal Cases');
+    Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index')->middleware('permission:View Formal Cases Form');
     Route::post('formAction', [FormalController::class, 'courtPolicePrison'])->name('formaction')->middleware('permission:Create Formal Case');
     Route::get('/edit-case', [FormalController::class, 'editCaseForm'])->name('edit-case.get')->middleware('permission:View Edit Formal Case Form');
     Route::post('/edit-case', [FormalController::class, 'editCase'])->name('edit-case.post')->middleware('permission:Edit Formal Case');

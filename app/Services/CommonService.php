@@ -8,17 +8,14 @@ use App\Models\FormalCase;
 use App\Models\District;
 use App\Models\Pngo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class CommonService
 {
     public function showCaseAssistanceData($did=Null, $pid=Null, $st=NULL)
     {
 
-        // $districtId = $request->input('district_id', 1);
-        // $pngoId = $request->input('pngo_id', 1);
-        // $status = $request->input('status', 1);
-        // $districtName = District::where('id', FormalCase::first()->district_id)->value('name');
-        // $pngoName = Pngo::where('id', FormalCase::first()->pngo_id)->value('name');
+       
 
         $filter = ['district_id' => $did, 'pngo_id' => $pid, 'status' => $st];
         $whr = array_filter($filter);
@@ -92,9 +89,12 @@ class CommonService
 
     public function showCaseAssistanceDistrictWise()
     {
-        // Define status value
-        $status = 1;
+        $districtId = Auth::user()->district_id;
+        $pngoId = Auth::user()->pngo_id;
+        $whr = ['district_id' => $districtId,'pngo_id' => $pngoId];
+        $whr = array_filter($whr);
 
+        $status = 1;
         // Fetch the district data grouped by district_id
         $data = FormalCase::select(
             'district_id',
@@ -106,6 +106,7 @@ class CommonService
         )
         // Add condition to filter by status (if required)
         ->where('status', $status)
+        ->where($whr)
         ->groupBy('district_id') // Group by district only, not by institute
         ->get();
 
@@ -132,7 +133,10 @@ class CommonService
 
     public function showCaseAssistancePngoWise()
     {
-        // Define status value
+        $districtId = Auth::user()->district_id;
+        $pngoId = Auth::user()->pngo_id;
+        $whr = ['district_id' => $districtId,'pngo_id' => $pngoId];
+        $whr = array_filter($whr);
         $status = 1;
 
         // Fetch the case data grouped by pngo_id
@@ -145,6 +149,7 @@ class CommonService
             DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
         )
         ->where('status', $status)
+        ->where($whr)
         ->groupBy('pngo_id') // Group by pngo_id instead of district_id
         ->get();
 

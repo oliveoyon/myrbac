@@ -53,10 +53,23 @@ td a {
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <select class="form-control form-control-sm district_id" name="district_id" id="district_id">
-                                            <option value="">All Districts</option>
-                                            @foreach ($districts as $district)
-                                                <option value="{{ $district->id }}">{{ $district->name }}</option>
-                                            @endforeach
+                                            @php
+                                                $userDistrictId = auth()->user()->district_id;
+                                            @endphp
+
+                                            @if ($userDistrictId)
+                                                @foreach ($districts as $district)
+                                                    @if ($district->id == $userDistrictId)
+                                                        <option value="{{ $district->id }}" selected>{{ $district->name }}</option>
+                                                    @endif
+                                                @endforeach
+                                            @else
+                                                <option value="">All Districts</option>
+                                                @foreach ($districts as $district)
+                                                    <option value="{{ $district->id }}">{{ $district->name }}</option>
+                                                @endforeach
+                                            @endif
+
                                         </select>
                                     </div>
                                 </div>
@@ -65,10 +78,22 @@ td a {
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <select class="form-control form-control-sm pngo_id" name="pngo_id" id="pngo_id">
-                                            <option value="">All PNGO</option>
-                                            @foreach ($pngos as $pngo)
-                                                <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
-                                            @endforeach
+                                            @php
+                                                $userPngoId = auth()->user()->pngo_id;
+                                            @endphp
+
+                                            @if ($userPngoId)
+                                                @foreach ($pngos as $pngo)
+                                                    @if ($pngo->id == $userPngoId)
+                                                        <option value="{{ $pngo->id }}" selected>{{ $pngo->name }}</option>
+                                                    @endif
+                                                @endforeach
+                                            @else
+                                                <option value="">All PNGO</option>
+                                                @foreach ($pngos as $pngo)
+                                                    <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </div>
                                 </div>

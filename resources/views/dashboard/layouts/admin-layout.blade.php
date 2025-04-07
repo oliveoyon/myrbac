@@ -36,6 +36,7 @@
             <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             @endcan
         
+            @can('View Districts')
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-cogs"></i> General Settings</a>
                 <ul class="submenu">
@@ -43,7 +44,9 @@
                     <li><a href="{{ route('dashboard.pngos') }}"><i class="fas fa-handshake"></i> PNGOs Management</a></li>
                 </ul>
             </li>
+            @endcan
         
+            @can('View Categories')
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-user-shield"></i> Roles & Permissions</a>
                 <ul class="submenu">
@@ -54,7 +57,8 @@
                     <li><a href="{{ route('users.index') }}"><i class="fas fa-user"></i> Users</a></li>
                 </ul>
             </li>
-            
+            @endcan
+
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-cogs"></i> Manage Data Entry</a>
                 <ul class="submenu">
@@ -74,7 +78,7 @@
                 </ul>
             </li>
         
-            <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
+            <!-- <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
         
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-wrench"></i> System Settings</a>
@@ -82,7 +86,7 @@
                     <li><a href="#"><i class="fas fa-cog"></i> Application Settings</a></li>
                     <li><a href="#"><i class="fas fa-user-lock"></i> Security Settings</a></li>
                 </ul>
-            </li>
+            </li> -->
     
             <!-- Logout Menu Option for Authenticated Users -->
             @auth
