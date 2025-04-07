@@ -287,7 +287,7 @@
                 {
                     label: 'Female',
                     data: femaleData, // Female count per district
-                    backgroundColor: '#ff66b2', // Pink color
+                    backgroundColor: '#800080', // Pink color
                     borderRadius: 5, // Rounded corners
                     borderWidth: 1,
                     borderColor: '#e60073', // Dark pink border for contrast
@@ -405,7 +405,7 @@
                     {
                         label: "Female",
                         data: femaleData,
-                        backgroundColor: "#ff66b2",
+                        backgroundColor: "#800080",
                         barThickness: 40,
                     },
                     {

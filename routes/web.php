@@ -60,35 +60,34 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::get('role/{role}/edit-permissions', [RolePermissionController::class, 'editPermissions'])->middleware('permission:Edit Role Permissions');  
     Route::post('role/update-permissions/{roleId}', [RolePermissionController::class, 'updatePermissions'])->middleware('permission:Update Role Permissions');  
 
-    Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index');  
-    Route::post('formAction', [FormalController::class, 'courtPolicePrison'])->name('formaction');  
-    Route::post('/edit-case', [FormalController::class, 'editCase'])->name('edit-case.post');
-    Route::get('/edit-case', [FormalController::class, 'editCaseForm'])->name('edit-case.get');
-    Route::post('editformaction', [FormalController::class, 'editCourtPolicePrison'])->name('editformaction');  
-    Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view');
-    Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store');
-    Route::post('/dashboard/search', [ReportController::class, 'search'])->name('dashboard.search');
-    Route::post('/edit-file', [FormalController::class, 'fileCase'])->name('edit-file.post');
-    Route::get('/edit-file', [FormalController::class, 'fileCaseForm'])->name('edit-file.get');
-    Route::get('/formal-cases/export', [ReportController::class, 'exportExcel'])->name('formal.cases.export');
-
-
-    // Reporting purpose
+    Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index')->middleware('permission:View Formal Cases');
+    Route::post('formAction', [FormalController::class, 'courtPolicePrison'])->name('formaction')->middleware('permission:Create Formal Case');
+    Route::get('/edit-case', [FormalController::class, 'editCaseForm'])->name('edit-case.get')->middleware('permission:View Edit Formal Case Form');
+    Route::post('/edit-case', [FormalController::class, 'editCase'])->name('edit-case.post')->middleware('permission:Edit Formal Case');
+    Route::post('editformaction', [FormalController::class, 'editCourtPolicePrison'])->name('editformaction')->middleware('permission:Update Formal Case Details');
+    Route::get('/edit-file', [FormalController::class, 'fileCaseForm'])->name('edit-file.get')->middleware('permission:View File Formal Case Form');
+    Route::post('/edit-file', [FormalController::class, 'fileCase'])->name('edit-file.post')->middleware('permission:File Formal Case');
+    Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view')->middleware('permission:View Formal Case Import Page');
+    Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store')->middleware('permission:Import Formal Cases');
+    Route::get('/formal-cases/export', [ReportController::class, 'exportExcel'])->name('formal.cases.export')->middleware('permission:Export Formal Cases');
+    Route::post('/dashboard/search', [ReportController::class, 'search'])->name('dashboard.search')->middleware('permission:Search Dashboard Reports');
     
 
-    Route::get('district-list-report', [ReportController::class, 'district_report'])->name('district-list-report');
+    // Reporting purpose
+
     Route::post('/generate-pdf', [ReportController::class, 'generatePdf'])->name('generate-pdf');
     Route::post('/generate-pdf-chart', [ReportController::class, 'generatePdfChart'])->name('generate-pdf-chart');
     Route::post('/generate-form', [ReportController::class, 'generateForm'])->name('generate-form');
 
-    Route::get('case-list', [ReportController::class, 'districtWiseCaselist'])->name('case_list');
-    Route::post('/case-list', [ReportController::class, 'districtWiseCaselistDetail'])->name('case_list1');
+    Route::get('district-list-report', [ReportController::class, 'district_report'])->name('district-list-report')->middleware('permission:View District List Report');
+    Route::get('case-list', [ReportController::class, 'districtWiseCaselist'])->name('case_list')->middleware('permission:View Case List Report');
+    Route::post('/case-list', [ReportController::class, 'districtWiseCaselistDetail'])->name('case_list1')->middleware('permission:View Case List Report Details');
+    Route::get('/intervention-report', [ReportController::class, 'customReport'])->name('customReport')->middleware('permission:View Intervention Report Page');
+    Route::post('/custom-report', [ReportController::class, 'generateCustomReport'])->name('custom.report.generate')->middleware('permission:Generate Custom Report');
+    Route::get('/getFormalCaseStats', [ReportController::class, 'getFormalCaseStats'])->name('getFormalCaseStats')->middleware('permission:View Formal Case Statistics');
+    Route::get('/district-summery', [ReportController::class, 'districtSummery'])->name('district.summery')->middleware('permission:View District Summary Report');
+    Route::get('/pngo-summery', [ReportController::class, 'pngoSummery'])->name('pngo.summery')->middleware('permission:View PNGO Summary Report');
     
-    Route::get('/intervention-report', [ReportController::class, 'customReport'])->name('customReport');
-    Route::post('/custom-report', [ReportController::class, 'generateCustomReport'])->name('custom.report.generate');
-    Route::get('/getFormalCaseStats', [ReportController::class, 'getFormalCaseStats'])->name('getFormalCaseStats');
-    Route::get('/district-summery', [ReportController::class, 'districtSummery'])->name('district.summery');
-    Route::get('/pngo-summery', [ReportController::class, 'pngoSummery'])->name('pngo.summery');
     
     
     Route::get('/generate-pdfs', [PDFController::class, 'generatePDF']);
