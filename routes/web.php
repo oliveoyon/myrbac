@@ -74,6 +74,7 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::post('/edit-case', [FormalController::class, 'editCase'])->name('edit-case.post')->middleware('permission:Edit Formal Case');
 
     Route::post('/verify-case', [FormalController::class, 'verifyCase'])->name('formal-case.verify')->middleware('permission:Verified by DPO');
+    Route::post('/verify-case1', [FormalController::class, 'verifyCaseMneo'])->name('formal-case.verifymneo')->middleware('permission:Verified by MNEO');
 
 
     Route::post('editformaction', [FormalController::class, 'editCourtPolicePrison'])->name('editformaction')->middleware('permission:Update Formal Case Details');

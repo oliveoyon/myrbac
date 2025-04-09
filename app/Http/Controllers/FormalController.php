@@ -623,6 +623,27 @@ private function convertToDateFormat($date)
         return response()->json(['success' => true, 'message' => 'Case verified successfully.']);
     }
 
+    public function verifyCaseMneo(Request $request)
+    {
+        // Validate the case ID
+        $request->validate([
+            'id' => 'required|exists:formal_cases,id',
+        ]);
+
+        // Check if the case has data in any of the specified fields
+        if (!$this->hasDataInFields($request->id)) {
+            // If the case doesn't have valid data, return an error response
+            return response()->json(['success' => false, 'message' => 'The case is not valid for verification.'], 400);
+        }
+
+        // Find the case and update the status
+        $case = FormalCase::findOrFail($request->id);
+        $case->status = 3; // Update status to "Verified by DPO"
+        $case->save();
+
+        return response()->json(['success' => true, 'message' => 'Case verified successfully.']);
+    }
+
     public function hasDataInFields($caseId)
     {
         // Fields for Court and Prison data

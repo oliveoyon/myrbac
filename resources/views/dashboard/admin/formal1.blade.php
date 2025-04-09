@@ -194,10 +194,7 @@
                                             <option value="Police Station">Police Station</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label for="profile_no" class="form-label">Profile No./Central ID No</label>
-                                        <input type="text" class="form-control" id="profile_no" name="profile_no">
-                                    </div>
+                                    
                                     <div class="col-md-4">
                                         <label for="full_name" class="form-label">Full Name</label>
                                         <input type="text" id="full_name" name="full_name"

@@ -3,25 +3,26 @@
 @push('styles')
 <style>
     a::after {
-    content: none !important;
-}
-td a {
-    display: inline-block;
-    margin-right: 5px; /* Adjust as needed */
-}
-@media print {
-    .no-print {
-        display: none !important;
+        content: none !important;
     }
-}
 
+    td a {
+        display: inline-block;
+        margin-right: 5px;
+        /* Adjust as needed */
+    }
 
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+    }
 </style>
 @endpush
 
 @section('content')
 
-    
+
 
 <section class="contents mt-3">
     <div class="container-fluid">
@@ -33,7 +34,7 @@ td a {
                             <i class="fas fa-chalkboard-teacher mr-1"></i>
                             Case List
                         </h6>
-                        
+
                     </div>
                     <div class="card-body table-responsive">
                         <div class="alert alert-danger" id="errorAlert" style="display: none;">
@@ -51,6 +52,7 @@ td a {
                                         <th>Date of Interview</th>
                                         <th>District</th>
                                         <th>PNGO</th>
+                                        <th>Status</th>
                                         <th class="no-print">Action</th>
                                     </tr>
                                 </thead>
@@ -65,13 +67,39 @@ td a {
                                         <td>{{ $caseData->phone_number ?? 'N/A' }}</td>
                                         <td>
                                             @if ($caseData->legal_representation_date)
-                                                {{ \Carbon\Carbon::parse($caseData->legal_representation_date)->translatedFormat('d F, Y') }}
+                                            {{ \Carbon\Carbon::parse($caseData->legal_representation_date)->translatedFormat('d F, Y') }}
                                             @else
-                                                N/A
+                                            N/A
                                             @endif
                                         </td>
                                         <td>{{ $caseData->district->name ?? 'N/A' }}</td>
                                         <td>{{ $caseData->pngo->name ?? 'N/A' }}</td>
+                                        <td>
+                                            @if ($caseData->status == 1)
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-danger">Pending</span>
+                                                @can('Verified by DPO')
+                                                <div class="form-check form-switch no-print">
+                                                    <input class="form-check-input verify-toggle" type="checkbox" data-id="{{ $caseData->id }}">
+                                                </div>
+                                                @endcan
+                                            </div>
+                                            @elseif ($caseData->status == 2)
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-success">Verified by DPO</span>
+                                                @can('Verified by MNEO')
+                                                <div class="form-check form-switch no-print">
+                                                    <input class="form-check-input verify-toggle-dpo" type="checkbox" data-ids="{{ $caseData->id }}">
+                                                </div>
+                                                @endcan
+                                            </div>
+                                            @elseif ($caseData->status == 3)
+                                            <span class="badge bg-primary">Verified by MNEO</span>
+                                            @else
+                                            <span class="badge bg-secondary">N/A</span>
+                                            @endif
+                                        </td>
+
                                         <td class="no-print">
                                             <a href="javascript:void(0);" class="pngo-link" data-pngo-id="{{ $caseData->id }}">
                                                 <i class="fa fa-eye"></i>
@@ -136,33 +164,32 @@ td a {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-
 </script>
 
 <script>
     $('#printButton').click(function() {
-    var data = $('#reportDiv').clone(); // Clone to keep original structure
-    data.find('.no-print').remove(); // Remove unwanted elements
+        var data = $('#reportDiv').clone(); // Clone to keep original structure
+        data.find('.no-print').remove(); // Remove unwanted elements
 
-    $('#loader-overlay').show(); // Show loader
+        $('#loader-overlay').show(); // Show loader
 
-    $.ajax({
-        url: '/mne/generate-pdf',
-        method: 'POST',
-        data: {
-            pdf_data: data.html(), // Send modified HTML
-            title: 'Case List',
-            orientation: 'L',
-            fname: 'Case List.pdf',
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-            if (response.pdf_url && isValidUrl(response.pdf_url)) {
-                $('#pdfModal').remove(); // Remove existing modal before adding a new one
+        $.ajax({
+            url: '/mne/generate-pdf',
+            method: 'POST',
+            data: {
+                pdf_data: data.html(), // Send modified HTML
+                title: 'Case List',
+                orientation: 'L',
+                fname: 'Case List.pdf',
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.pdf_url && isValidUrl(response.pdf_url)) {
+                    $('#pdfModal').remove(); // Remove existing modal before adding a new one
 
-                var modalContent = `
+                    var modalContent = `
                     <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-fullscreen">
                             <div class="modal-content">
@@ -180,31 +207,31 @@ td a {
                         </div>
                     </div>`;
 
-                $('body').append(modalContent); // Append modal
-                $('#pdfModal').modal('show'); // Show modal
+                    $('body').append(modalContent); // Append modal
+                    $('#pdfModal').modal('show'); // Show modal
 
-                $('#pdfIframe').on('load', function() {
-                    $('#pdfLoaderOverlay').hide(); // Hide loader when PDF loads
-                    $('#pdfIframe').show();
-                });
+                    $('#pdfIframe').on('load', function() {
+                        $('#pdfLoaderOverlay').hide(); // Hide loader when PDF loads
+                        $('#pdfIframe').show();
+                    });
 
-            } else {
+                } else {
+                    alert('Error generating PDF. Please try again.');
+                }
+            },
+            error: function(xhr, status, error) {
                 alert('Error generating PDF. Please try again.');
+            },
+            complete: function() {
+                $('#loader-overlay').hide(); // Hide main loader
             }
-        },
-        error: function(xhr, status, error) {
-            alert('Error generating PDF. Please try again.');
-        },
-        complete: function() {
-            $('#loader-overlay').hide(); // Hide main loader
-        }
+        });
     });
-});
 
-// URL Validation Function
-function isValidUrl(url) {
-    return /^https?:\/\/.+/.test(url);
-}
+    // URL Validation Function
+    function isValidUrl(url) {
+        return /^https?:\/\/.+/.test(url);
+    }
 
 
 
@@ -212,15 +239,15 @@ function isValidUrl(url) {
 
 
     $(document).on('click', '.pngo-link', function() {
-    var pngoId = $(this).data('pngo-id'); // Get PNGO ID from data attribute
+        var pngoId = $(this).data('pngo-id'); // Get PNGO ID from data attribute
 
-    // Show the loader overlay
-    $('#loader-overlay').show();
+        // Show the loader overlay
+        $('#loader-overlay').show();
 
-    $.ajax({
-        url: '/mne/generate-form', // Update with the correct URL to fetch the PDF URL
-        method: 'POST',
-        data: {
+        $.ajax({
+            url: '/mne/generate-form', // Update with the correct URL to fetch the PDF URL
+            method: 'POST',
+            data: {
                 title: 'Case List',
                 orientation: 'P',
                 fname: 'Case List.pdf',
@@ -229,141 +256,251 @@ function isValidUrl(url) {
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-        success: function(response) {
-            if (response.pdf_url && isValidUrl(response.pdf_url)) {
-                // Create the modal content dynamically with the response PDF URL
-                var modalContent =
-                    '<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">';
-                modalContent +=
-                    '<div class="modal-dialog modal-dialog-centered modal-fullscreen">'; // Changed to fullscreen modal
-                modalContent += '<div class="modal-content">';
-                modalContent += '<div class="modal-header">';
-                modalContent += '<h5 class="modal-title" id="pdfModalLabel">CentralID Form</h5>';
-                modalContent +=
-                    '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
-                modalContent += '</div>';
-                modalContent += '<div class="modal-body">';
-                modalContent +=
-                    '<div id="pdfLoaderOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center;">';
-                modalContent += '<img src="/path/to/loader.gif" alt="Loader">';
-                modalContent += '</div>';
-                modalContent += '<iframe id="pdfIframe" src="' + response.pdf_url +
-                    '" style="width: 100%; height: 80vh; display: none;"></iframe>';
-                modalContent += '</div>';
-                modalContent += '</div>';
-                modalContent += '</div>';
-                modalContent += '</div>';
+            success: function(response) {
+                if (response.pdf_url && isValidUrl(response.pdf_url)) {
+                    // Create the modal content dynamically with the response PDF URL
+                    var modalContent =
+                        '<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">';
+                    modalContent +=
+                        '<div class="modal-dialog modal-dialog-centered modal-fullscreen">'; // Changed to fullscreen modal
+                    modalContent += '<div class="modal-content">';
+                    modalContent += '<div class="modal-header">';
+                    modalContent += '<h5 class="modal-title" id="pdfModalLabel">CentralID Form</h5>';
+                    modalContent +=
+                        '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+                    modalContent += '</div>';
+                    modalContent += '<div class="modal-body">';
+                    modalContent +=
+                        '<div id="pdfLoaderOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center;">';
+                    modalContent += '<img src="/path/to/loader.gif" alt="Loader">';
+                    modalContent += '</div>';
+                    modalContent += '<iframe id="pdfIframe" src="' + response.pdf_url +
+                        '" style="width: 100%; height: 80vh; display: none;"></iframe>';
+                    modalContent += '</div>';
+                    modalContent += '</div>';
+                    modalContent += '</div>';
+                    modalContent += '</div>';
 
-                // Append modal to the body and show it
-                $('body').append(modalContent);
-                $('#pdfModal').modal('show');
+                    // Append modal to the body and show it
+                    $('body').append(modalContent);
+                    $('#pdfModal').modal('show');
 
-                // Hide the loader overlay when the PDF is loaded
-                $('#pdfIframe').on('load', function() {
-                    $('#pdfLoaderOverlay').hide();
-                    $('#pdfIframe').show();
-                });
+                    // Hide the loader overlay when the PDF is loaded
+                    $('#pdfIframe').on('load', function() {
+                        $('#pdfLoaderOverlay').hide();
+                        $('#pdfIframe').show();
+                    });
 
-                console.log('PDF URL received successfully');
-            } else {
-                console.error('Invalid PDF response:', response);
+                    console.log('PDF URL received successfully');
+                } else {
+                    console.error('Invalid PDF response:', response);
+                    alert('Error fetching PNGO report. Please try again.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX request failed:', error);
                 alert('Error fetching PNGO report. Please try again.');
+            },
+            complete: function() {
+                // Hide the loader overlay when the request is complete
+                $('#loader-overlay').hide();
             }
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX request failed:', error);
-            alert('Error fetching PNGO report. Please try again.');
-        },
-        complete: function() {
-            // Hide the loader overlay when the request is complete
-            $('#loader-overlay').hide();
-        }
+        });
     });
-});
 
-function isValidUrl(url) {
-    // Check if the URL is valid based on your requirements
-    return /^https?:\/\/.+/.test(url);
-}
-
+    function isValidUrl(url) {
+        // Check if the URL is valid based on your requirements
+        return /^https?:\/\/.+/.test(url);
+    }
 </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         // Get the 'from_date' and 'to_date' inputs
         const fromDateInput = document.getElementById("from_date");
         const toDateInput = document.getElementById("to_date");
 
         // Enable 'to_date' when 'from_date' is selected
-        fromDateInput.addEventListener("change", function () {
+        fromDateInput.addEventListener("change", function() {
             if (fromDateInput.value) {
                 toDateInput.disabled = false;
             } else {
                 toDateInput.disabled = true;
-                toDateInput.value = "";  // Reset 'to_date' if 'from_date' is empty
+                toDateInput.value = ""; // Reset 'to_date' if 'from_date' is empty
             }
         });
 
         // Ensure 'to_date' is not earlier than 'from_date'
-        toDateInput.addEventListener("change", function () {
+        toDateInput.addEventListener("change", function() {
             const fromDate = new Date(fromDateInput.value);
             const toDate = new Date(toDateInput.value);
 
             // If 'to_date' is earlier than 'from_date', set 'to_date' to 'from_date'
             if (toDate < fromDate) {
                 alert("To date cannot be earlier than From date.");
-                toDateInput.value = fromDateInput.value;  // Set 'to_date' to 'from_date'
+                toDateInput.value = fromDateInput.value; // Set 'to_date' to 'from_date'
             }
         });
     });
 </script>
 
 <script>
-$(document).on("click", ".edit-link", function (event) {
-    event.preventDefault();
+    $(document).on("click", ".edit-link", function(event) {
+        event.preventDefault();
 
-    var editId = $(this).data("edit-id"); // Get the edit ID
+        var editId = $(this).data("edit-id"); // Get the edit ID
 
-    $.ajax({
-        url: "/mne/edit-case",
-        type: "POST",
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content'),
-            edit_id: editId
-        },
-        success: function (response) {
-            if (response.success) {
-                window.location.href = response.redirect_url; // Redirect to edit form
+        $.ajax({
+            url: "/mne/edit-case",
+            type: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                edit_id: editId
+            },
+            success: function(response) {
+                if (response.success) {
+                    window.location.href = response.redirect_url; // Redirect to edit form
+                }
+            },
+            error: function(xhr) {
+                console.error("AJAX request failed", xhr);
             }
-        },
-        error: function (xhr) {
-            console.error("AJAX request failed", xhr);
+        });
+    });
+
+    $(document).on("click", ".file-link", function(event) {
+        event.preventDefault();
+
+        var fileId = $(this).data("file-id"); // Get the edit ID
+
+        $.ajax({
+            url: "/mne/edit-file",
+            type: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                file_id: fileId
+            },
+            success: function(response) {
+                if (response.success) {
+                    window.location.href = response.redirect_url; // Redirect to edit form
+                }
+            },
+            error: function(xhr) {
+                console.error("AJAX request failed", xhr);
+            }
+        });
+    });
+</script>
+<script>
+    $(document).on('change', '.verify-toggle', function() {
+        const id = $(this).data('id');
+        const checkbox = $(this); // Store reference to toggle
+
+        if (this.checked) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Please see the form carefully before verifying.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, verify it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('formal-case.verify') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            id: id
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Verified!',
+                                    text: 'Case has been verified successfully.',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                // Replace toggle with badge
+                                const td = checkbox.closest('td');
+                                td.html(
+                                    '<span class="badge bg-success">Verified by DPO</span>'
+                                );
+                            } else {
+                                Swal.fire('Error!', 'Verification failed.', 'error');
+                                checkbox.prop('checked', false);
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error!', 'An error occurred during verification.',
+                                'error');
+                            checkbox.prop('checked', false);
+                        }
+                    });
+                } else {
+                    checkbox.prop('checked', false); // Uncheck if canceled
+                }
+            });
         }
     });
-});
 
-$(document).on("click", ".file-link", function (event) {
-    event.preventDefault();
 
-    var fileId = $(this).data("file-id"); // Get the edit ID
+    $(document).on('change', '.verify-toggle-dpo', function() {
+        const id = $(this).data('ids');
+        const checkbox = $(this); // Store reference to toggle
 
-    $.ajax({
-        url: "/mne/edit-file",
-        type: "POST",
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content'),
-            file_id: fileId
-        },
-        success: function (response) {
-            if (response.success) {
-                window.location.href = response.redirect_url; // Redirect to edit form
-            }
-        },
-        error: function (xhr) {
-            console.error("AJAX request failed", xhr);
+        if (this.checked) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Please see the form carefully before verifying.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, verify it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('formal-case.verifymneo') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            id: id
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Verified!',
+                                    text: 'Case has been verified successfully.',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                // Replace toggle with badge
+                                const td = checkbox.closest('td');
+                                td.html(
+                                    '<span class="badge bg-primary">Verified by MNEO</span>'
+                                );
+                            } else {
+                                Swal.fire('Error!', 'Verification failed.', 'error');
+                                checkbox.prop('checked', false);
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error!', 'An error occurred during verification.',
+                                'error');
+                            checkbox.prop('checked', false);
+                        }
+                    });
+                } else {
+                    checkbox.prop('checked', false); // Uncheck if canceled
+                }
+            });
         }
     });
-});
-
 </script>
 @endpush
