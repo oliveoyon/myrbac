@@ -19,6 +19,21 @@
             background-color: #f8f9fa;
         }
 
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: white;
+            padding: 10px 20px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .top-left-logo img {
+            height: 40px;
+            width: auto;
+        }
+
         .main-wrapper {
             display: flex;
             flex-direction: column;
@@ -28,15 +43,6 @@
             text-align: center;
             padding: 20px;
         }
-
-        /* Logo styling (commented out for now, you can use it later) */
-
-        .logo {
-            width: 120px;
-            /* Adjust size of the logo */
-            margin-bottom: 20px;
-        }
-
 
         .main-wrapper h1 {
             font-size: 48px;
@@ -53,42 +59,58 @@
         }
 
         .btn-login {
-    padding: 14px 35px;
-    font-size: 20px;
-    font-weight: bold;
-    border-radius: 50px;
-    background: linear-gradient(135deg, #800000, #a00000);
-    color: white;
-    border: none;
-    text-transform: uppercase;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
+            padding: 14px 35px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #800000, #a00000);
+            color: white;
+            border: none;
+            text-transform: uppercase;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
 
-.btn-login:hover {
-    background: linear-gradient(135deg, #a00000, #c00000);
-    /* transform: scale(1.05); */
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
-}
-
+        .btn-login:hover {
+            background: linear-gradient(135deg, #a00000, #c00000);
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+        }
 
         footer {
             position: absolute;
             bottom: 0;
             width: 100%;
             background-color: #800000;
-            /* Deep Maroon Red */
             color: white;
             padding: 15px 0;
             text-align: center;
             font-size: 14px;
         }
 
-        /* Justice Icon Style */
+        footer a {
+            color: white;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        footer a:hover {
+            border-bottom: 2px solid white;
+        }
+
+        footer .row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        footer .col-12 {
+            text-align: center;
+        }
+
         .justice-icon {
             font-size: 80px;
             color: #800000;
-            /* Justice icon color */
             margin-bottom: 20px;
         }
     </style>
@@ -96,26 +118,42 @@
 
 <body>
 
+    <header>
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="top-left-logo">
+                <img src="{{ asset('logo/giz-logo.gif') }}" alt="Company Logo">
+            </div>
+        </div>
+    </header>
+
     <!-- Main Wrapper -->
     <div class="main-wrapper">
         <!-- Justice Icon -->
         <i class="fas fa-chart-line justice-icon"></i>
 
-        <!-- Logo (Commented out for now) -->
-        <!-- <img src="path/to/your/logo.png" alt="Logo" class="logo"> -->
-
         <h1>Welcome</h1>
         <p>Empowering Decision-Making with a Data-Driven Approach and Real-Time Insights</p>
+
         @guest
             <a href="{{ route('login') }}" class="btn btn-login">Login</a>
         @endguest
-
-
     </div>
 
     <!-- Footer -->
     <footer>
-        &copy; 2025 Access to Justice for Women. All Rights Reserved.
+        <div class="container">
+            <div class="row text-center text-md-start">
+                <div class="col-12 col-md-4 mb-2 mb-md-0">
+                    <a href="{{ url('registration-information') }}" class="text-white text-decoration-none">Registration Info</a>
+                </div>
+                <div class="col-12 col-md-4 mb-2 mb-md-0">
+                    &copy; 2025 Access to Justice for Women. All Rights Reserved.
+                </div>
+                <div class="col-12 col-md-4 mb-2 mb-md-0">
+                    <a href="{{ url('privacy-policy') }}" class="text-white text-decoration-none">Data Privacy Policy</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <!-- Bootstrap JS -->

@@ -131,6 +131,7 @@ class ReportController extends Controller
             'institute' => $request->institute,
             'district_id' => $request->district_id,
             'pngo_id' => $request->pngo_id,
+            'status' => $request->status,
         ];
         
         $whr = array_filter($whr);

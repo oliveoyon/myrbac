@@ -13,6 +13,7 @@ use App\Imports\FormalCaseImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
+use App\Services\CommonService;
 
 class FormalController extends Controller
 {
@@ -242,7 +243,6 @@ class FormalController extends Controller
         $id = $request->id;
         $case = FormalCase::find($id);
         
-        $case->status = 2;
         $case->institute = $request->institute;
         $case->full_name = $request->full_name;
         $case->nick_name = $request->nick_name;
@@ -600,6 +600,77 @@ private function convertToDateFormat($date)
     {
         return Excel::toArray([], $file)[0]; // Read the first sheet
     }
+
+
+    public function verifyCase(Request $request)
+    {
+        // Validate the case ID
+        $request->validate([
+            'id' => 'required|exists:formal_cases,id',
+        ]);
+
+        // Check if the case has data in any of the specified fields
+        if (!$this->hasDataInFields($request->id)) {
+            // If the case doesn't have valid data, return an error response
+            return response()->json(['success' => false, 'message' => 'The case is not valid for verification.'], 400);
+        }
+
+        // Find the case and update the status
+        $case = FormalCase::findOrFail($request->id);
+        $case->status = 2; // Update status to "Verified by DPO"
+        $case->save();
+
+        return response()->json(['success' => true, 'message' => 'Case verified successfully.']);
+    }
+
+    public function hasDataInFields($caseId)
+    {
+        // Fields for Court and Prison data
+        $courtFields = [
+            'custody_status', 'charges_details', 'arrest_date', 'case_no', 'family_communication_date',
+            'legal_representation', 'legal_representation_date', 'collected_vokalatnama_date',
+            'collected_case_doc', 'identify_sureties', 'witness_communication_date', 'medical_report_date',
+            'legal_assistance_date', 'assistance_under_custody_date', 'referral_service',
+            'referral_service_date', 'resolved_dispute_date', 'appoint_lawyer_date', 'release_status',
+            'fine_amount', 'release_status_date', 'application_mode', 'application_mode_date',
+            'received_application', 'reference_no', 'type_of_service', 'type_of_service_date', 'service_description'
+        ];
+
+        $prisonFields = [
+            'source_of_interview', 'prison_reg_no', 'section_no', 'present_court', 'lockup_no', 'entry_date',
+            'case_transferred', 'current_court', 'case_status', 'co_offenders', 'next_court_date', 'facts_of_case',
+            'imprisonment_condition', 'imprisonment_status', 'special_condition', 'surrender_date',
+            'prison_family_communication', 'prison_legal_representation', 'prison_legal_representation_date',
+            'next_court_collection_date', 'collected_case_doc_prison', 'identify_sureties_prison_nid',
+            'identify_sureties_prison_phone', 'witness_communication_prison', 'bail_bond_submission',
+            'court_order_communication', 'application_certified_copies', 'appeal_assistance',
+            'ministerial_communication', 'other_legal_assistance', 'other_legal_assistance_date'
+        ];
+
+        // Merge both arrays into one for easier checking
+        $fieldsToCheck = array_merge($courtFields, $prisonFields);
+
+        // Get the case record based on the provided ID
+        $case = FormalCase::find($caseId);
+
+        // If no case is found, return false
+        if (!$case) {
+            return false;
+        }
+
+        // Check if any of the fields have data
+        foreach ($fieldsToCheck as $field) {
+            if (!empty($case->$field)) {
+                return true; // At least one field has data
+            }
+        }
+
+        // If no field has data, return false
+        return false;
+    }
+
+
+
     
 
 }

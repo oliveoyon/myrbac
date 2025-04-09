@@ -16,6 +16,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('registration-information', function () {
+    return view('regInfo');
+});
+
+Route::get('privacy-policy', function () {
+    return view('privacy');
+});
+
 // Route::get('/dashboards', [DashboardController::class, 'index'])->name('dashboard.index');
 
 Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
@@ -64,6 +72,10 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::post('formAction', [FormalController::class, 'courtPolicePrison'])->name('formaction')->middleware('permission:Create Formal Case');
     Route::get('/edit-case', [FormalController::class, 'editCaseForm'])->name('edit-case.get')->middleware('permission:View Edit Formal Case Form');
     Route::post('/edit-case', [FormalController::class, 'editCase'])->name('edit-case.post')->middleware('permission:Edit Formal Case');
+
+    Route::post('/verify-case', [FormalController::class, 'verifyCase'])->name('formal-case.verify')->middleware('permission:Verified by DPO');
+
+
     Route::post('editformaction', [FormalController::class, 'editCourtPolicePrison'])->name('editformaction')->middleware('permission:Update Formal Case Details');
     Route::get('/edit-file', [FormalController::class, 'fileCaseForm'])->name('edit-file.get')->middleware('permission:View File Formal Case Form');
     Route::post('/edit-file', [FormalController::class, 'fileCase'])->name('edit-file.post')->middleware('permission:File Formal Case');

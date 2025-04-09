@@ -94,7 +94,6 @@ class CommonService
         $whr = ['district_id' => $districtId,'pngo_id' => $pngoId];
         $whr = array_filter($whr);
 
-        $status = 1;
         // Fetch the district data grouped by district_id
         $data = FormalCase::select(
             'district_id',
@@ -105,7 +104,7 @@ class CommonService
             DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
         )
         // Add condition to filter by status (if required)
-        ->where('status', $status)
+        ->where('status', '>', 1) 
         ->where($whr)
         ->groupBy('district_id') // Group by district only, not by institute
         ->get();
@@ -137,7 +136,6 @@ class CommonService
         $pngoId = Auth::user()->pngo_id;
         $whr = ['district_id' => $districtId,'pngo_id' => $pngoId];
         $whr = array_filter($whr);
-        $status = 1;
 
         // Fetch the case data grouped by pngo_id
         $data = FormalCase::select(
@@ -148,7 +146,7 @@ class CommonService
             DB::raw('COUNT(CASE WHEN age < 18 AND (' . $this->buildCondition() . ') THEN 1 END) as under_18'),
             DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
         )
-        ->where('status', $status)
+        ->where('status', '>', 1) 
         ->where($whr)
         ->groupBy('pngo_id') // Group by pngo_id instead of district_id
         ->get();
@@ -172,6 +170,10 @@ class CommonService
 
         return $resultData;
     }
+
+
+    
+
 
 
 }

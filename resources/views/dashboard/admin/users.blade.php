@@ -7,6 +7,7 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.2.0/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         .modal-body {
             overflow-y: auto;
@@ -202,7 +203,12 @@
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->district ? $user->district->name : 'No District' }}</td>
                             <td>{{ $user->pngo ? $user->pngo->name : 'No PNGO' }}</td>
-                            <td>{{ $user->status == 1 ? 'Active' : 'Inactive' }}</td>
+                            <td>
+                                <span class="badge {{ $user->status == 1 ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ $user->status == 1 ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            
                             <td>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-info btn-sm" data-id="{{ $user->id }}"
@@ -349,7 +355,7 @@
 
                                 <div class="mb-3">
                                     <label class="form-label required" for="role_name">Roles</label>
-                                    <select class="form-control" name="role_name[]" id="role_name" multiple>
+                                    <select class="form-control" name="role_name[]" id="role_name1" multiple>
                                         <option value="">Select Role (Multiple)</option>
                                         @foreach ($roles as $role)
                                             <option value="{{ $role->name }}">{{ $role->name }}</option>
@@ -452,6 +458,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.2.0/dist/sweetalert2.min.js"></script>
     <!-- Toastr -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $.ajaxSetup({
             headers: {
@@ -580,24 +587,31 @@
                 });
             });
 
-            $(document).on('click', '#editUserBtn', function() {
+            $(document).on('click', '#editUserBtn', function () {
                 var user_id = $(this).data('id');
                 $('.editUser').find('form')[0].reset();
                 $('.editUser').find('span.error-text').text('');
+
                 $.post("{{ route('getUserDetails') }}", {
                     user_id: user_id
-                }, function(data) {
-                    $('.editUser').find('input[name="uid"]').val(data.details.id);
-                    $('.editUser').find('input[name="name"]').val(data.details.name);
-                    $('.editUser').find('input[name="email"]').val(data.details.email);
-                    $('.editUser').find('select[name="district_id"]').val(data.details.district_id);
-                    $('.editUser').find('select[name="role_name"]').val(data.details.role_name);
-                    $('.editUser').find('select[name="pngo_id"]').val(data.details.pngo_id);
-                    $('.editUser').find('select[name="status"]').val(data.details
-                        .status);
-                    $('.editUser').modal('show');
+                }, function (data) {
+                    const modal = $('.editUser');
+
+                    modal.find('input[name="uid"]').val(data.details.id);
+                    modal.find('input[name="name"]').val(data.details.name);
+                    modal.find('input[name="email"]').val(data.details.email);
+                    modal.find('select[name="district_id"]').val(data.details.district_id);
+                    modal.find('select[name="pngo_id"]').val(data.details.pngo_id);
+                    modal.find('select[name="status"]').val(data.details.status);
+
+                    // ✅ Set Select2 roles
+                    let roleSelect = modal.find('select[name="role_name[]"]');
+                    roleSelect.val(data.details.role_name).trigger('change');
+
+                    modal.modal('show');
                 }, 'json');
             });
+
 
 
             // Update Class RECORD
@@ -772,4 +786,22 @@
 
         });
     </script>
+
+<script>
+    $(document).ready(function () {
+        $('#role_name1').select2({
+            dropdownParent: $('#editUserModal'),
+            placeholder: "Select Role(s)",
+            width: '100%'
+        });
+
+        $('#role_name').select2({
+            placeholder: "Select Role(s)",
+            width: '100%',
+            dropdownParent: $('#addUserModal')  // Adjust modal ID if necessary
+        });
+
+    });
+</script>
+
 @endpush

@@ -68,11 +68,25 @@ class UserController extends Controller
         $userDetails = User::with('roles')->find($user_id);
 
         if ($userDetails) {
-            return response()->json(['details' => $userDetails]);
+            return response()->json([
+                'details' => [
+                    'id' => $userDetails->id,
+                    'name' => $userDetails->name,
+                    'email' => $userDetails->email,
+                    'district_id' => $userDetails->district_id,
+                    'pngo_id' => $userDetails->pngo_id,
+                    'status' => $userDetails->status,
+                    'role_name' => $userDetails->roles->pluck('name')->toArray(), // for multiple roles
+                ]
+            ]);
         } else {
-            return response()->json(['code' => 0, 'msg' => 'User not found']);
+            return response()->json([
+                'code' => 0,
+                'msg' => 'User not found'
+            ]);
         }
     }
+
 
     // Update user details
     public function updateUserDetails(Request $request)
