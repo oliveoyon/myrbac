@@ -119,7 +119,7 @@
                     </tr>
                     <tr style="height:6pt;">
                         <td colspan="3" style="width:178.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">{{ $details->full_name; }}</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;"></span>{{ $details->full_name; }}</p>
                         </td>
                         <td colspan="3" style="width:128.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span>{{ $details->nick_name; }}</p>
