@@ -8,6 +8,8 @@ use App\Models\Pngo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\CommonService;
+use App\Services\LogService;
+
 
 class DashboardController extends Controller
 {
@@ -56,6 +58,11 @@ class DashboardController extends Controller
         $district = District::findOrFail($districtId);
         $district->name = $request->name;
         $district->save();
+
+        LogService::logAction('District Update', [
+            'changed_fields' => ['name'],
+            
+        ]);
 
         return response()->json([
             'success' => true,

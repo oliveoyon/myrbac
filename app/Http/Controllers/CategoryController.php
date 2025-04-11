@@ -42,6 +42,8 @@ class CategoryController extends Controller
         $category->name = $request->name;
         $category->save();
 
+        
+
         return response()->json([
             'success' => true,
             'message' => 'Category updated successfully!',
