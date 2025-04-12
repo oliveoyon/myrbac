@@ -7,24 +7,24 @@
     <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
     <style>
         #loader-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.7);
-        z-index: 9999;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #5d5c5cb3;
+            z-index: 9999;
         }
-
+        
         #loader {
-        border: 16px solid #f3f3f3;
-        border-top: 16px solid #3498db;
-        border-radius: 50%;
-        width: 80px;
-        height: 80px;
-        margin: 15% auto;
-        animation: spin 1s linear infinite;
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #c30f08;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            margin: 15% auto;
+            animation: spin 1s linear infinite;
         }
 
         .modal.modal-fullscreen .modal-dialog {

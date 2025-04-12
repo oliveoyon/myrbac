@@ -113,7 +113,7 @@
                             <canvas id="pngoBarChart"></canvas>
                         </div>
                         <!-- Details Table -->
-                        <div class="mt-4">
+                        <div class="mt-4 table-responsive">
                             <h6>PNGO Breakdown</h6>
                             <table class="table table-bordered table-striped">
                                 <thead>

@@ -170,7 +170,7 @@
 
 @section('content')
     <section>
-        <div class="container-fluid">
+        <div class="container-fluid table-responsive">
             <div class="row mb-3">
                 <div class="col">
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">

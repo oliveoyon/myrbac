@@ -13,19 +13,19 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(255, 255, 255, 0.7);
+        background: #5d5c5cb3;
         z-index: 9999;
-        }
-
-        #loader {
+    }
+    
+    #loader {
         border: 16px solid #f3f3f3;
-        border-top: 16px solid #3498db;
+        border-top: 16px solid #c30f08;
         border-radius: 50%;
         width: 80px;
         height: 80px;
         margin: 15% auto;
         animation: spin 1s linear infinite;
-        }
+    }
 
         .modal.modal-fullscreen .modal-dialog {
             width: 100vw;
@@ -72,10 +72,10 @@
             <div class="col-md-12">
                 <div class="card card-outline">
                 <div class="card-header text-bg-dark d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">
+                        <h6 class="card-title">
                             <i class="fas fa-chalkboard-teacher mr-1"></i>
                             District Wise Summery
-                        </h4>
+                        </h6>
                         <button class="btn btn-success btn-sm" id="printButton">
                             <i class="fas fa-print mr-1"></i> Print Report
                         </button>

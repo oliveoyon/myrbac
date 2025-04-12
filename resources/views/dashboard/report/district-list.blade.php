@@ -3,49 +3,49 @@
 @section('title', 'Category Management')
 
 @push('styles')
-    <!-- DataTables -->
-    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
-    <style>
-        #loader-overlay {
-   display: none;
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background: rgba(255, 255, 255, 0.7);
-   z-index: 9999;
-}
+<!-- DataTables -->
+<link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<style>
+    #loader-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #5d5c5cb3;
+        z-index: 9999;
+    }
+    
+    #loader {
+        border: 16px solid #f3f3f3;
+        border-top: 16px solid #c30f08;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        margin: 15% auto;
+        animation: spin 1s linear infinite;
+    }
 
-#loader {
-   border: 16px solid #f3f3f3;
-   border-top: 16px solid #3498db;
-   border-radius: 50%;
-   width: 80px;
-   height: 80px;
-   margin: 15% auto;
-   animation: spin 1s linear infinite;
-}
+    .modal.modal-fullscreen .modal-dialog {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        max-width: none;
+    }
 
-.modal.modal-fullscreen .modal-dialog {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    max-width: none;
-  }
+    .modal.modal-fullscreen .modal-content {
+        height: auto;
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+    }
 
-  .modal.modal-fullscreen .modal-content {
-    height: auto;
-    height: 100vh;
-    border-radius: 0;
-    border: none;
-  }
-
-  .modal.modal-fullscreen .modal-body {
-    overflow-y: auto;
-  }
-    </style>
+    .modal.modal-fullscreen .modal-body {
+        overflow-y: auto;
+    }
+</style>
 @endpush
 
 @section('content')
@@ -58,10 +58,10 @@
             <div class="col-md-12">
                 <div class="card card-outline">
                     <div class="card-header bg-navy">
-                        <h3 class="card-title">
+                        <h6 class="card-title">
                             <i class="fas fa-chalkboard-teacher mr-1"></i>
                             {{ __('language.district_list') }}
-                        </h3>
+                        </h6>
                         <div class="card-tools">
                             <ul class="nav nav-pills ml-auto">
                                 <li class="nav-item">
@@ -80,14 +80,14 @@
                             <table class="table table-bordered table-striped table-hover table-sm" id="class-table">
                                 <thead style="border-top: 1px solid #b4b4b4">
                                     <th style="width: 10px">#</th>
-                                    <th style="font-family: SolaimanLipi">District Name  প্রোফাইল নম্বর</th>
+                                    <th style="font-family: SolaimanLipi">District Name প্রোফাইল নম্বর</th>
                                 </thead>
                                 <tbody>
                                     @foreach ($districts as $district)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td class="font-weight-bold">{{ $district->name }}</td>
-                                        </tr>
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td class="font-weight-bold">{{ $district->name }}</td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>

@@ -7,7 +7,7 @@
     <title>Invoice</title>
     <style>
         body {
-            font-family: bangla;
+            font-family: Arial, sans-serif
             margin: 0;
             padding: 0;
             min-height: 100%;
