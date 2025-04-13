@@ -249,6 +249,12 @@ class ReportController extends Controller
         $whr = [
             'district_id' => $request->district_id,
             'pngo_id' => $request->pngo_id,
+            'institute' => $request->institute,
+            'education_level' => $request->education_level,
+            'special_condition' => $request->special_condition,
+            'status' => $request->status,
+            'application_mode' => $request->application_mode,
+            'type_of_service' => $request->type_of_service,
         ];
         $whr = array_filter($whr); // Remove null/empty values
 

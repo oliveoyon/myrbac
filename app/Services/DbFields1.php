@@ -2,18 +2,51 @@
 
 
 return [
-    
     'primary_info' => [
-        'interview_date' => 'Interview Date',
-        'family_informed' => 'Family Informed',
-        'has_guardian' => 'Has Guardian',
-        'guardian_surety' => 'Guardian Surety',
-        'has_lawyer' => 'Has Lawyer',
-        'incident_details' => 'Incident Details',
-        'children_with_prisoner' => 'Children with Prisoner',
-       
+        'institute' => 'Institute',
+        'central_id' => 'Central ID',
+        'user_id' => 'User ID',
+        'district_id' => 'District ID',
+        'pngo_id' => 'PNGO ID',
+        'status' => 'Status',
+        'full_name' => 'Full Name',
+        'nick_name' => 'Nick Name',
+        'father_name' => 'Father Name',
+        'mother_name' => 'Mother Name',
+        'sex' => 'Sex',
+        'age' => 'Age',
+        'disability' => 'Disability',
+        'nationality' => 'Nationality',
+        'nid_passport' => 'NID/Passport',
+        'phone_number' => 'Phone Number',
     ],
-   
+    'session_info' => [
+        'address' => 'Address',
+        'interview_date' => 'Interview Date',
+        'interview_time' => 'Interview Time',
+        'interview_place' => 'Interview Place',
+    ],
+    'personal_info' => [
+        'marital_status' => 'Marital Status',
+        'spouse_name' => 'Spouse Name',
+        'education_level' => 'Education Level',
+        'occupation' => 'Occupation',
+        'monthly_income' => 'Monthly Income',
+        'family_informed' => 'Family Informed',
+    ],
+    'female_prisoner_info' => [
+        'children_with_prisoner' => 'Children with Prisoner',
+        'child_sex' => 'Child Sex',
+        'child_age' => 'Child Age',
+    ],
+    'guardian_info' => [
+        'has_guardian' => 'Has Guardian',
+        'guardian_name' => 'Guardian Name',
+        'guardian_phone' => 'Guardian Phone',
+        'guardian_address' => 'Guardian Address',
+        'guardian_relation' => 'Guardian Relation',
+        'guardian_surety' => 'Guardian Surety',
+    ],
     'lawyer_info' => [
         'has_lawyer' => 'Has Lawyer',
         'lawyer_type' => 'Lawyer Type',
@@ -21,7 +54,16 @@ return [
         'lawyer_membership' => 'Lawyer Membership',
         'lawyer_phone' => 'Lawyer Phone',
     ],
-       'assistance_info' => [
+    'incident_info' => [
+        'incident_details' => 'Incident Details',
+    ],
+    'court_police_support_info' => [
+        'custody_status' => 'Custody Status',
+        'charges_details' => 'Charges Details',
+        'arrest_date' => 'Arrest Date',
+        'case_no' => 'Case No',
+    ],
+    'assistance_info' => [
         'family_communication_date' => 'Family Communication Date',
         'legal_representation' => 'Legal Representation',
         'legal_representation_date' => 'Legal Representation Date',
@@ -41,10 +83,17 @@ return [
         'release_status' => 'Release Status',
     ],
     'legal_aid_info' => [
-        'fine_amount' => 'Has Fine Amount',
+        'fine_amount' => 'Fine Amount',
         'release_status_date' => 'Release Status Date',
+        'application_mode' => 'Application Mode',
+        'application_mode_date' => 'Application Mode Date',
         'received_application' => 'Received Application',
         'reference_no' => 'Reference No',
+        'type_of_service' => 'Type of Service',
+        'type_of_service_date' => 'Type of Service Date',
+    ],
+    'service_description' => [
+        'service_description' => 'Service Description',
     ],
     'support_in_prison' => [
         'source_of_interview' => 'Source of Interview',

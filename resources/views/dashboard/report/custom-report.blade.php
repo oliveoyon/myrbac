@@ -119,7 +119,7 @@
                         <div class="collapse show" id="caseCardBody">
                             <div class="card-body">
                                 <div class="row align-items-end">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3 mb-2">
                                         <div class="form-group">
                                             <select class="form-control form-control-sm district_id" name="district_id" id="district_id">
                                             @php
@@ -141,7 +141,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3 mb-2">
                                         <div class="form-group">
                                             <select class="form-control form-control-sm pngo_id" name="pngo_id" id="pngo_id">
                                             @php
@@ -162,6 +162,69 @@
                                             @endif
                                             </select>
                                         </div>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <div class="form-group">
+                                            <select class="form-control form-control-sm institute" name="institute" id="institute">
+                                                <option value="">All Institute</option>
+                                                <option value="Court">Court</option>
+                                                <option value="Prison">Prison</option>
+                                                <option value="Police Station">Police Station</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <div class="form-group">
+                                            <select class="form-control form-control-sm" id="education_level" name="education_level">
+                                                <option value="">Education Level</option>
+                                                <option value="Illiterate">Illiterate</option>
+                                                <option value="Can Sign">Can Sign</option>
+                                                <option value="Primary">Primary</option>
+                                                <option value="Secondary">Secondary</option>
+                                                <option value="Higher Secondary">Higher Secondary</option>
+                                                <option value="Graduate">Graduate</option>
+                                                <option value="Postgraduate">Postgraduate</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <div class="form-group">
+                                            <select class="form-control form-control-sm" id="special_condition" name="special_condition">
+                                                <option value="">Disability Status</option>
+                                                <option value="Critical Ill">Critical Ill</option>
+                                                <option value="Disabled">Disabled</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-2">
+                                        <div class="form-group">
+                                            <select class="form-control form-control-sm status" name="status"
+                                                id="status">
+                                                <option value="">Status</option>
+                                                <option value="1">Pending</option>
+                                                <option value="2">Verified by DPO</option>
+                                                <option value="3">Verified by MNEO</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <select class="form-control form-control-sm" id="application_mode" name="application_mode">
+                                            <option value="">Application Mode</option>
+                                            <option value="Online">Online</option>
+                                            <option value="Office Application">Office Application</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <select class="form-control form-control-sm" id="type_of_service" name="type_of_service">
+                                            <option value="">Type of Service</option>
+                                            <option value="Legal Advice">Legal Advice</option>
+                                            <option value="Alternate Dispute Resolution">Alternate Dispute Resolution
+                                            </option>
+                                            <option value="Filing New Lawsuit">Filing New Lawsuit</option>
+                                            <option value="Legal Aid in Existing Case">Legal Aid in Existing Case</option>
+                                        </select>
                                     </div>
                                     
                                 </div> <!-- row -->
