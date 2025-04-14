@@ -111,9 +111,13 @@
                 <i class="fas fa-user"></i> {{ Auth::user()->name }}
             </button>
             <div class="dropdown-menu">
-                <a href="#">My Profile</a>
-                <a href="#">Settings</a>
-                <a href="#">Log Out</a>
+                <a href="{{ route('users.my-profile') }}"><i class="fas fa-user"></i> My Profile</a>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
             </div>
         </div>
     </div>

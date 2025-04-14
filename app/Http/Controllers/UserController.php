@@ -28,7 +28,7 @@ class UserController extends Controller
     // Add a new user and assign roles
     public function addUser(Request $request)
     {
-       
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:users,name',
             'email' => 'required|email|unique:users,email',
@@ -49,7 +49,7 @@ class UserController extends Controller
         $user->password = Hash::make('12345678'); // Default password
         $user->district_id = $request->district_id;
         $user->pngo_id = $request->pngo_id;
-        $user->status = $request->status;
+        $user->status = $request->status == 1 ? 2 : 0;
 
         if ($user->save()) {
             $user->syncRoles($request->role_name); // Assign multiple roles
@@ -135,7 +135,7 @@ class UserController extends Controller
     public function deleteUser(Request $request)
     {
         $user = User::find($request->user_id);
-        
+
         if (!$user) {
             return response()->json(['code' => 0, 'msg' => 'User not found']);
         }
@@ -155,7 +155,7 @@ class UserController extends Controller
         return response()->json($permissions);
     }
 
-    
+
 
     public function viewUserPermissions($userId)
     {
@@ -189,9 +189,9 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id); // Ensure user exists
-            
+
             $permissions = $request->input('permissions'); // Array of permission IDs
-            
+
             // Sync user permissions
             $user->permissions()->sync($permissions);
             app()[PermissionRegistrar::class]->forgetCachedPermissions();
@@ -202,9 +202,40 @@ class UserController extends Controller
         }
     }
 
+    public function myProfile()
+    {
+        $user = auth()->user();
+        return view('dashboard.admin.profile', compact('user'));
+    }
 
+    public function changePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'current_password' => ['required', 'current_password'],
+                'new_password' => [
+                    'required',
+                    'string',
+                    'min:8',
+                    'confirmed',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^])[A-Za-z\d@$!%*#?&^]{8,}$/'
+                ],
+            ], [
+                'new_password.regex' => 'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.',
+            ]);
 
+            $user = auth()->user();
+            $user->password = bcrypt($request->new_password);
+            $user->status = 1;
+            $user->save();
 
-
-    
+            return redirect()->back()->with('success', 'Password updated successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Something went wrong while updating the password.');
+        }
+    }
 }

@@ -26,7 +26,7 @@ Route::get('privacy-policy', function () {
 
 // Route::get('/dashboards', [DashboardController::class, 'index'])->name('dashboard.index');
 
-Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('permission:Admin Dashboard');
 
@@ -52,6 +52,8 @@ Route::prefix('mne')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/users/{userId}/permissions', [UserController::class, 'viewUserPermissions'])->middleware('permission:View User Permissions');  
     Route::get('/users/{id}/edit-permissions', [UserController::class, 'editPermissions'])->name('users.edit-permissions')->middleware('permission:Edit User Permissions');  
     Route::post('/users/{id}/update-permissions', [UserController::class, 'updatePermissions'])->name('users.update-permissions')->middleware('permission:Update User Permissions');  
+    Route::get('/my-profile', [UserController::class, 'myProfile'])->name('users.my-profile'); //->middleware('permission:My Profile') 
+    Route::post('/change-my-password', [UserController::class, 'changePassword'])->name('users.change-my-password'); //->middleware('permission:My Profile') 
 
     Route::get('role-management', [RoleController::class, 'roles'])->name('dashboard.roles')->middleware('permission:View Roles');  
     Route::post('roles', [RoleController::class, 'roleAdd'])->name('roles.add')->middleware('permission:Add Role');  

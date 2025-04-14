@@ -31,9 +31,18 @@ class NewPasswordController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'token' => ['required'],
-            'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        'token' => ['required'],
+        'email' => ['required', 'email'],
+        'password' => [
+            'required',
+            'confirmed',
+            Password::min(8)
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised(), // Optional: checks if it's not in a known data breach
+            ],
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we
