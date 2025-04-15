@@ -13,6 +13,7 @@ use App\Services\CommonService;
 use App\Exports\FormalCaseExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
+use App\Services\LogService;
 
 class ReportController extends Controller
 {
@@ -320,8 +321,16 @@ class ReportController extends Controller
     
     public function exportExcel()
     {
+        // Log the export action
+        LogService::logAction('Formal Cases Exported', [
+            'exported_by' => auth()->user()->name,
+            'exported_at' => now(),
+        ]);
+
+        // Proceed with the Excel download
         return Excel::download(new FormalCaseExport, 'formal_cases.xlsx');
     }
+
 
 
 

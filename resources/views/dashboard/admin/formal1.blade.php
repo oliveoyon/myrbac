@@ -1262,11 +1262,11 @@
                         </div>
                     </div>
                 </div>
-
-
+                @can('Create Formal Case')
                 <div class="mt-3">
                     <button type="submit" class="btnCustom btn btn-primary">Submit</button>
                 </div>
+                @endcan
             </div>
         </form>
     </div>

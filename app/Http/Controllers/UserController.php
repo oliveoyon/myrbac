@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
+use App\Services\LogService;
+use Illuminate\Support\Facades\Log;
+
 
 
 class UserController extends Controller
@@ -28,38 +31,68 @@ class UserController extends Controller
     // Add a new user and assign roles
     public function addUser(Request $request)
     {
-
+        // Validate incoming request
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:users,name',
             'email' => 'required|email|unique:users,email',
             'status' => 'required',
-            // 'district_id' => 'required|exists:districts,id', 
-            // 'pngo_id' => 'required|exists:pngos,id',
             'role_name' => 'required|array',
             'role_name.*' => 'exists:roles,name'
         ]);
 
+        // If validation fails, return error response
         if ($validator->fails()) {
             return response()->json(['code' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make('12345678'); // Default password
-        $user->district_id = $request->district_id;
-        $user->pngo_id = $request->pngo_id;
-        $user->status = $request->status == 1 ? 2 : 0;
+        try {
+            // Create new user
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = Hash::make('12345678'); // Default password
+            $user->district_id = $request->district_id;
+            $user->pngo_id = $request->pngo_id;
+            $user->status = $request->status == 1 ? 2 : 0;
 
-        if ($user->save()) {
-            $user->syncRoles($request->role_name); // Assign multiple roles
-            app()[PermissionRegistrar::class]->forgetCachedPermissions();
+            // Save user to the database
+            if ($user->save()) {
+                // Assign roles to the user
+                $user->syncRoles($request->role_name);
+                app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-            return response()->json(['code' => 1, 'msg' => 'User Added Successfully', 'redirect' => route('users.index')]);
-        } else {
-            return response()->json(['code' => 0, 'msg' => 'Something went wrong']);
+                // Log the user creation action
+                LogService::logAction('Add User', [
+                    'user_id' => $user->id,
+                    'user_name' => $user->name,
+                    'roles' => implode(',', $request->role_name),
+                    'district_id' => $user->district_id,
+                    'pngo_id' => $user->pngo_id,
+                ]);
+
+                // Return success response
+                return response()->json(['code' => 1, 'msg' => 'User Added Successfully', 'redirect' => route('users.index')]);
+            } else {
+                // Log the error if the user creation fails
+                Log::error('Failed to add user', [
+                    'name' => $request->name,
+                    'email' => $request->email
+                ]);
+                
+                // Return failure response
+                return response()->json(['code' => 0, 'msg' => 'Something went wrong']);
+            }
+        } catch (\Exception $e) {
+            // Log any unexpected errors
+            Log::error('Error in user creation: ' . $e->getMessage(), [
+                'request_data' => $request->all()
+            ]);
+
+            // Return error response
+            return response()->json(['code' => 0, 'msg' => 'An error occurred. Please try again later.']);
         }
     }
+
 
     // Get user details for editing
     public function getUserDetails(Request $request)
@@ -88,48 +121,78 @@ class UserController extends Controller
     }
 
 
-    // Update user details
     public function updateUserDetails(Request $request)
     {
+        // Retrieve the user by ID with their roles
         $user_id = $request->uid;
         $user = User::with('roles')->find($user_id);
+
         if (!$user) {
+            // Log the failed user retrieval for debugging
+            Log::warning("User not found", ['user_id' => $user_id]);
+            
             return response()->json(['code' => 0, 'msg' => 'User not found']);
         }
 
+        // Validate incoming data
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:users,name,' . $user_id . ',id',
             'email' => 'required|email|unique:users,email,' . $user_id . ',id',
             'status' => 'required',
-            // 'district_id' => 'required|exists:districts,id',
-            // 'pngo_id' => 'required|exists:pngos,id',
             'role_name' => 'required|array',
             'role_name.*' => 'exists:roles,name'
         ]);
 
+        // If validation fails, return the errors
         if ($validator->fails()) {
             return response()->json(['code' => 0, 'error' => $validator->errors()->toArray()]);
         }
 
+        // Update user details
         $user->name = $request->name;
         $user->email = $request->email;
         $user->district_id = $request->district_id;
         $user->pngo_id = $request->pngo_id;
         $user->status = $request->status;
 
+        // If password is provided, update it
         if ($request->has('password') && !empty($request->password)) {
             $user->password = Hash::make($request->password);
         }
 
-        if ($user->save()) {
-            $user->syncRoles($request->role_name); // Update roles
-            app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        try {
+            // Save the user and sync roles
+            if ($user->save()) {
+                $user->syncRoles($request->role_name);  // Update roles
+                app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-            return response()->json(['code' => 1, 'msg' => 'User Updated Successfully', 'redirect' => route('users.index')]);
-        } else {
-            return response()->json(['code' => 0, 'msg' => 'Something went wrong']);
+                // Log the successful update
+                LogService::logAction('Update User', [
+                    'user_id' => $user->id,
+                    'user_name' => $user->name,
+                    'roles' => implode(',', $request->role_name),
+                    'district_id' => $user->district_id,
+                    'pngo_id' => $user->pngo_id,
+                ]);
+
+                return response()->json(['code' => 1, 'msg' => 'User Updated Successfully', 'redirect' => route('users.index')]);
+            } else {
+                // Log failure if save fails
+                Log::error('Failed to update user', ['user_id' => $user_id]);
+
+                return response()->json(['code' => 0, 'msg' => 'Something went wrong']);
+            }
+        } catch (\Exception $e) {
+            // Log unexpected errors
+            Log::error('Error in user update: ' . $e->getMessage(), [
+                'request_data' => $request->all(),
+                'user_id' => $user_id
+            ]);
+
+            return response()->json(['code' => 0, 'msg' => 'An error occurred. Please try again later.']);
         }
     }
+
 
     // Delete user
     public function deleteUser(Request $request)
@@ -225,9 +288,17 @@ class UserController extends Controller
             ]);
 
             $user = auth()->user();
-            $user->password = bcrypt($request->new_password);
+            $userId = $user->id;
+
+            $user->password = Hash::make($request->new_password);
             $user->status = 1;
             $user->save();
+
+            // ✅ Log using your pattern
+            LogService::logAction('Password Change', [
+                'user_id' => $userId,
+                'message' => "User ID {$userId} changed their password.",
+            ]);
 
             return redirect()->back()->with('success', 'Password updated successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 
 use Illuminate\Http\Request;
+use App\Services\LogService;
 
 class CategoryController extends Controller
 {
@@ -13,16 +14,20 @@ class CategoryController extends Controller
         return view('dashboard.admin.category', compact('categories'));
     }
     // Function to Add a New Category
-    public function districtAdd(Request $request)
+    public function categoryAdd(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
-        // Create a new category
         $category = new Category();
         $category->name = $request->name;
         $category->save();
+
+        LogService::logAction('Category Create', [
+            'category_id' => $category->id,
+            'name' => $category->name,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -31,18 +36,22 @@ class CategoryController extends Controller
         ]);
     }
 
-    // Function to Update an Existing Category
-    public function districtUpdate(Request $request, $districtId)
+    public function categoryUpdate(Request $request, $categoryId)
     {
         $request->validate([
-            'name' => 'required|unique:categories,name,' . $districtId,
+            'name' => 'required|unique:categories,name,' . $categoryId,
         ]);
 
-        $category = Category::findOrFail($districtId);
+        $category = Category::findOrFail($categoryId);
+        $oldName = $category->name;
+
         $category->name = $request->name;
         $category->save();
 
-        
+        LogService::logAction('Category Update', [
+            'category_id' => $categoryId,
+            'changed_fields' => "Name changed from '{$oldName}' to '{$category->name}'",
+        ]);
 
         return response()->json([
             'success' => true,
@@ -51,15 +60,22 @@ class CategoryController extends Controller
         ]);
     }
 
-    // Function to Delete a Category
-    public function districtDelete($districtId)
+    public function categoryDelete($categoryId)
     {
-        $category = Category::findOrFail($districtId);
+        $category = Category::findOrFail($categoryId);
+        $categoryName = $category->name;
         $category->delete();
+
+        LogService::logAction('Category Delete', [
+            'category_id' => $categoryId,
+            'deleted_name' => $categoryName,
+            'message' => "Category '{$categoryName}' (ID: {$categoryId}) was deleted.",
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Category deleted successfully!',
         ]);
     }
+
 }

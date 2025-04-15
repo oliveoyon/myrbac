@@ -14,6 +14,9 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use App\Services\CommonService;
+use Illuminate\Support\Facades\DB;
+use App\Services\LogService;
+use Illuminate\Support\Str;
 
 class FormalController extends Controller
 {
@@ -181,38 +184,81 @@ class FormalController extends Controller
         $case->result_description = $request->result_description;
         $case->file_closure_date = $request->file_closure_date;
     
-        // Save the case
-        $case->save();
+        DB::beginTransaction();
 
-        $followup = new FollowUpIntervention();
-        $followup->central_id = $case->id;
-        $followup->user_id = auth()->id();
-        $followup->intervention_taken = $request->intervention_taken;
-        $followup->intervention_taken_date = $request->intervention_taken_date;
-        $followup->intervention_to_be_taken = $request->intervention_to_be_taken;
-        $followup->to_be_taken_date = $request->to_be_taken_date;
-        $followup->save();
+        try {
+            // Save the case
+            $case->save();
 
-        if ($request->hasFile('fileUpload')) {
-            foreach ($request->file('fileUpload') as $file) {
-                $originalName = $file->getClientOriginalName();
-                $extension = $file->getClientOriginalExtension();
-                $newFileName = $case->id . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
-        
-                // Store the file
-                $file->storeAs('uploads/formal_cases', $newFileName, 'public');
-        
-                // Save to database
-                FileUpload::create([
-                    'case_id' => $case->id,
-                    'file_name' => $newFileName,
-                ]);
+            // Create and save the follow-up intervention
+            $followup = new FollowUpIntervention([
+                'central_id' => $case->id,
+                'user_id' => auth()->id(),
+                'intervention_taken' => $request->intervention_taken,
+                'intervention_taken_date' => $request->intervention_taken_date,
+                'intervention_to_be_taken' => $request->intervention_to_be_taken,
+                'to_be_taken_date' => $request->to_be_taken_date,
+            ]);
+            $followup->save();
+
+            // Initialize the log data
+            $logData = [
+                'case_id' => $case->id,
+                'central_id' => $centralId,  
+                'created_by' => auth()->user()->name,
+                'followup_intervention_taken' => $followup->intervention_taken,
+                'followup_taken_on' => $followup->intervention_taken_date,
+            ];
+
+            // Initialize an array to store file upload details
+            $uploadedFiles = [];
+
+            // Handle file uploads, if any
+            if ($request->hasFile('fileUpload')) {
+                $logData['file_count'] = count($request->file('fileUpload'));
+
+                foreach ($request->file('fileUpload') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $extension = $file->getClientOriginalExtension();
+                    $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+                    $newFileName = $case->id . '_' . Str::slug($baseName) . '_' . uniqid() . '.' . $extension;
+
+                    // Store the file
+                    $path = $file->storeAs('uploads/formal_cases', $newFileName, 'public');
+
+                    // Save the file upload record
+                    FileUpload::create([
+                        'case_id' => $case->id,
+                        'file_name' => $newFileName,
+                        'file_path' => $path,
+                        'uploaded_by' => auth()->id(),
+                    ]);
+
+                    // Add file details to the log
+                    $uploadedFiles[] = [
+                        'file_name' => $newFileName,
+                        'file_path' => $path,
+                    ];
+                }
+
+                // Add uploaded files details to the log
+                $logData['uploaded_files'] = $uploadedFiles;
             }
+
+            // Log the entire process in one go
+            LogService::logAction('Case and Follow-up Created with File Uploads', $logData);
+
+            // Commit the transaction
+            DB::commit();
+
+            return redirect()->route('form.index')->with('success', 'Case has been successfully created.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'An error occurred: ' . $e->getMessage());
         }
+
     
-        // dd($case);
-    
-        return redirect()->route('form.index')->with('success', 'Case has been successfully created.');
+        
     }
     
     public function editCourtPolicePrison(Request $request)
@@ -352,38 +398,76 @@ class FormalController extends Controller
         $case->result_description = $request->result_description;
         $case->file_closure_date = $request->file_closure_date;
 
-        // Save the case
-        $case->save();
+        DB::beginTransaction();
 
-        $followup = new FollowUpIntervention();
-        $followup->central_id = $case->id;
-        $followup->user_id = auth()->id();
-        $followup->intervention_taken = $request->intervention_taken;
-        $followup->intervention_taken_date = $request->intervention_taken_date;
-        $followup->intervention_to_be_taken = $request->intervention_to_be_taken;
-        $followup->to_be_taken_date = $request->to_be_taken_date;
-        $followup->save();
+        try {
+            // Save the case
+            $case->save();
 
-        if ($request->hasFile('fileUpload')) {
-            foreach ($request->file('fileUpload') as $file) {
-                $originalName = $file->getClientOriginalName();
-                $extension = $file->getClientOriginalExtension();
-                $newFileName = $case->id . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
-        
-                // Store the file
-                $file->storeAs('uploads/formal_cases', $newFileName, 'public');
-        
-                // Save to database
-                FileUpload::create([
-                    'case_id' => $case->id,
-                    'file_name' => $newFileName,
-                ]);
+            // Create or update the follow-up intervention
+            $followup = FollowUpIntervention::firstOrNew(['central_id' => $case->id]);
+            $followup->user_id = auth()->id();
+            $followup->intervention_taken = $request->intervention_taken;
+            $followup->intervention_taken_date = $request->intervention_taken_date;
+            $followup->intervention_to_be_taken = $request->intervention_to_be_taken;
+            $followup->to_be_taken_date = $request->to_be_taken_date;
+            $followup->save();
+
+            // Initialize the log data
+            $logData = [
+                'case_id' => $case->id,
+                'central_id' => $case->central_id,  // Assuming central_id is part of the case
+                'updated_by' => auth()->user()->name,
+                'followup_intervention_taken' => $followup->intervention_taken,
+                'followup_taken_on' => $followup->intervention_taken_date,
+            ];
+
+            // Initialize an array to store file upload details
+            $uploadedFiles = [];
+
+            // Handle file uploads, if any
+            if ($request->hasFile('fileUpload')) {
+                $logData['file_count'] = count($request->file('fileUpload'));
+
+                foreach ($request->file('fileUpload') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $extension = $file->getClientOriginalExtension();
+                    $newFileName = $case->id . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $extension;
+
+                    // Store the file
+                    $path = $file->storeAs('uploads/formal_cases', $newFileName, 'public');
+
+                    // Save the file upload record
+                    FileUpload::create([
+                        'case_id' => $case->id,
+                        'file_name' => $newFileName,
+                        'file_path' => $path, // optional if your table has this column
+                        'uploaded_by' => auth()->id(),
+                    ]);
+
+                    // Add file details to the log
+                    $uploadedFiles[] = [
+                        'file_name' => $newFileName,
+                        'file_path' => $path,
+                    ];
+                }
+
+                // Add uploaded files details to the log
+                $logData['uploaded_files'] = $uploadedFiles;
             }
+
+            // Log the entire process in one go
+            LogService::logAction('Case and Follow-up Updated with File Uploads', $logData);
+
+            // Commit the transaction
+            DB::commit();
+
+            return redirect()->route('form.index')->with('success', 'Case has been successfully edited.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'An error occurred: ' . $e->getMessage());
         }
 
-        // dd($case);
-
-        return redirect()->route('form.index')->with('success', 'Case has been successfully Edited.');
     }
 
     public function editCase(Request $request)
@@ -617,11 +701,21 @@ private function convertToDateFormat($date)
 
         // Find the case and update the status
         $case = FormalCase::findOrFail($request->id);
+        $oldStatus = $case->status; // Store the previous status
         $case->status = 2; // Update status to "Verified by DPO"
         $case->save();
 
+        // Log the action in the LogService
+        LogService::logAction('Case Verified by DPO', [
+            'case_id' => $case->id,
+            'previous_status' => $oldStatus,
+            'new_status' => $case->status,
+            'verified_by' => auth()->user()->name,
+        ]);
+
         return response()->json(['success' => true, 'message' => 'Case verified successfully.']);
     }
+
 
     public function verifyCaseMneo(Request $request)
     {
@@ -629,20 +723,31 @@ private function convertToDateFormat($date)
         $request->validate([
             'id' => 'required|exists:formal_cases,id',
         ]);
-
+    
         // Check if the case has data in any of the specified fields
         if (!$this->hasDataInFields($request->id)) {
             // If the case doesn't have valid data, return an error response
             return response()->json(['success' => false, 'message' => 'The case is not valid for verification.'], 400);
         }
-
+    
         // Find the case and update the status
         $case = FormalCase::findOrFail($request->id);
-        $case->status = 3; // Update status to "Verified by DPO"
+        $oldStatus = $case->status; // Store the previous status
+        $case->status = 3; // Update status to "Verified by MNEO"
         $case->save();
-
-        return response()->json(['success' => true, 'message' => 'Case verified successfully.']);
+    
+        // Log the action in the LogService
+        LogService::logAction('Case Verified by MNEO', [
+            'case_id' => $case->id,
+            'previous_status' => $oldStatus,
+            'new_status' => $case->status,
+            'verified_by' => auth()->user()->name,
+        ]);
+    
+        return response()->json(['success' => true, 'message' => 'Case verified successfully by MNEO.']);
     }
+    
+
 
     public function hasDataInFields($caseId)
     {

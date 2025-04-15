@@ -36,10 +36,15 @@ class DashboardController extends Controller
             'name' => 'required|string|max:255|unique:districts,name',
         ]);
 
-        // Create a new district
         $district = new District();
         $district->name = $request->name;
         $district->save();
+
+        // Log the creation
+        LogService::logAction('District Created', [
+            'district_id' => $district->id,
+            'district_name' => $district->name,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -47,6 +52,7 @@ class DashboardController extends Controller
             'district' => $district,
         ]);
     }
+
 
     // Function to Update an Existing District
     public function districtUpdate(Request $request, $districtId)
@@ -56,13 +62,25 @@ class DashboardController extends Controller
         ]);
 
         $district = District::findOrFail($districtId);
+
+        $changes = [];
+
+        if ($district->name !== $request->name) {
+            $changes['name'] = [
+                'from' => $district->name,
+                'to' => $request->name,
+            ];
+        }
+
         $district->name = $request->name;
         $district->save();
 
-        LogService::logAction('District Update', [
-            'changed_fields' => ['name'],
-            
-        ]);
+        if (!empty($changes)) {
+            LogService::logAction('District Updated', [
+                'district_id' => $district->id,
+                'changed_fields' => $changes,
+            ]);
+        }
 
         return response()->json([
             'success' => true,
@@ -71,17 +89,27 @@ class DashboardController extends Controller
         ]);
     }
 
+
     // Function to Delete a District
     public function districtDelete($districtId)
     {
         $district = District::findOrFail($districtId);
+        $deletedName = $district->name;
+
         $district->delete();
+
+        // Log the deletion
+        LogService::logAction('District Deleted', [
+            'district_id' => $districtId,
+            'district_name' => $deletedName,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'District deleted successfully!',
         ]);
     }
+
 
 
     public function pngos()
@@ -96,10 +124,16 @@ class DashboardController extends Controller
             'name' => 'required|string|max:255|unique:pngos,name',
         ]);
 
-        // Create a new pngo
+        // Create a new PNGO
         $pngo = new Pngo();
         $pngo->name = $request->name;
         $pngo->save();
+
+        // Log the creation
+        LogService::logAction('PNGO Added', [
+            'pngo_id' => $pngo->id,
+            'name' => $pngo->name,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -108,35 +142,53 @@ class DashboardController extends Controller
         ]);
     }
 
+
     // Function to Update an Existing Pngo
-    public function pngoUpdate(Request $request, $districtId)
+    public function pngoUpdate(Request $request, $pngoId)
     {
         $request->validate([
-            'name' => 'required|unique:pngos,name,' . $districtId,
+            'name' => 'required|unique:pngos,name,' . $pngoId,
         ]);
 
-        $pngo = Pngo::findOrFail($districtId);
+        $pngo = Pngo::findOrFail($pngoId);
+        $oldName = $pngo->name;
         $pngo->name = $request->name;
         $pngo->save();
 
+        // Log the update
+        LogService::logAction('PNGO Update', [
+            'pngo_id' => $pngo->id,
+            'changed_fields' => "Name changed from '{$oldName}' to '{$pngo->name}'",
+        ]);
+
         return response()->json([
             'success' => true,
-            'message' => 'Pngo updated successfully!',
+            'message' => 'PNGO updated successfully!',
             'pngo' => $pngo,
         ]);
     }
 
+
     // Function to Delete a Pngo
-    public function pngoDelete($districtId)
+    public function pngoDelete($pngoId)
     {
-        $pngo = Pngo::findOrFail($districtId);
+        $pngo = Pngo::findOrFail($pngoId);
+        $pngoName = $pngo->name;
         $pngo->delete();
+
+        // Log the delete action
+        LogService::logAction('PNGO Delete', [
+            'pngo_id' => $pngoId,
+            'deleted_name' => $pngoName,
+            'message' => "PNGO '{$pngoName}' (ID: {$pngoId}) was deleted.",
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Pngo deleted successfully!',
+            'message' => 'PNGO deleted successfully!',
         ]);
     }
+
 
     
 

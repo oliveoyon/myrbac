@@ -31,9 +31,9 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('permission:Admin Dashboard');
 
     Route::get('category-management', [CategoryController::class, 'categories'])->name('dashboard.categories')->middleware('permission:View Categories');  
-    Route::post('categories', [CategoryController::class, 'districtAdd'])->name('categories.add')->middleware('permission:Add Category');  
-    Route::put('categories/{category}', [CategoryController::class, 'districtUpdate'])->name('categories.update')->middleware('permission:Edit Category');  
-    Route::delete('categories/{category}', [CategoryController::class, 'districtDelete'])->name('categories.delete')->middleware('permission:Delete Category');  
+    Route::post('categories', [CategoryController::class, 'categoryAdd'])->name('categories.add')->middleware('permission:Add Category');  
+    Route::put('categories/{category}', [CategoryController::class, 'categoryUpdate'])->name('categories.update')->middleware('permission:Edit Category');  
+    Route::delete('categories/{category}', [CategoryController::class, 'categoryDelete'])->name('categories.delete')->middleware('permission:Delete Category');  
 
     Route::get('district-management', [DashboardController::class, 'districts'])->name('dashboard.districts')->middleware('permission:View Districts');  
     Route::post('districts', [DashboardController::class, 'districtAdd'])->name('districts.add')->middleware('permission:Add District');  
@@ -107,7 +107,7 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     
     Route::get('/generate-pdfs', [PDFController::class, 'generatePDF']);
 
-
+  
 
     
 
