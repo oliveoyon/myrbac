@@ -42,7 +42,7 @@
     <div class="container-fluid">
         <div class="row mb-4">
             <!-- User Info Card -->
-            <div class="col-md-6">
+            <div class="col-md-6 mb-4">
                 <div class="card shadow border-0">
                     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>User Information</h5>
@@ -67,7 +67,7 @@
             </div>
 
             <!-- Password Change Card -->
-            <div class="col-md-6">
+            <div class="col-md-6 mb-4">
                 <div class="card shadow border-0">
                     <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="fas fa-key me-2"></i>Change Password</h5>

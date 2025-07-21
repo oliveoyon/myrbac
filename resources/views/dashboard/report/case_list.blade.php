@@ -598,7 +598,7 @@
         if (this.checked) {
             Swal.fire({
                 title: 'Are you sure?',
-                text: "Please see the form carefully before verifying.",
+                text: "Please see the form and attachment carefully before verifying.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
