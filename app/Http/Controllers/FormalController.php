@@ -560,14 +560,18 @@ class FormalController extends Controller
             $row['date_of_reliefe'] = $this->convertToDateFormat($row['date_of_reliefe']);
             $row['file_closure_date'] = $this->convertToDateFormat($row['file_closure_date']);
 
+            if (!empty($row['reference_no'])) {
+                $row['received_application'] = 'Yes';
+            }
+
             
             // Insert the row into the database
             FormalCase::create([
                 'institute' => $row['institute'],
                 'central_id' => $row['central_id'],
                 'user_id' => auth()->id(),
-                'district_id' => Auth::user()->district_id,
-                'pngo_id' => Auth::user()->pngo_id,
+                'district_id' => $row['district_id'],
+                'pngo_id' => $row['pngo_id'],
                 'status' => $row['status'],
                 'full_name' => $row['full_name'],
                 'nick_name' => $row['nick_name'],

@@ -289,7 +289,7 @@
                             <td>${caseData.full_name || 'N/A'}</td>
                             <td>${caseData.phone_number || 'N/A'}</td>
                             <td>${caseData.legal_representation_date 
-                                ? new Date(caseData.legal_representation_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) 
+                                ? new Date(caseData.interview_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) 
                                 : 'N/A'}</td>
                             <td>${caseData.district?.name || 'N/A'}</td>
                             <td>${caseData.pngo?.name || 'N/A'}</td>
