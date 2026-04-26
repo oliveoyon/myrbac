@@ -222,8 +222,6 @@ class ReportController extends Controller
             ->first();
         });
 
-        dd($results);
-
         return response()->json($results);
     }
     
@@ -374,4 +372,3 @@ class ReportController extends Controller
         //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
         //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as total')
         //     )->groupBy('institute')->get();
-

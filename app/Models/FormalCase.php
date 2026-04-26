@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class FormalCase extends Model
 {
+    public const STATUS_SUBMITTED = 1;
+    public const STATUS_DPO_VERIFIED = 2;
+    public const STATUS_MNEO_VERIFIED = 3;
+
     protected $fillable = [
         'institute','central_id', 'user_id', 'district_id', 'pngo_id', 'status', 'profile_no',
         'full_name', 'nick_name', 'father_name', 'mother_name', 'sex', 'age', 

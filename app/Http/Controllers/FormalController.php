@@ -61,8 +61,8 @@ class FormalController extends Controller
         ->first();
                             
 
-        $highestCentralId = $existingCentralIds->central_id;
-        preg_match('/(\d+)$/', $highestCentralId, $matches);
+        $highestCentralId = $existingCentralIds?->central_id;
+        preg_match('/(\d+)$/', (string) $highestCentralId, $matches);
         $lastNumber = isset($matches[1]) ? $matches[1] : null;
         $nextNumber = $lastNumber ? $lastNumber + 1 : 1;
 
@@ -74,7 +74,7 @@ class FormalController extends Controller
         $case->user_id = auth()->id();
         $case->district_id = $districtId;
         $case->pngo_id = $pngoId;
-        $case->status = 1;
+        $case->status = FormalCase::STATUS_SUBMITTED;
         $case->institute = $request->institute;
         $case->full_name = $request->full_name;
         $case->nick_name = $request->nick_name;
@@ -706,7 +706,15 @@ private function convertToDateFormat($date)
         // Find the case and update the status
         $case = FormalCase::findOrFail($request->id);
         $oldStatus = $case->status; // Store the previous status
-        $case->status = 2; // Update status to "Verified by DPO"
+
+        if ((int) $oldStatus !== FormalCase::STATUS_SUBMITTED) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only submitted cases can be verified by DPO.',
+            ], 400);
+        }
+
+        $case->status = FormalCase::STATUS_DPO_VERIFIED; // Update status to "Verified by DPO"
         $case->save();
 
         // Log the action in the LogService
@@ -737,7 +745,15 @@ private function convertToDateFormat($date)
         // Find the case and update the status
         $case = FormalCase::findOrFail($request->id);
         $oldStatus = $case->status; // Store the previous status
-        $case->status = 3; // Update status to "Verified by MNEO"
+
+        if ((int) $oldStatus !== FormalCase::STATUS_DPO_VERIFIED) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The case must be verified by DPO before MNEO verification.',
+            ], 400);
+        }
+
+        $case->status = FormalCase::STATUS_MNEO_VERIFIED; // Update status to "Verified by MNEO"
         $case->save();
     
         // Log the action in the LogService

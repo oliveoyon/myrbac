@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\Importable;
+use Illuminate\Support\Facades\Auth;
 
 class FormalCaseImport implements ToModel, WithHeadingRow, WithValidation
 {
@@ -107,9 +108,6 @@ class FormalCaseImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
-            'district_id' => 'required|exists:districts,id',
-            'pngo_id' => 'required|exists:pngos,id',
             'age' => 'nullable|integer',
             'monthly_income' => 'nullable|numeric',
             'fine_amount' => 'nullable|numeric',
