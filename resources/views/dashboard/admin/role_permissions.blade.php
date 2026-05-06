@@ -1,6 +1,6 @@
 @extends('dashboard.layouts.admin-layout')
 
-@section('title', 'Pngo Management')
+@section('title', 'Roles and Permissions')
 
 @push('styles')
     <style>
@@ -10,49 +10,150 @@
             /* Keeps content scrollable within the full-screen modal */
         }
 
-        /* Styling for each category box */
         .category-box {
-            padding: 20px;
-            background-color: #ffffff;
-            border: 1px solid #ddd;
+            margin-bottom: 14px;
+            border: 1px solid #e0e6ed;
             border-radius: 8px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            /* Add space between categories */
+            background-color: #ffffff;
+            overflow: hidden;
         }
 
-        /* Category Header Styling */
         .category-header {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 15px;
+            margin: 0;
+            padding: 12px 14px;
+            border-bottom: 1px solid #f0d2cf;
+            background: #fff7f6;
+            color: #c30f08;
+            font-size: 15px;
+            font-weight: 800;
         }
 
-        /* Permissions Grid inside each category */
         .permissions-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
-            /* Space between permission items */
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 8px;
+            padding: 12px;
         }
 
-        /* Individual Permission Item Styling */
         .permission-item {
-            padding: 10px 15px;
-            background-color: #f4f7fc;
-            border-left: 5px solid #4CAF50;
-            margin-bottom: 10px;
-            color: #333;
-            font-size: 15px;
-            border-radius: 8px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            min-height: 38px;
+            padding: 8px 10px;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background-color: #fff;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 600;
         }
 
         .permission-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+            border-color: #c30f08;
+            background: #fff7f6;
+        }
+
+        #permissionsViewModal .modal-body {
+            background: #f8fafc;
+        }
+
+        .permission-view-shell {
+            display: grid;
+            gap: 14px;
+        }
+
+        .permission-view-summary {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid #e1e5ea;
+            border-left: 4px solid #c30f08;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .permission-view-summary h6 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .permission-view-summary p {
+            margin: 4px 0 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .permission-view-count {
+            padding: 4px 10px;
+            border: 1px solid #f0d2cf;
+            border-radius: 999px;
+            background: #fff7f6;
+            color: #9d0c06;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .permission-view-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 12px;
+        }
+
+        #permissionsViewModal .category-box {
+            margin-bottom: 0;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+        }
+
+        #permissionsViewModal .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            color: #fff !important;
+        }
+
+        .category-header-count {
+            padding: 3px 8px;
+            border: 1px solid #f0d2cf;
+            border-radius: 999px;
+            background: #fff;
+            color: #7f1d1d;
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        #permissionsViewModal .permissions-grid {
+            grid-template-columns: 1fr;
+            gap: 6px;
+            padding: 10px;
+        }
+
+        #permissionsViewModal .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 34px;
+            padding: 7px 9px;
+            font-weight: 600;
+        }
+
+        #permissionsViewModal .permission-item i {
+            color: #c30f08;
+            font-size: 11px;
+        }
+
+        .permission-view-empty {
+            padding: 16px;
+            border: 1px dashed #d8dee6;
+            border-radius: 8px;
+            background: #fff;
+            color: #6b7280;
+            text-align: center;
+            font-weight: 700;
         }
 
         /* Custom Styling for the Edit Permissions Form */
@@ -63,18 +164,18 @@
             color: #2c3e50;
         }
 
-        .category-box {
-            background-color: #f9fafb;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-
-
         /* Ensuring the grid remains neat on smaller screens */
         @media (max-width: 768px) {
             .permissions-grid {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .permission-view-summary {
+                flex-direction: column;
+            }
+
+            .permission-view-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -100,30 +201,38 @@
 
         /* Category Title */
         .classic-category-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #e74c3c;
-            margin-bottom: 10px;
+            padding: 12px 14px;
+            border: 1px solid #f0d2cf;
+            border-radius: 8px 8px 0 0;
+            background: #fff7f6;
+            color: #c30f08 !important;
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 0;
         }
 
         /* Grid Layout for Permission Items */
         .classic-row {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            /* Auto-fit columns with a minimum width of 120px */
-            gap: 16px;
-            /* Space between checkboxes */
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 8px;
+            padding: 12px;
+            border: 1px solid #e0e6ed;
+            border-top: 0;
+            border-radius: 0 0 8px 8px;
             margin-bottom: 20px;
-            /* Space between categories */
         }
 
         /* Permission Items */
         .form-check {
             display: flex;
             align-items: center;
-            /* Vertically align checkbox with label */
             justify-content: flex-start;
-            /* Align items to the start */
+            min-height: 38px;
+            padding: 8px 10px;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fff;
         }
 
         /* Column Control for Grid Layout */
@@ -163,37 +272,52 @@
 @endpush
 
 @section('content')
-    <section>
-        <div class="container-fluid">
-            <div class="row mb-3">
-                <div class="container">
-                    <h2>Roles and Permissions</h2>
+    <section class="management-page">
+        <div class="management-header">
+            <div>
+                <h1>Roles and Permissions</h1>
+                <p>Review each role and adjust the permissions assigned to it.</p>
+            </div>
+        </div>
 
-                    <table class="table table-bordered table-striped table-hover table-sm">
+        <div class="management-card">
+            <div class="management-card-header">
+                <h2><i class="fas fa-users-cog me-2"></i>Role Permission Matrix</h2>
+                <span class="management-count">{{ $roles->count() }} Role{{ $roles->count() === 1 ? '' : 's' }}</span>
+            </div>
+
+            <div class="management-table-wrap table-responsive">
+                    <table class="table table-bordered table-striped table-hover table-sm management-table">
                         <thead>
                             <tr>
                                 <th>Role Name</th>
-                                <th>Actions</th>
+                                <th style="width: 190px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($roles as $role)
                                 <tr>
-                                    <td>{{ $role->name }}</td>
+                                    <td class="management-name-cell">{{ $role->name }}</td>
                                     <td>
-                                        <!-- View Permissions Button -->
-                                        <button class="btn btn-info btn-sm view-permissions" data-id="{{ $role->id }}"
-                                            data-toggle="modal" data-target="#permissionsViewModal">View</button>
+                                        <div class="management-actions">
+                                            <button class="btn btn-info btn-sm view-permissions" data-id="{{ $role->id }}"
+                                                data-name="{{ $role->name }}"
+                                                data-toggle="modal" data-target="#permissionsViewModal">
+                                                <i class="fas fa-eye"></i>
+                                                View
+                                            </button>
 
-                                        <!-- Edit Permissions Button -->
-                                        <button class="btn btn-warning btn-sm edit-permissions" data-id="{{ $role->id }}"
-                                            data-toggle="modal" data-target="#permissionsEditModal">Edit</button>
+                                            <button class="btn btn-warning btn-sm edit-permissions" data-id="{{ $role->id }}"
+                                                data-name="{{ $role->name }}" data-toggle="modal" data-target="#permissionsEditModal">
+                                                <i class="fas fa-edit"></i>
+                                                Edit
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                </div>
             </div>
         </div>
     </section>
@@ -255,30 +379,53 @@
             // When View button is clicked
             $('.view-permissions').on('click', function() {
                 var roleId = $(this).data('id'); // Get role ID
+                var roleName = $(this).data('name');
                 $.ajax({
                     url: '/mne/role/' + roleId + '/permissions', // Fetch permissions for viewing
                     method: 'GET',
                     success: function(response) {
                         var permissionsList = '';
+                        var totalPermissions = 0;
+                        var categoryCount = Object.keys(response.permissions || {}).length;
 
                         // Loop through grouped permissions
                         $.each(response.permissions, function(category, permissions) {
+                            totalPermissions += permissions.length;
                             permissionsList +=
                                 '<div class="category-box">'; // Start of category box
-                            permissionsList += '<div class="category-header">' +
-                                category + '</div>'; // Category name header
+                            permissionsList += '<div class="category-header"><span>' +
+                                category + '</span><span class="category-header-count">' + permissions.length +
+                                '</span></div>'; // Category name header
                             permissionsList +=
                                 '<div class="permissions-grid">'; // Start of permission grid
 
                             permissions.forEach(function(permission) {
                                 permissionsList +=
-                                    '<div class="permission-item">' + permission
-                                    .name + '</div>';
+                                    '<div class="permission-item"><i class="fas fa-check-circle"></i><span>' + permission
+                                    .name + '</span></div>';
                             });
 
                             permissionsList +=
                                 '</div></div>'; // Close permissions grid and category box
                         });
+
+                        if (!totalPermissions) {
+                            permissionsList = '<div class="permission-view-empty">No permissions assigned to this role.</div>';
+                        } else {
+                            permissionsList = '<div class="permission-view-grid">' + permissionsList + '</div>';
+                        }
+
+                        permissionsList =
+                            '<div class="permission-view-shell">' +
+                                '<div class="permission-view-summary">' +
+                                    '<div>' +
+                                        '<h6>' + roleName + '</h6>' +
+                                        '<p>' + categoryCount + ' categories with assigned permissions</p>' +
+                                    '</div>' +
+                                    '<span class="permission-view-count">' + totalPermissions + ' Permissions</span>' +
+                                '</div>' +
+                                permissionsList +
+                            '</div>';
 
                         // Display in modal
                         $('#permissionsViewModal .modal-body').html(permissionsList);

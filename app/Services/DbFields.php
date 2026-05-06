@@ -24,11 +24,13 @@ return [
         'collected_vokalatnama_date' => 'Collected Vokalatnama',
         'collected_case_doc' => 'Collected Case Document',
         'identify_sureties' => 'Identify Sureties',
+        'identify_sureties_date' => 'Identify Sureties Date',
         'witness_communication_date' => 'Witness Communication',
         'medical_report_date' => 'Medical Report',
         'legal_assistance_date' => 'Legal Assistance',
         'assistance_under_custody_date' => 'Assistance Under Custody',
         'referral_service' => 'Referral Service',
+        'referral_service_details' => 'Referral Service Details',
     ],
     'result_of_assistance' => [
         'resolved_dispute_date' => 'Resolved Dispute',

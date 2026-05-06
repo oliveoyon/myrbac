@@ -30,6 +30,20 @@ class FormalController extends Controller
         $validator = Validator::make($request->all(), [
             'institute' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
+            'sex' => 'required|string|max:255',
+            'age' => 'required|integer|min:0|max:150',
+            'family_informed' => 'required|string|max:255',
+            'child_age' => 'nullable|integer|min:0|max:150',
+            'child_2_age' => 'nullable|integer|min:0|max:150',
+            'guardian_relation_details' => 'nullable|string|max:255',
+            'lawyer_type_details' => 'nullable|string|max:255',
+            'legal_representation_details' => 'nullable|string|max:255',
+            'referral_service_details' => 'nullable|string|max:255',
+            'source_of_interview_details' => 'nullable|string|max:255',
+            'special_condition_details' => 'nullable|string|max:255',
+            'prison_legal_representation_details' => 'nullable|string|max:255',
+            'other_legal_assistance_details' => 'nullable|string|max:255',
+            'send_to_details' => 'nullable|string|max:255',
             'intervention_taken' => 'required|string|max:255',
         ], [
             'institute.required' => 'Institute is required. Please enter your name.',
@@ -39,6 +53,13 @@ class FormalController extends Controller
             'full_name.required' => 'The full name is required. Please enter your name.',
             'full_name.string' => 'The full name must be a valid text.',
             'full_name.max' => 'The full name should not exceed 255 characters.',
+
+            'sex.required' => 'Sex is required.',
+            'age.required' => 'Age is required.',
+            'age.integer' => 'Age must be a valid number.',
+            'age.min' => 'Age cannot be negative.',
+            'age.max' => 'Age should not exceed 150.',
+            'family_informed.required' => 'Please specify whether family or relatives have been informed.',
             
             'intervention_taken.required' => 'Please specify the intervention taken.',
             'intervention_taken.string' => 'Intervention details must be in text format.',
@@ -99,14 +120,18 @@ class FormalController extends Controller
         $case->children_with_prisoner = $request->children_with_prisoner;
         $case->child_sex = $request->child_sex;
         $case->child_age = $request->child_age;
+        $case->child_2_sex = $request->child_2_sex;
+        $case->child_2_age = $request->child_2_age;
         $case->has_guardian = $request->has_guardian;
         $case->guardian_name = $request->guardian_name;
         $case->guardian_phone = $request->guardian_phone;
         $case->guardian_address = $request->guardian_address;
         $case->guardian_relation = $request->guardian_relation;
+        $case->guardian_relation_details = $request->guardian_relation_details;
         $case->guardian_surety = $request->guardian_surety;
         $case->has_lawyer = $request->has_lawyer;
         $case->lawyer_type = $request->lawyer_type;
+        $case->lawyer_type_details = $request->lawyer_type_details;
         $case->lawyer_name = $request->lawyer_name;
         $case->lawyer_membership = $request->lawyer_membership;
         $case->lawyer_phone = $request->lawyer_phone;
@@ -117,15 +142,18 @@ class FormalController extends Controller
         $case->case_no = $request->case_no;
         $case->family_communication_date = $request->family_communication_date;
         $case->legal_representation = $request->legal_representation;
+        $case->legal_representation_details = $request->legal_representation_details;
         $case->legal_representation_date = $request->legal_representation_date;
         $case->collected_vokalatnama_date = $request->collected_vokalatnama_date;
         $case->collected_case_doc = $request->collected_case_doc;
         $case->identify_sureties = $request->identify_sureties;
+        $case->identify_sureties_date = $request->identify_sureties_date;
         $case->witness_communication_date = $request->witness_communication_date;
         $case->medical_report_date = $request->medical_report_date;
         $case->legal_assistance_date = $request->legal_assistance_date;
         $case->assistance_under_custody_date = $request->assistance_under_custody_date;
         $case->referral_service = $request->referral_service;
+        $case->referral_service_details = $request->referral_service_details;
         $case->referral_service_date = $request->referral_service_date;
         $case->resolved_dispute_date = $request->resolved_dispute_date;
         $case->appoint_lawyer_date = $request->appoint_lawyer_date;
@@ -140,6 +168,7 @@ class FormalController extends Controller
         $case->type_of_service_date = $request->type_of_service_date;
         $case->service_description = $request->service_description;
         $case->source_of_interview = $request->source_of_interview;
+        $case->source_of_interview_details = $request->source_of_interview_details;
         $case->prison_reg_no = $request->prison_reg_no;
         $case->prison_case_no = $request->prison_case_no;
         $case->section_no = $request->section_no;
@@ -155,10 +184,12 @@ class FormalController extends Controller
         $case->imprisonment_condition = $request->imprisonment_condition;
         $case->imprisonment_status = $request->imprisonment_status;
         $case->special_condition = $request->special_condition;
+        $case->special_condition_details = $request->special_condition_details;
         $case->prison_arrest_date = $request->prison_arrest_date;
         $case->surrender_date = $request->surrender_date;
         $case->prison_family_communication = $request->prison_family_communication;
         $case->prison_legal_representation = $request->prison_legal_representation;
+        $case->prison_legal_representation_details = $request->prison_legal_representation_details;
         $case->prison_legal_representation_date = $request->prison_legal_representation_date;
         $case->next_court_collection_date = $request->next_court_collection_date;
         $case->prison_next_court_date = $request->prison_next_court_date;
@@ -172,10 +203,12 @@ class FormalController extends Controller
         $case->appeal_assistance = $request->appeal_assistance;
         $case->ministerial_communication = $request->ministerial_communication;
         $case->other_legal_assistance = $request->other_legal_assistance;
+        $case->other_legal_assistance_details = $request->other_legal_assistance_details;
         $case->other_legal_assistance_date = $request->other_legal_assistance_date;
         $case->released_on = $request->released_on;
         $case->released_on_date = $request->released_on_date;
         $case->send_to = $request->send_to;
+        $case->send_to_details = $request->send_to_details;
         $case->send_to_date = $request->send_to_date;
         $case->convicted_length = $request->convicted_length;
         $case->convicted_sentence_expire = $request->convicted_sentence_expire;
@@ -266,6 +299,20 @@ class FormalController extends Controller
         $validator = Validator::make($request->all(), [
             'institute' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
+            'sex' => 'required|string|max:255',
+            'age' => 'required|integer|min:0|max:150',
+            'family_informed' => 'required|string|max:255',
+            'child_age' => 'nullable|integer|min:0|max:150',
+            'child_2_age' => 'nullable|integer|min:0|max:150',
+            'guardian_relation_details' => 'nullable|string|max:255',
+            'lawyer_type_details' => 'nullable|string|max:255',
+            'legal_representation_details' => 'nullable|string|max:255',
+            'referral_service_details' => 'nullable|string|max:255',
+            'source_of_interview_details' => 'nullable|string|max:255',
+            'special_condition_details' => 'nullable|string|max:255',
+            'prison_legal_representation_details' => 'nullable|string|max:255',
+            'other_legal_assistance_details' => 'nullable|string|max:255',
+            'send_to_details' => 'nullable|string|max:255',
             'intervention_taken' => 'required|string|max:255',
         ], [
             'institute.required' => 'Institute is required. Please enter your name.',
@@ -275,6 +322,13 @@ class FormalController extends Controller
             'full_name.required' => 'The full name is required. Please enter your name.',
             'full_name.string' => 'The full name must be a valid text.',
             'full_name.max' => 'The full name should not exceed 255 characters.',
+
+            'sex.required' => 'Sex is required.',
+            'age.required' => 'Age is required.',
+            'age.integer' => 'Age must be a valid number.',
+            'age.min' => 'Age cannot be negative.',
+            'age.max' => 'Age should not exceed 150.',
+            'family_informed.required' => 'Please specify whether family or relatives have been informed.',
             
             'intervention_taken.required' => 'Please specify the intervention taken.',
             'intervention_taken.string' => 'Intervention details must be in text format.',
@@ -313,14 +367,18 @@ class FormalController extends Controller
         $case->children_with_prisoner = $request->children_with_prisoner;
         $case->child_sex = $request->child_sex;
         $case->child_age = $request->child_age;
+        $case->child_2_sex = $request->child_2_sex;
+        $case->child_2_age = $request->child_2_age;
         $case->has_guardian = $request->has_guardian;
         $case->guardian_name = $request->guardian_name;
         $case->guardian_phone = $request->guardian_phone;
         $case->guardian_address = $request->guardian_address;
         $case->guardian_relation = $request->guardian_relation;
+        $case->guardian_relation_details = $request->guardian_relation_details;
         $case->guardian_surety = $request->guardian_surety;
         $case->has_lawyer = $request->has_lawyer;
         $case->lawyer_type = $request->lawyer_type;
+        $case->lawyer_type_details = $request->lawyer_type_details;
         $case->lawyer_name = $request->lawyer_name;
         $case->lawyer_membership = $request->lawyer_membership;
         $case->lawyer_phone = $request->lawyer_phone;
@@ -331,15 +389,18 @@ class FormalController extends Controller
         $case->case_no = $request->case_no;
         $case->family_communication_date = $request->family_communication_date;
         $case->legal_representation = $request->legal_representation;
+        $case->legal_representation_details = $request->legal_representation_details;
         $case->legal_representation_date = $request->legal_representation_date;
         $case->collected_vokalatnama_date = $request->collected_vokalatnama_date;
         $case->collected_case_doc = $request->collected_case_doc;
         $case->identify_sureties = $request->identify_sureties;
+        $case->identify_sureties_date = $request->identify_sureties_date;
         $case->witness_communication_date = $request->witness_communication_date;
         $case->medical_report_date = $request->medical_report_date;
         $case->legal_assistance_date = $request->legal_assistance_date;
         $case->assistance_under_custody_date = $request->assistance_under_custody_date;
         $case->referral_service = $request->referral_service;
+        $case->referral_service_details = $request->referral_service_details;
         $case->referral_service_date = $request->referral_service_date;
         $case->resolved_dispute_date = $request->resolved_dispute_date;
         $case->appoint_lawyer_date = $request->appoint_lawyer_date;
@@ -354,6 +415,7 @@ class FormalController extends Controller
         $case->type_of_service_date = $request->type_of_service_date;
         $case->service_description = $request->service_description;
         $case->source_of_interview = $request->source_of_interview;
+        $case->source_of_interview_details = $request->source_of_interview_details;
         $case->prison_reg_no = $request->prison_reg_no;
         $case->prison_case_no = $request->prison_case_no;
         $case->section_no = $request->section_no;
@@ -369,10 +431,12 @@ class FormalController extends Controller
         $case->imprisonment_condition = $request->imprisonment_condition;
         $case->imprisonment_status = $request->imprisonment_status;
         $case->special_condition = $request->special_condition;
+        $case->special_condition_details = $request->special_condition_details;
         $case->prison_arrest_date = $request->prison_arrest_date;
         $case->surrender_date = $request->surrender_date;
         $case->prison_family_communication = $request->prison_family_communication;
         $case->prison_legal_representation = $request->prison_legal_representation;
+        $case->prison_legal_representation_details = $request->prison_legal_representation_details;
         $case->prison_legal_representation_date = $request->prison_legal_representation_date;
         $case->next_court_collection_date = $request->next_court_collection_date;
         $case->prison_next_court_date = $request->prison_next_court_date;
@@ -386,10 +450,12 @@ class FormalController extends Controller
         $case->appeal_assistance = $request->appeal_assistance;
         $case->ministerial_communication = $request->ministerial_communication;
         $case->other_legal_assistance = $request->other_legal_assistance;
+        $case->other_legal_assistance_details = $request->other_legal_assistance_details;
         $case->other_legal_assistance_date = $request->other_legal_assistance_date;
         $case->released_on = $request->released_on;
         $case->released_on_date = $request->released_on_date;
         $case->send_to = $request->send_to;
+        $case->send_to_details = $request->send_to_details;
         $case->send_to_date = $request->send_to_date;
         $case->convicted_length = $request->convicted_length;
         $case->convicted_sentence_expire = $request->convicted_sentence_expire;
@@ -404,8 +470,9 @@ class FormalController extends Controller
             // Save the case
             $case->save();
 
-            // Create or update the follow-up intervention
-            $followup = FollowUpIntervention::firstOrNew(['central_id' => $case->id]);
+            // Save each edit follow-up as a new intervention history row.
+            $followup = new FollowUpIntervention();
+            $followup->central_id = $case->id;
             $followup->user_id = auth()->id();
             $followup->intervention_taken = $request->intervention_taken;
             $followup->intervention_taken_date = $request->intervention_taken_date;
@@ -523,6 +590,7 @@ class FormalController extends Controller
         foreach ($data as $row) {
             // Ensure that child_age is null if empty
             $row['child_age'] = !empty($row['child_age']) && is_numeric($row['child_age']) ? $row['child_age'] : null;
+            $row['child_2_age'] = !empty($row['child_2_age']) && is_numeric($row['child_2_age']) ? $row['child_2_age'] : null;
 
             // Convert dates to proper format (if necessary) and handle missing dates collected_case_doc
             $row['interview_date'] = $this->convertToDateFormat($row['interview_date']);
@@ -541,6 +609,7 @@ class FormalController extends Controller
             $row['application_mode_date'] = $this->convertToDateFormat($row['application_mode_date']);
             $row['type_of_service_date'] = $this->convertToDateFormat($row['type_of_service_date']);
             $row['collected_case_doc'] = $this->convertToDateFormat($row['collected_case_doc']);
+            $row['identify_sureties_date'] = $this->convertToDateFormat($row['identify_sureties_date'] ?? null);
             $row['entry_date'] = $this->convertToDateFormat($row['entry_date']);
             $row['next_court_date'] = $this->convertToDateFormat($row['next_court_date']);
             $row['surrender_date'] = $this->convertToDateFormat($row['surrender_date']);
@@ -596,14 +665,18 @@ class FormalController extends Controller
                 'children_with_prisoner' => $row['children_with_prisoner'],
                 'child_sex' => $row['child_sex'],
                 'child_age' => $row['child_age'],  // Now null if empty
+                'child_2_sex' => $row['child_2_sex'] ?? null,
+                'child_2_age' => $row['child_2_age'] ?? null,
                 'has_guardian' => $row['has_guardian'],
                 'guardian_name' => $row['guardian_name'],
                 'guardian_phone' => $row['guardian_phone'],
                 'guardian_address' => $row['guardian_address'],
                 'guardian_relation' => $row['guardian_relation'],
+                'guardian_relation_details' => $row['guardian_relation_details'] ?? null,
                 'guardian_surety' => $row['guardian_surety'],
                 'has_lawyer' => $row['has_lawyer'],
                 'lawyer_type' => $row['lawyer_type'],
+                'lawyer_type_details' => $row['lawyer_type_details'] ?? null,
                 'lawyer_name' => $row['lawyer_name'],
                 'lawyer_membership' => $row['lawyer_membership'],
                 'lawyer_phone' => $row['lawyer_phone'],
@@ -614,15 +687,18 @@ class FormalController extends Controller
                 'case_no' => $row['case_no'],
                 'family_communication_date' => $row['family_communication_date'],
                 'legal_representation' => $row['legal_representation'],
+                'legal_representation_details' => $row['legal_representation_details'] ?? null,
                 'legal_representation_date' => $row['legal_representation_date'],
                 'collected_vokalatnama_date' => $row['collected_vokalatnama_date'],
                 'collected_case_doc' => $row['collected_case_doc'],
                 'identify_sureties' => $row['identify_sureties'],
+                'identify_sureties_date' => $row['identify_sureties_date'] ?? null,
                 'witness_communication_date' => $row['witness_communication_date'],
                 'medical_report_date' => $row['medical_report_date'],
                 'legal_assistance_date' => $row['legal_assistance_date'],
                 'assistance_under_custody_date' => $row['assistance_under_custody_date'],
                 'referral_service' => $row['referral_service'],
+                'referral_service_details' => $row['referral_service_details'] ?? null,
                 'referral_service_date' => $row['referral_service_date'],
                 'resolved_dispute_date' => $row['resolved_dispute_date'],
                 'appoint_lawyer_date' => $row['appoint_lawyer_date'],
@@ -637,6 +713,7 @@ class FormalController extends Controller
                 'type_of_service_date' => $row['type_of_service_date'],
                 'service_description' => $row['service_description'],
                 'source_of_interview' => $row['source_of_interview'],
+                'source_of_interview_details' => $row['source_of_interview_details'] ?? null,
                 'prison_reg_no' => $row['prison_reg_no'],
                 'prison_case_no' => $row['prison_case_no'],
                 'entry_date' => $row['entry_date'],
@@ -647,10 +724,14 @@ class FormalController extends Controller
                 'facts_of_case' => $row['facts_of_case'],
                 'imprisonment_condition' => $row['imprisonment_condition'],
                 'special_condition' => $row['special_condition'],
+                'special_condition_details' => $row['special_condition_details'] ?? null,
                 'prison_arrest_date' => $row['prison_arrest_date'],
                 'surrender_date' => $row['surrender_date'],
                 'released_on' => $row['released_on'],
+                'prison_legal_representation_details' => $row['prison_legal_representation_details'] ?? null,
+                'other_legal_assistance_details' => $row['other_legal_assistance_details'] ?? null,
                 'result_of_appeal' => $row['result_of_appeal'],
+                'send_to_details' => $row['send_to_details'] ?? null,
                 'date_of_reliefe' => $row['date_of_reliefe'],
                 'file_closure_date' => $row['file_closure_date'],
             ]);
@@ -775,8 +856,8 @@ private function convertToDateFormat($date)
         $courtFields = [
             'custody_status', 'charges_details', 'arrest_date', 'case_no', 'family_communication_date',
             'legal_representation', 'legal_representation_date', 'collected_vokalatnama_date',
-            'collected_case_doc', 'identify_sureties', 'witness_communication_date', 'medical_report_date',
-            'legal_assistance_date', 'assistance_under_custody_date', 'referral_service',
+            'collected_case_doc', 'identify_sureties', 'identify_sureties_date', 'witness_communication_date', 'medical_report_date',
+            'legal_assistance_date', 'assistance_under_custody_date', 'referral_service', 'referral_service_details',
             'referral_service_date', 'resolved_dispute_date', 'appoint_lawyer_date', 'release_status',
             'fine_amount', 'release_status_date', 'application_mode', 'application_mode_date',
             'received_application', 'reference_no', 'type_of_service', 'type_of_service_date', 'service_description'

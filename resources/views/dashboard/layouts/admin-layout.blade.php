@@ -24,56 +24,59 @@
     <div id="overlay"></div>
 
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="logo">DigiTrack</div>
+    <aside class="sidebar app-sidebar" id="sidebar" aria-label="Main navigation">
+        <div class="logo">
+            <span class="brand-mark">D</span>
+            <span class="brand-text">DigiTrack</span>
+        </div>
         <form action="{{ route('dashboard.search') }}" method="POST" class="search-form">
             @csrf
             <input type="text" name="query" placeholder="Central ID..." required>
-            <button type="submit"><i class="fas fa-search"></i></button>
+            <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
         </form>
-        <ul>
+        <ul class="sidebar-nav">
             @can('Admin Dashboard')
-            <li><a href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a class="nav-link" href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i><span class="nav-text">Dashboard</span></a></li>
             @endcan
         
             @can('View Districts')
             <li class="has-submenu">
-                <a href="#"><i class="fas fa-cogs"></i> General Settings</a>
+                <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">General Settings</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
-                    <li><a href="{{ route('dashboard.districts') }}"><i class="fas fa-map-marker-alt"></i> District Management</a></li>
-                    <li><a href="{{ route('dashboard.pngos') }}"><i class="fas fa-handshake"></i> PNGOs Management</a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('dashboard.districts') }}"><i class="fas fa-map-marker-alt"></i><span class="nav-text">District Management</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('dashboard.pngos') }}"><i class="fas fa-handshake"></i><span class="nav-text">PNGOs Management</span></a></li>
                 </ul>
             </li>
             @endcan
         
             @can('View Categories')
             <li class="has-submenu">
-                <a href="#"><i class="fas fa-user-shield"></i> Roles & Permissions</a>
+                <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-user-shield"></i><span class="nav-text">Roles & Permissions</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
-                    <li><a href="{{ route('dashboard.categories') }}"><i class="fas fa-tags"></i> Manage Category</a></li>
-                    <li><a href="{{ route('dashboard.roles') }}"><i class="fas fa-user-tag"></i> Manage Roles</a></li>
-                    <li><a href="{{ route('permissions.list') }}"><i class="fas fa-key"></i> Manage Permissions</a></li>
-                    <li><a href="{{ route('roles.permissions') }}"><i class="fas fa-users-cog"></i> Assign Roles & Permissions</a></li>
-                    <li><a href="{{ route('users.index') }}"><i class="fas fa-user"></i> Users</a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('dashboard.categories') }}"><i class="fas fa-tags"></i><span class="nav-text">Manage Category</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('dashboard.roles') }}"><i class="fas fa-user-tag"></i><span class="nav-text">Manage Roles</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('permissions.list') }}"><i class="fas fa-key"></i><span class="nav-text">Manage Permissions</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('roles.permissions') }}"><i class="fas fa-users-cog"></i><span class="nav-text">Assign Roles & Permissions</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('users.index') }}"><i class="fas fa-user"></i><span class="nav-text">Users</span></a></li>
                 </ul>
             </li>
             @endcan
 
             <li class="has-submenu">
-                <a href="#"><i class="fas fa-cogs"></i> Manage Data Entry</a>
+                <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">Manage Data Entry</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
-                    <li><a href="{{ route('form.index') }}"><i class="fas fa-database"></i> Data Entry Forms</a></li>
-                    <li><a href="{{ route('import.view') }}"><i class="fas fa-database"></i> Bulk Data Entry</a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('form.index') }}"><i class="fas fa-database"></i><span class="nav-text">Data Entry Forms</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('import.view') }}"><i class="fas fa-database"></i><span class="nav-text">Bulk Data Entry</span></a></li>
                 </ul>
             </li>
             <li class="has-submenu">
-                <a href="#"><i class="fas fa-file-alt"></i> Reports & Analytics</a>
+                <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-file-alt"></i><span class="nav-text">Reports & Analytics</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
-                    <li><a href="{{ route('case_list') }}"><i class="fas fa-chart-bar"></i> Case List</a></li>
-                    <li><a href="{{ route('customReport') }}"><i class="fas fa-chart-bar"></i> Intervention Report</a></li>
-                    <li><a href="{{ route('district.summery') }}"><i class="fas fa-user-clock"></i> District Summery</a></li>
-                    <li><a href="{{ route('pngo.summery') }}"><i class="fas fa-lock"></i> PNGO Summery</a></li>
-                    <li><a href="{{ route('formal.cases.export') }}"><i class="fa fa-download"></i> Download Excel</a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('case_list') }}"><i class="fas fa-chart-bar"></i><span class="nav-text">Case List</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('customReport') }}"><i class="fas fa-chart-bar"></i><span class="nav-text">Intervention Report</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('district.summery') }}"><i class="fas fa-user-clock"></i><span class="nav-text">District Summery</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('pngo.summery') }}"><i class="fas fa-lock"></i><span class="nav-text">PNGO Summery</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('formal.cases.export') }}"><i class="fa fa-download"></i><span class="nav-text">Download Excel</span></a></li>
 
                 </ul>
             </li>
@@ -91,8 +94,8 @@
             <!-- Logout Menu Option for Authenticated Users -->
             @auth
             <li>
-                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i><span class="nav-text">Logout</span>
                 </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf
@@ -100,12 +103,15 @@
             </li>
             @endauth
         </ul>
-    </div>
+    </aside>
     
     
 
-    <div class="header">
-        <button id="sidebarToggle"><i class="fas fa-bars"></i></button>
+    <header class="header app-header">
+        <div class="header-left">
+            <button id="sidebarToggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
+            <div class="page-title">@yield('title')</div>
+        </div>
         <div class="profile-menu">
             <button class="profile-button">
                 <i class="fas fa-user"></i> {{ Auth::user()->name }}
@@ -120,19 +126,19 @@
                 </form>
             </div>
         </div>
-    </div>
+    </header>
     
     
 
     <!-- Content -->
-    <div class="content" id="content">
+    <main class="content app-content" id="content">
 
         @yield('content')
         <div id="loader-overlay">
             <div id="loader"></div>
         </div>
 
-    </div>
+    </main>
     <!-- Bootstrap JS & jQuery (optional) -->
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap Bundle --> --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

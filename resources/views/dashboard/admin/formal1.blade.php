@@ -4,144 +4,329 @@
 
 @push('styles')
 <style>
-    /* Global Styles */
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f4f6f9;
-        color: #333;
+    .case-entry-page {
+        background: #f5f6f8;
+        color: #1f2933;
+        min-height: calc(100vh - 80px);
+        padding-bottom: 36px;
+    }
+
+    .case-form-shell {
+        max-width: 1320px;
+        margin: 0 auto;
+    }
+
+    .case-form-hero {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: flex-start;
+        background: #ffffff;
+        border: 1px solid #e1e5ea;
+        border-left: 4px solid #c30f08;
+        border-radius: 8px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+    }
+
+    .case-kicker {
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    .case-form-hero h2 {
+        margin: 4px 0 6px;
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .case-form-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0;
+    }
+
+    .case-form-meta span,
+    .case-status-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        background: #f3f4f6;
+        color: #374151;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .case-status-pill {
+        background: #fff7ed;
+        color: #9a3412;
+        white-space: nowrap;
+    }
+
+    .case-section-nav {
+        position: sticky;
+        top: 68px;
+        z-index: 4;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 10px;
+        margin-bottom: 16px;
+        background: rgba(245, 246, 248, .96);
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+    }
+
+    .case-section-nav a {
+        flex: 0 0 auto;
+        color: #374151;
+        background: #ffffff;
+        border: 1px solid #d8dee6;
+        border-radius: 6px;
+        padding: 7px 10px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .case-section-nav a:hover,
+    .case-section-nav a:focus {
+        border-color: #c30f08;
+        color: #c30f08;
+    }
+
+    .accordion {
+        display: grid;
+        gap: 12px;
     }
 
     .accordion-item {
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
         background-color: #fff;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+        overflow: hidden;
+    }
+
+    .accordion-header {
+        padding: 0;
+        background-color: #fff;
+        border-bottom: 0;
     }
 
     .accordion-button {
-        /* background-color: #4CAF50; */
-        background-color: #545b62;
-        color: white;
-        font-weight: bold;
-        padding: 15px;
-        font-size: 16px;
+        background: #ffffff;
+        color: #1f2937;
+        font-weight: 700;
+        padding: 14px 18px;
+        font-size: 15px;
         border: none;
         text-align: left;
-        border-radius: 5px;
         width: 100%;
-        transition: all 0.3s ease;
+        box-shadow: none;
     }
 
     .accordion-button:hover,
     .accordion-button:focus {
-        background-color: #45a049;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        color: #c30f08;
+        background: #fff7f6;
+        box-shadow: none;
     }
 
     .accordion-button:not(.collapsed) {
-        background-color: #45a049;
+        color: #c30f08;
+        background: #fff7f6;
+        border-bottom: 1px solid #f0d2cf;
+        box-shadow: none;
     }
 
-    .accordion-collapse {
-        padding: 20px;
-        border-top: 1px solid #ddd;
+    .accordion-title {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        min-width: 0;
     }
 
-    /* Form Field Styles */
-    .form-label {
+    .accordion-title-no {
+        flex: 0 0 auto;
+        min-width: 38px;
+        padding: 3px 8px;
+        border: 1px solid #f0d2cf;
+        border-radius: 999px;
+        background: #ffffff;
+        color: #9d0c06;
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .accordion-title-text {
+        display: grid;
+        gap: 1px;
+        min-width: 0;
+    }
+
+    .accordion-title-bn {
+        color: #1f2937;
         font-size: 14px;
-        color: #555;
-        margin-bottom: 5px;
+        font-weight: 800;
     }
 
-    .form-control {
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        font-size: 14px;
-        width: 100%;
-        transition: border-color 0.3s ease;
-    }
-
-    .form-control:focus {
-        border-color: #4CAF50;
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
-    }
-
-    .select2-container .form-select {
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    /* Apply focus effect to form-select dropdowns */
-    .form-select:focus {
-        border-color: #4CAF50 !important;
-        /* Green border like input fields */
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.3) !important;
-        outline: none;
-    }
-
-    /* Improve dropdown appearance */
-    .form-select {
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        font-size: 14px;
-        width: 100%;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        background-color: white;
-    }
-
-    /* Optional: Custom dropdown arrow */
-    .form-select {
-        appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="gray"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        background-size: 16px;
-        padding-right: 30px;
-        /* Space for dropdown arrow */
-    }
-
-    /* Column Spacing and Alignment */
-    .row.g-3 {
-        margin-bottom: 20px;
-    }
-
-    /* Mobile Responsiveness */
-    @media (max-width: 767px) {
-        .accordion-button {
-            font-size: 14px;
-            padding: 10px;
-        }
-
-        .form-control,
-        .form-select {
-            font-size: 14px;
-        }
-
-        .col-md-4 {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-    }
-
-    /* Accordion Header Styles */
-    .accordion-header {
-        padding: 10px;
-        background-color: #f1f1f1;
-        border-bottom: 1px solid #ddd;
+    .accordion-title-en {
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 600;
     }
 
     .accordion-body {
-        background-color: #fafafa;
-        padding: 20px;
+        background-color: #ffffff;
+        padding: 18px;
     }
 
-    /* Transitions and Animations */
-    .accordion-collapse {
-        transition: height 0.3s ease-out;
+    .row.g-3 {
+        row-gap: 14px;
+        margin-bottom: 8px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        color: #374151;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .form-label.manual-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        min-height: 34px;
+        line-height: 1.25;
+    }
+
+    .manual-label-no {
+        flex: 0 0 auto;
+        min-width: 34px;
+        padding: 2px 6px;
+        border: 1px solid #f0d2cf;
+        border-radius: 999px;
+        background: #fff7f6;
+        color: #9d0c06;
+        font-size: 11px;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .manual-label-text {
+        display: grid;
+        gap: 1px;
+    }
+
+    .manual-label-bn {
+        color: #1f2937;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .manual-label-en {
+        color: #6b7280;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .manual-label-required {
+        color: #c30f08;
+        font-size: 14px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 42px;
+        border-radius: 6px;
+        border: 1px solid #cfd6df;
+        padding: 9px 10px;
+        font-size: 14px;
+        width: 100%;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        background-color: white;
+    }
+
+    textarea.form-control {
+        min-height: 92px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #c30f08 !important;
+        box-shadow: 0 0 0 3px rgba(195, 15, 8, 0.12) !important;
+        outline: none;
+    }
+
+    .form-select {
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%236b7280"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
+        padding-right: 34px;
+    }
+
+    .accordion-body h5 {
+        font-size: 14px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .case-submit-bar {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        display: flex;
+        justify-content: flex-end;
+        padding: 14px 0 0;
+        background: linear-gradient(rgba(245, 246, 248, 0), #f5f6f8 35%);
+    }
+
+    .case-submit-bar .btn {
+        min-width: 160px;
+        min-height: 44px;
+        border-radius: 6px;
+        font-weight: 700;
+    }
+
+    @media (max-width: 767px) {
+        .case-form-hero {
+            flex-direction: column;
+        }
+
+        .case-form-hero h2 {
+            font-size: 20px;
+        }
+
+        .case-section-nav {
+            top: 58px;
+            border-radius: 6px;
+        }
+
+        .accordion-button {
+            font-size: 14px;
+            padding: 12px 14px;
+        }
+
+        .accordion-body {
+            padding: 14px;
+        }
     }
 </style>
 @endpush
@@ -149,8 +334,8 @@
 @section('content')
 
 
-<section>
-    <div class="container-fluid">
+<section class="case-entry-page">
+    <div class="container-fluid case-form-shell">
         @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -170,7 +355,30 @@
 
         <form method="post" action="{{ route('formaction') }}" enctype="multipart/form-data">
             @csrf
-            <h2>Court-Police-Prison Form</h2>
+            <div class="case-form-hero">
+                <div>
+                    <span class="case-kicker">New case entry</span>
+                    <h2>Court-Police-Prison Form</h2>
+                    <p class="case-form-meta">
+                        <span>Initial status: Submitted</span>
+                        <span>Current reporting: DPO verified records</span>
+                    </p>
+                </div>
+                <div class="case-status-pill">Draft entry</div>
+            </div>
+
+            <nav class="case-section-nav" aria-label="Case form sections">
+                <a href="#collapseOne" data-bs-toggle="collapse" data-bs-target="#collapseOne">1. Profile</a>
+                <a href="#collapseThree" data-bs-toggle="collapse" data-bs-target="#collapseThree">3. Personal</a>
+                <a href="#collapseSeven" data-bs-toggle="collapse" data-bs-target="#collapseSeven">7. Case</a>
+                <a href="#collapseEight" data-bs-toggle="collapse" data-bs-target="#collapseEight">8. Assistance</a>
+                <a href="#collapseNine" data-bs-toggle="collapse" data-bs-target="#collapseNine">9. Result</a>
+                <a href="#collapseTwelve" data-bs-toggle="collapse" data-bs-target="#collapseTwelve">11. Prison Case</a>
+                <a href="#collapseFourteen" data-bs-toggle="collapse" data-bs-target="#collapseFourteen">13. Prison Assistance</a>
+                <a href="#collapseSeventeen" data-bs-toggle="collapse" data-bs-target="#collapseSeventeen">17. Follow-Up</a>
+                <a href="#collapseEighteen" data-bs-toggle="collapse" data-bs-target="#collapseEighteen">18. Uploads</a>
+            </nav>
+
             <div class="accordion" id="caseFormAccordion">
                 <!-- Profile Information (Section 1) -->
                 <div class="accordion-item">
@@ -389,6 +597,21 @@
                                         <label for="child_age" class="form-label">Child's Age</label>
                                         <input type="number" class="form-control" id="child_age" name="child_age">
                                     </div>
+
+                                    <div class="col-md-3" id="child_2_sex" style="display: none;">
+                                        <label for="child_2_sex_input" class="form-label">Second Child's Sex</label>
+                                        <select class="form-select" id="child_2_sex_input" name="child_2_sex">
+                                            <option value="">Select</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Transgender">Transgender</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3" id="child_2_age" style="display: none;">
+                                        <label for="child_2_age_input" class="form-label">Second Child's Age</label>
+                                        <input type="number" class="form-control" id="child_2_age_input" name="child_2_age">
+                                    </div>
                                 </div>
                             </div>
 
@@ -451,6 +674,10 @@
                                         <option value="Yes">Yes</option>
                                     </select>
                                 </div>
+                                <div class="col-md-4" id="guardian_relation_details_field" style="display: none;">
+                                    <label for="guardian_relation_details" class="form-label">Specify Guardian Relation</label>
+                                    <input type="text" class="form-control" id="guardian_relation_details" name="guardian_relation_details">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -488,6 +715,10 @@
                                         <option value="State Defense">State Defense</option>
                                         <option value="Other">Other</option>
                                     </select>
+                                </div>
+                                <div class="col-md-4" id="lawyer_type_details_field" style="display: none;">
+                                    <label for="lawyer_type_details" class="form-label">Specify Lawyer Type</label>
+                                    <input type="text" class="form-control" id="lawyer_type_details" name="lawyer_type_details">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="lawyer_name" class="form-label">Lawyer’s Name</label>
@@ -600,6 +831,10 @@
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
+                                <div class="col-md-4" id="legal_representation_details_field" style="display: none;">
+                                    <label for="legal_representation_details" class="form-label">Specify Legal Representation</label>
+                                    <input type="text" class="form-control" id="legal_representation_details" name="legal_representation_details">
+                                </div>
                                 <div class="col-md-4">
                                     <label for="legal_representation_date" class="form-label">Date</label>
                                     <input type="date" class="form-control" id="legal_representation_date"
@@ -626,6 +861,11 @@
                                         and Phone No)</label>
                                     <input type="text" class="form-control" id="identify_sureties"
                                         name="identify_sureties">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="identify_sureties_date" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="identify_sureties_date"
+                                        name="identify_sureties_date">
                                 </div>
 
                                 <div class="col-md-4">
@@ -667,7 +907,13 @@
                                         <option value="NGOs/RJ/Mediation">NGOs/RJ/Mediation</option>
                                         <option value="Village Court">Village Court</option>
                                         <option value="Safe Home">Safe Home</option>
+                                        <option value="Other">Other</option>
                                     </select>
+                                </div>
+                                <div class="col-md-4" id="referral_service_details_field" style="display: none;">
+                                    <label for="referral_service_details" class="form-label">Specify Referral Service</label>
+                                    <input type="text" class="form-control" id="referral_service_details"
+                                        name="referral_service_details">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="referral_service_date" class="form-label">Date</label>
@@ -729,71 +975,12 @@
                     </div>
                 </div>
 
-                <!-- Section 10: District Legal Aid Office Information -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingTen">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
-                            10. District Legal Aid Office Information
-                        </button>
-                    </h2>
-                    <div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen"
-                        data-bs-parent="#caseFormAccordion">
-                        <div class="accordion-body">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label for="application_mode" class="form-label">Mode of application</label>
-                                    <select class="form-select" id="application_mode" name="application_mode">
-                                        <option value="">Select</option>
-                                        <option value="Online">Online</option>
-                                        <option value="Office Application">Office Application</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="application_mode_date" class="form-label">Date</label>
-                                    <input type="date" class="form-control" id="application_mode_date"
-                                        name="application_mode_date">
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="received_application" class="form-label">Application Received?</label>
-                                    <select class="form-select" id="received_application"
-                                        name="received_application">
-                                        <option value="">Select</option>
-                                        <option value="No">No</option>
-                                        <option value="Yes">Yes</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4" id="reference_no" style="display: none;">
-                                    <label for="reference_no" class="form-label">Reference No</label>
-                                    <input type="number" class="form-control" id="reference_no"
-                                        name="reference_no">
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="type_of_service" class="form-label">Type of Service</label>
-                                    <select class="form-select" id="type_of_service" name="type_of_service">
-                                        <option value="">Select</option>
-                                        <option value="Legal Advice">Legal Advice</option>
-                                        <option value="Alternate Dispute Resolution">Alternate Dispute Resolution
-                                        </option>
-                                        <option value="Filing New Lawsuit">Filing New Lawsuit</option>
-                                        <option value="Legal Aid in Existing Case">Legal Aid in Existing Case</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="type_of_service_date" class="form-label">Date</label>
-                                    <input type="date" class="form-control" id="type_of_service_date"
-                                        name="type_of_service_date">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Section 11: Description of Service Provided -->
+                <!-- Section 10: Description of Service Provided -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingEleven">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
-                            11. Description of Service Provided
+                            10. Description of Service Provided
                         </button>
                     </h2>
                     <div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven"
@@ -809,12 +996,12 @@
                     </div>
                 </div>
 
-                <!-- Section 12: Basic Case Information -->
+                <!-- Section 11: Basic Case Information -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwelve">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseTwelve" aria-expanded="false" aria-controls="collapseTwelve">
-                            12. Basic Case Information
+                            11. Basic Case Information
                         </button>
                     </h2>
                     <div id="collapseTwelve" class="accordion-collapse collapse" aria-labelledby="headingTwelve"
@@ -830,6 +1017,10 @@
                                         <option value="Prison Register">Prison Register</option>
                                         <option value="Other">Other</option>
                                     </select>
+                                </div>
+                                <div class="col-md-4" id="source_of_interview_details_field" style="display: none;">
+                                    <label for="source_of_interview_details" class="form-label">Specify Source of Interview</label>
+                                    <input type="text" class="form-control" id="source_of_interview_details" name="source_of_interview_details">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="prison_reg_no" class="form-label">Prison Registration Number</label>
@@ -894,13 +1085,13 @@
                     </div>
                 </div>
 
-                <!-- Section 13: Imprisonment Information -->
+                <!-- Section 12: Imprisonment Information -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingThirteen">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseThirteen" aria-expanded="false"
                             aria-controls="collapseThirteen">
-                            13. Imprisonment Information
+                            12. Imprisonment Information
                         </button>
                     </h2>
                     <div id="collapseThirteen" class="accordion-collapse collapse" aria-labelledby="headingThirteen"
@@ -939,6 +1130,10 @@
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
+                                <div class="col-md-4" id="special_condition_details_field" style="display: none;">
+                                    <label for="special_condition_details" class="form-label">Specify Special Condition</label>
+                                    <input type="text" class="form-control" id="special_condition_details" name="special_condition_details">
+                                </div>
                                 <div class="col-md-4">
                                     <label for="arrest_date" class="form-label">Date of Arrest</label>
                                     <input type="date" class="form-control" id="arrest_date" name="arrest_date">
@@ -952,13 +1147,13 @@
                         </div>
                     </div>
                 </div>
-                <!-- Section 14: Nature of Assistance in Prison -->
+                <!-- Section 13: Nature of Assistance in Prison -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingFourteen">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseFourteen" aria-expanded="false"
                             aria-controls="collapseFourteen">
-                            14. Nature of Assistance in Prison
+                            13. Nature of Assistance in Prison
                         </button>
                     </h2>
                     <div id="collapseFourteen" class="accordion-collapse collapse" aria-labelledby="headingFourteen"
@@ -983,6 +1178,10 @@
                                         <option value="NGO Panel Lawyer">NGO Panel Lawyer</option>
                                         <option value="Other">Other</option>
                                     </select>
+                                </div>
+                                <div class="col-md-4" id="prison_legal_representation_details_field" style="display: none;">
+                                    <label for="prison_legal_representation_details" class="form-label">Specify Prison Legal Representation</label>
+                                    <input type="text" class="form-control" id="prison_legal_representation_details" name="prison_legal_representation_details">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="prison_legal_representation_date" class="form-label">Date</label>
@@ -1079,6 +1278,10 @@
                                         <option value="other">Other</option>
                                     </select>
                                 </div>
+                                <div class="col-md-4" id="other_legal_assistance_details_field" style="display: none;">
+                                    <label for="other_legal_assistance_details" class="form-label">Specify Other Legal Assistance</label>
+                                    <input type="text" class="form-control" id="other_legal_assistance_details" name="other_legal_assistance_details">
+                                </div>
                                 <div class="col-md-4">
                                     <label for="other_legal_assistance_date" class="form-label">Date</label>
                                     <input type="date" class="form-control" id="other_legal_assistance_date"
@@ -1089,13 +1292,13 @@
                     </div>
                 </div>
 
-                <!-- Section 15: Result -->
+                <!-- Section 14: Result -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingFifteen">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseFifteen" aria-expanded="false"
                             aria-controls="collapseFifteen">
-                            15. Result
+                            14. Result
                         </button>
                     </h2>
                     <div id="collapseFifteen" class="accordion-collapse collapse" aria-labelledby="headingFifteen"
@@ -1133,6 +1336,10 @@
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
+                                <div class="col-md-4" id="send_to_details_field" style="display: none;">
+                                    <label for="send_to_details" class="form-label">Specify Send To</label>
+                                    <input type="text" class="form-control" id="send_to_details" name="send_to_details">
+                                </div>
                                 <div class="col-md-4">
                                     <label for="send_to_date" class="form-label">Date</label>
                                     <input type="date" class="form-control" id="send_to_date"
@@ -1166,6 +1373,65 @@
                                         Prison</label>
                                     <input type="date" class="form-control" id="date_of_reliefe"
                                         name="date_of_reliefe">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Section 15: District Legal Aid Office Information -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTen">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
+                            15. District Legal Aid Office Information
+                        </button>
+                    </h2>
+                    <div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen"
+                        data-bs-parent="#caseFormAccordion">
+                        <div class="accordion-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="application_mode" class="form-label">Mode of application</label>
+                                    <select class="form-select" id="application_mode" name="application_mode">
+                                        <option value="">Select</option>
+                                        <option value="Online">Online</option>
+                                        <option value="Office Application">Office Application</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="application_mode_date" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="application_mode_date"
+                                        name="application_mode_date">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="received_application" class="form-label">Application Received?</label>
+                                    <select class="form-select" id="received_application"
+                                        name="received_application">
+                                        <option value="">Select</option>
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4" id="reference_no" style="display: none;">
+                                    <label for="reference_no" class="form-label">Reference No</label>
+                                    <input type="number" class="form-control" id="reference_no"
+                                        name="reference_no">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="type_of_service" class="form-label">Type of Service</label>
+                                    <select class="form-select" id="type_of_service" name="type_of_service">
+                                        <option value="">Select</option>
+                                        <option value="Legal Advice">Legal Advice</option>
+                                        <option value="Alternate Dispute Resolution">Alternate Dispute Resolution
+                                        </option>
+                                        <option value="Filing New Lawsuit">Filing New Lawsuit</option>
+                                        <option value="Legal Aid in Existing Case">Legal Aid in Existing Case</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="type_of_service_date" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="type_of_service_date"
+                                        name="type_of_service_date">
                                 </div>
                             </div>
                         </div>
@@ -1243,13 +1509,13 @@
 
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingEighteen">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#collapseEighteen" aria-expanded="true"
-                            aria-controls="collapseSeventeen">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseEighteen" aria-expanded="false"
+                            aria-controls="collapseEighteen">
                             18. Upload Additional Documents
                         </button>
                     </h2>
-                    <div id="collapseEighteen" class="accordion-collapse collapse show"
+                    <div id="collapseEighteen" class="accordion-collapse collapse"
                         aria-labelledby="headingEighteen" data-bs-parent="#caseFormAccordion">
                         <div class="accordion-body">
                             <div class="row g-3">
@@ -1263,7 +1529,7 @@
                     </div>
                 </div>
                 @can('Create Formal Case')
-                <div class="mt-3">
+                <div class="case-submit-bar">
                     <button type="submit" class="btnCustom btn btn-primary">Submit</button>
                 </div>
                 @endcan
@@ -1275,6 +1541,12 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('dashboard/js/court-police-prison-labels.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        window.applyCourtPolicePrisonManualLabels();
+    });
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         // Reusable function to toggle the visibility of dependent fields
@@ -1321,7 +1593,7 @@
             },
             {
                 id: "children_with_prisoner",
-                targets: ["child_sex", "child_age"],
+                targets: ["child_sex", "child_age", "child_2_sex", "child_2_age"],
                 showValue: "Yes"
             },
             {
@@ -1333,10 +1605,20 @@
                 isParentColumn: true
             },
             {
+                id: "guardian_relation",
+                targets: ["guardian_relation_details_field"],
+                showValue: ["Family Member", "Relative", "Other"]
+            },
+            {
                 id: "has_lawyer",
                 targets: ["lawyer_type", "lawyer_name", "lawyer_membership", "lawyer_phone"],
                 showValue: "Yes",
                 isParentColumn: true
+            },
+            {
+                id: "lawyer_type",
+                targets: ["lawyer_type_details_field"],
+                showValue: "Other"
             },
             {
                 id: "custody_status",
@@ -1355,6 +1637,41 @@
                 showValue: "Yes"
             },
             {
+                id: "legal_representation",
+                targets: ["legal_representation_details_field"],
+                showValue: ["NGO Panel Lawyer", "Other"]
+            },
+            {
+                id: "referral_service",
+                targets: ["referral_service_details_field"],
+                showValue: ["NGOs/RJ/Mediation", "Other"]
+            },
+            {
+                id: "source_of_interview",
+                targets: ["source_of_interview_details_field"],
+                showValue: "Other"
+            },
+            {
+                id: "special_condition",
+                targets: ["special_condition_details_field"],
+                showValue: "Other"
+            },
+            {
+                id: "prison_legal_representation",
+                targets: ["prison_legal_representation_details_field"],
+                showValue: "Other"
+            },
+            {
+                id: "other_legal_assistance",
+                targets: ["other_legal_assistance_details_field"],
+                showValue: "other"
+            },
+            {
+                id: "send_to",
+                targets: ["send_to_details_field"],
+                showValue: "Other"
+            },
+            {
                 id: "case_transferred",
                 targets: ["current_court_name"],
                 showValue: "Yes"
@@ -1365,6 +1682,34 @@
         fieldToggles.forEach(function(toggle) {
             toggleDependentFields(toggle.id, toggle.targets, toggle.showValue, toggle.isParentColumn);
         });
+
+        function syncSpecifyFields() {
+            const hasGuardian = document.getElementById("has_guardian");
+            const guardianRelation = document.getElementById("guardian_relation");
+            const guardianRelationDetails = document.getElementById("guardian_relation_details_field");
+            const hasLawyer = document.getElementById("has_lawyer");
+            const lawyerType = document.getElementById("lawyer_type");
+            const lawyerTypeDetails = document.getElementById("lawyer_type_details_field");
+
+            if (guardianRelationDetails) {
+                const showGuardianDetails = hasGuardian.value === "Yes" && ["Family Member", "Relative", "Other"].includes(guardianRelation.value);
+                guardianRelationDetails.style.display = showGuardianDetails ? "block" : "none";
+            }
+
+            if (lawyerTypeDetails) {
+                const showLawyerDetails = hasLawyer.value === "Yes" && lawyerType.value === "Other";
+                lawyerTypeDetails.style.display = showLawyerDetails ? "block" : "none";
+            }
+        }
+
+        ["has_guardian", "guardian_relation", "has_lawyer", "lawyer_type"].forEach(function(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener("change", syncSpecifyFields);
+            }
+        });
+
+        syncSpecifyFields();
     });
 
     // Show Section 9 if any input/select in Section 8 has a value
@@ -1376,11 +1721,13 @@
             "collected_vokalatnama_date",
             "collected_case_doc",
             "identify_sureties",
+            "identify_sureties_date",
             "witness_communication_date",
             "medical_report_date",
             "legal_assistance_date",
             "assistance_under_custody_date",
             "referral_service",
+            "referral_service_details",
             "referral_service_date"
         ];
 
@@ -1408,11 +1755,13 @@
         "collected_vokalatnama_date",
         "collected_case_doc",
         "identify_sureties",
+        "identify_sureties_date",
         "witness_communication_date",
         "medical_report_date",
         "legal_assistance_date",
         "assistance_under_custody_date",
         "referral_service",
+        "referral_service_details",
         "referral_service_date"
     ].forEach(id => {
         const el = document.getElementById(id);

@@ -3,38 +3,57 @@
 @section('title', 'Permission Management')
 
 @section('content')
-    <section>
-        <div class="container-fluid">
-            <div class="row mb-3">
-                <div class="col">
-                    <button class="btn btn-success btn-sm" id="createPermissionBtn"><i class="fas fa-plus-square mr-1"></i> Create Permission</button>
-                </div>
+    <section class="management-page">
+        <div class="management-header">
+            <div>
+                <h1>Permission Management</h1>
+                <p>Create and organize permissions by category before assigning them to roles.</p>
+            </div>
+            <button class="btn btn-success" id="createPermissionBtn">
+                <i class="fas fa-plus-square"></i>
+                Create Permission
+            </button>
+        </div>
+
+        <div class="management-card">
+            <div class="management-card-header">
+                <h2><i class="fas fa-key me-2"></i>Permission List</h2>
+                <span class="management-count">{{ $permissions->count() }} Permission{{ $permissions->count() === 1 ? '' : 's' }}</span>
             </div>
 
-            <!-- Permissions Table -->
-            <table class="table table-striped" id="permissionsTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Category</th> <!-- Added Category Column -->
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($permissions as $permission)
-                        <tr id="permission-{{ $permission->id }}">
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $permission->name }}</td>
-                            <td>{{ $permission->category }}</td> <!-- Display Category -->
-                            <td>
-                                <button class="btn btn-warning btn-sm editPermissionBtn" data-id="{{ $permission->id }}" data-name="{{ $permission->name }}" data-category="{{ $permission->category }}">Edit</button>
-                                <button class="btn btn-danger btn-sm deletePermissionBtn" data-id="{{ $permission->id }}">Delete</button>
-                            </td>
+            <div class="management-table-wrap table-responsive">
+                <table class="table table-striped table-hover table-sm management-table" id="permissionsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">#</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th style="width: 190px;">Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($permissions as $permission)
+                            <tr id="permission-{{ $permission->id }}">
+                                <td>{{ $loop->iteration }}</td>
+                                <td class="permission-name management-name-cell">{{ $permission->name }}</td>
+                                <td><span class="badge bg-secondary">{{ $permission->category }}</span></td>
+                                <td>
+                                    <div class="management-actions">
+                                        <button class="btn btn-warning btn-sm editPermissionBtn" data-id="{{ $permission->id }}" data-name="{{ $permission->name }}" data-category="{{ $permission->category }}">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm deletePermissionBtn" data-id="{{ $permission->id }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Modal for Create/Edit Permission -->
@@ -46,6 +65,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="management-modal-note">Choose a clear permission name and place it under the correct category.</p>
                         <form id="permissionForm" method="POST">
                             @csrf
                             <div class="mb-3">
@@ -65,8 +85,12 @@
                                 </select>
                             </div>
 
-                            <div class="mb-3 text-end custombtn">
-                                <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
+                            <div class="mb-0 text-end custombtn">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <i class="fas fa-save"></i>
+                                    Save
+                                </button>
                             </div>
                         </form>
                     </div>

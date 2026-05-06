@@ -8,6 +8,8 @@ use App\Models\District;
 use App\Models\FollowUpIntervention;
 use App\Models\Pngo;
 use Illuminate\Support\Facades\DB;
+use Mpdf\Config\ConfigVariables;
+use Mpdf\Config\FontVariables;
 use Mpdf\Mpdf;
 use App\Services\CommonService;
 use App\Exports\FormalCaseExport;
@@ -158,6 +160,30 @@ class ReportController extends Controller
         $send['data'] = $request->input('pdf_data');
         $send['title'] = $request->input('title');
         $fname = $request->input('fname');
+        $fontDirs = (new ConfigVariables())->getDefaults()['fontDir'];
+        $fontData = (new FontVariables())->getDefaults()['fontdata'];
+        $appFontDir = resource_path('fonts');
+        $appBanglaFont = $appFontDir . DIRECTORY_SEPARATOR . 'SolaimanLipi.ttf';
+        $windowsFontDir = 'C:/Windows/Fonts';
+        $windowsBanglaFont = $windowsFontDir . '/kalpurush.ttf';
+        $banglaFontAvailable = false;
+
+        if (is_file($appBanglaFont)) {
+            $fontDirs[] = $appFontDir;
+            $fontData['bangla'] = [
+                'R' => 'SolaimanLipi.ttf',
+                'useOTL' => 0xFF,
+            ];
+            $banglaFontAvailable = true;
+        } elseif (is_file($windowsBanglaFont)) {
+            $fontDirs[] = $windowsFontDir;
+            $fontData['bangla'] = [
+                'R' => 'kalpurush.ttf',
+                'useOTL' => 0xFF,
+            ];
+            $banglaFontAvailable = true;
+        }
+
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4',
@@ -165,6 +191,11 @@ class ReportController extends Controller
             'margin_top' => 5,
             'margin_bottom' => 5,
             'margin_header' => 5,
+            'fontDir' => $fontDirs,
+            'fontdata' => $fontData,
+            'default_font' => $banglaFontAvailable ? 'bangla' : 'dejavusans',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
         ]);
 
         $mpdf->setAutoBottomMargin = 'stretch';
@@ -196,11 +227,13 @@ class ReportController extends Controller
             'collected_vokalatnama_date',
             'collected_case_doc',
             'identify_sureties',
+            'identify_sureties_date',
             'witness_communication_date',
             'medical_report_date',
             'legal_assistance_date',
             'assistance_under_custody_date',
             'referral_service',
+            'referral_service_details',
             'referral_service_date',
         ];
 

@@ -258,6 +258,12 @@
             },
             success: function(response) {
                 if (response.pdf_url && isValidUrl(response.pdf_url)) {
+                    $('#pdfModal').remove();
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open').css('padding-right', '');
+
+                    var pdfUrl = response.pdf_url + (response.pdf_url.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
+
                     // Create the modal content dynamically with the response PDF URL
                     var modalContent =
                         '<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">';
@@ -274,7 +280,7 @@
                         '<div id="pdfLoaderOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center;">';
                     modalContent += '<img src="/path/to/loader.gif" alt="Loader">';
                     modalContent += '</div>';
-                    modalContent += '<iframe id="pdfIframe" src="' + response.pdf_url +
+                    modalContent += '<iframe id="pdfIframe" src="' + pdfUrl +
                         '" style="width: 100%; height: 80vh; display: none;"></iframe>';
                     modalContent += '</div>';
                     modalContent += '</div>';
@@ -289,6 +295,13 @@
                     $('#pdfIframe').on('load', function() {
                         $('#pdfLoaderOverlay').hide();
                         $('#pdfIframe').show();
+                    });
+
+                    $('#pdfModal').on('hidden.bs.modal', function() {
+                        $('#pdfIframe').attr('src', 'about:blank');
+                        $(this).remove();
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open').css('padding-right', '');
                     });
 
                     console.log('PDF URL received successfully');

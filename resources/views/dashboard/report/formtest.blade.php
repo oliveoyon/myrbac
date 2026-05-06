@@ -42,7 +42,34 @@
                 counter-increment: awlistcounter38_0
             }
             body {
-                font-family: 'Lucida Sans', 'SolaimanLipi'
+                font-family: bangla, Arial, sans-serif;
+            }
+
+            .report-header {
+                margin: 0 0 10pt;
+                text-align: center;
+            }
+
+            .report-header img {
+                width: 100%;
+                max-height: 95pt;
+                object-fit: contain;
+                margin-bottom: 4pt;
+            }
+
+            .report-header-title {
+                margin: 0;
+                font-family: Arial, sans-serif;
+                font-size: 14pt;
+                font-weight: bold;
+                line-height: 1.25;
+            }
+
+            .report-header-subtitle {
+                margin: 2pt 0 0;
+                font-family: Arial, sans-serif;
+                font-size: 8.5pt;
+                line-height: 1.25;
             }
         </style>
         <style>
@@ -69,6 +96,11 @@
     </head> 
     <body>
         <div class="font">
+            <div class="report-header">
+                <img src="{{ public_path('reportHeader.png') }}" alt="Report Header">
+                <p class="report-header-title">Access to Justice for Women</p>
+                <p class="report-header-subtitle">(A Project Implemented jointly by Law and Justice Division, Ministry of Law, Justice and Parliamentary Affairs and GIZ Bangladesh)</p>
+            </div>
             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:108%; font-size:14pt;"><strong><span style="font-family:Arial;">&nbsp;&nbsp;&nbsp;&nbsp;</span></strong></p>
             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:108%; font-size:14pt;"><strong><span style="font-family:Arial;">SUPPORT IN</span></strong><strong><span style="font-family:Arial;">&nbsp; </span></strong><input type="checkbox" name="Check83" <?php echo ($details->institute == 'Court') ? 'checked="checked"' : ''; ?>><strong><span style="font-family:Arial;">&nbsp;COURT&nbsp;</span></strong><input type="checkbox" name="Check83" <?php echo ($details->institute == 'Police Station') ? 'checked="checked"' : ''; ?>><strong><span style="font-family:Arial;">&nbsp;POLICE STATION&nbsp;</span></strong><input type="checkbox" name="Check83" <?php echo ($details->institute == 'Prison') ? 'checked="checked"' : ''; ?>><strong><span style="font-family:Arial;">&nbsp;PRISON</span></strong></p>
             <p style="margin-top:0pt; margin-bottom:0pt; line-height:108%; font-size:7pt;"><span style="font-family:Arial;">&nbsp;</span></p>
@@ -509,13 +541,13 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">Sex</span></p>
                         </td>
                         <td colspan="2" style="width:204.15pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><input type="checkbox" name="Check83"><span style="font-family:Arial;">&nbsp;Male&nbsp;</span><input type="checkbox" name="Check83"><span style="font-family:Arial;">&nbsp;Female&nbsp;</span><input type="checkbox" name="Check83"><span style="font-family:Arial;">&nbsp;Transgender Person</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><input type="checkbox" name="Check83" <?php echo (($details->child_2_sex ?? '') == 'Male') ? 'checked="checked"' : ''; ?>><span style="font-family:Arial;">&nbsp;Male&nbsp;</span><input type="checkbox" name="Check83" <?php echo (($details->child_2_sex ?? '') == 'Female') ? 'checked="checked"' : ''; ?>><span style="font-family:Arial;">&nbsp;Female&nbsp;</span><input type="checkbox" name="Check83" <?php echo (($details->child_2_sex ?? '') == 'Transgender') ? 'checked="checked"' : ''; ?>><span style="font-family:Arial;">&nbsp;Transgender Person</span></p>
                         </td>
                         <td style="width:16.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">Age</span></p>
                         </td>
                         <td style="width:34.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->child_2_age ?? '' }}</p>
                         </td>
                     </tr>
                     <tr style="height:0pt;">
@@ -969,7 +1001,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:Arial;"></span></p>
                         </td>
                         <td rowspan="3" style="width:92.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">{{ $details->identify_sureties_date ?? '' }}</span></p>
                         </td>
                     </tr>
                     <tr style="height:5.75pt;">
@@ -1059,7 +1091,7 @@
                     </tr>
                     <tr style="height:3.45pt;">
                         <td style="width:377.6pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->referral_service == 'NGOs/RJ/Mediation') ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">এনজিওতে আরজে/সালিশ, উল্লেখ্ করুন&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(NGOs RJ/ Mediation, please specify) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->referral_service == 'NGOs/RJ/Mediation') ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">এনজিওতে আরজে/সালিশ, উল্লেখ্ করুন&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(NGOs RJ/ Mediation, please specify) {{ $details->referral_service == 'NGOs/RJ/Mediation' ? ($details->referral_service_details ?? '') : '' }}</span></p>
                         </td>
                         <td style="width:92.8pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.</span></p>
@@ -1079,6 +1111,14 @@
                         </td>
                         <td style="width:92.8pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.</span></p>
+                        </td>
+                    </tr>
+                    <tr style="height:3.45pt;">
+                        <td style="width:377.6pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->referral_service == 'Other') ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;Other: {{ $details->referral_service == 'Other' ? ($details->referral_service_details ?? '') : '' }}</span></p>
+                        </td>
+                        <td style="width:92.8pt; border-left-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt;">
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">{{ $details->referral_service == 'Other' ? ($details->referral_service_date ?? '') : '' }}</span></p>
                         </td>
                     </tr>
                 </tbody>
@@ -2037,5 +2077,3 @@
         </div>
     </body>
 </html>
-
-

@@ -4,41 +4,57 @@
 
 
 @section('content')
-    <section>
-        <div class="container-fluid">
-            <div class="row mb-3">
-                <div class="col">
-                    <button class="btn btn-success btn-sm" id="createDistrictBtn"><i class="fas fa-plus-square mr-1"></i> Add
-                        New Category</button>
+    <section class="management-page">
+        <div class="management-header">
+            <div>
+                <h1>Category Management</h1>
+                <p>Create and maintain permission categories for cleaner role and permission organization.</p>
+            </div>
+            <button class="btn btn-success" id="createDistrictBtn">
+                <i class="fas fa-plus-square"></i>
+                Add New Category
+            </button>
+        </div>
 
-                </div>
+        <div class="management-card">
+            <div class="management-card-header">
+                <h2><i class="fas fa-tags me-2"></i>Category List</h2>
+                <span class="management-count">{{ $categories->count() }} Categor{{ $categories->count() === 1 ? 'y' : 'ies' }}</span>
             </div>
 
-            <!-- Categories Table -->
-            <table class="table table-striped" id="districtsTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- This is where you will loop through your categories -->
-                    @foreach ($categories as $category)
-                        <tr id="category-{{ $category->id }}">
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $category->name }}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm editDistrictBtn" data-id="{{ $category->id }}"
-                                    data-name="{{ $category->name }}">Edit</button>
-                                <button class="btn btn-danger btn-sm deleteDistrictBtn"
-                                    data-id="{{ $category->id }}">Delete</button>
-                            </td>
+            <div class="management-table-wrap table-responsive">
+                <table class="table table-striped table-hover table-sm management-table" id="districtsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">#</th>
+                            <th>Name</th>
+                            <th style="width: 190px;">Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($categories as $category)
+                            <tr id="category-{{ $category->id }}">
+                                <td>{{ $loop->iteration }}</td>
+                                <td class="category-name management-name-cell">{{ $category->name }}</td>
+                                <td>
+                                    <div class="management-actions">
+                                        <button class="btn btn-warning btn-sm editDistrictBtn" data-id="{{ $category->id }}"
+                                            data-name="{{ $category->name }}">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm deleteDistrictBtn"
+                                            data-id="{{ $category->id }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Fullscreen Modal for Create/Edit Category -->
@@ -50,14 +66,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="management-modal-note">Use a short, clear category name for grouping permissions.</p>
                         <form id="districtForm" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="districtName" class="form-label">Category Name</label>
-                                <input type="text" class="form-control" id="districtName" name="name">
+                                <input type="text" class="form-control" id="districtName" name="name" placeholder="Example: Reports">
                             </div>
-                            <div class="mb-3 text-end custombtn">
-                                <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
+                            <div class="mb-0 text-end custombtn">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <i class="fas fa-save"></i>
+                                    Save
+                                </button>
                             </div>
                         </form>
                     </div>

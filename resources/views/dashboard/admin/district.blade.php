@@ -2,43 +2,204 @@
 
 @section('title', 'District Management')
 
+@push('styles')
+    <style>
+        .district-page {
+            display: grid;
+            gap: 16px;
+        }
+
+        .district-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 20px;
+            border: 1px solid #e1e5ea;
+            border-left: 4px solid #c30f08;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+        }
+
+        .district-header h1 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .district-header p {
+            margin: 6px 0 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .district-card {
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+        }
+
+        .district-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0d2cf;
+            background: #fff7f6;
+            color: #c30f08;
+        }
+
+        .district-card-header h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .district-count {
+            padding: 4px 10px;
+            border: 1px solid #f0d2cf;
+            border-radius: 999px;
+            background: #fff;
+            color: #7f1d1d;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .district-table-wrap {
+            padding: 14px;
+        }
+
+        #districtsTable {
+            margin: 0;
+        }
+
+        #districtsTable thead th {
+            background: #f8fafc;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        #districtsTable tbody td {
+            vertical-align: middle;
+        }
+
+        .district-name-cell {
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .district-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .district-actions .btn {
+            min-width: 78px;
+        }
+
+        .district-modal-note {
+            margin: 0 0 14px;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .district-header,
+            .district-card-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .district-header h1 {
+                font-size: 19px;
+            }
+
+            .district-header .btn,
+            .district-actions,
+            .district-actions .btn {
+                width: 100%;
+            }
+
+            .district-table-wrap {
+                padding: 10px;
+            }
+
+            #districtsTable {
+                min-width: 520px;
+            }
+        }
+    </style>
+@endpush
+
 
 @section('content')
-    <section>
-        <div class="container-fluid">
-            <div class="row mb-3">
-                <div class="col">
-                    <button class="btn btn-success btn-sm" id="createDistrictBtn"><i class="fas fa-plus-square mr-1"></i> Add
-                        New District</button>
+    <section class="district-page">
+        <div class="district-header">
+            <div>
+                <h1>District Management</h1>
+                <p>Create and maintain the district list used across users, cases, filters, and reports.</p>
+            </div>
+            <button class="btn btn-success" id="createDistrictBtn">
+                <i class="fas fa-plus-square"></i>
+                Add New District
+            </button>
+        </div>
 
-                </div>
+        <div class="district-card">
+            <div class="district-card-header">
+                <h2><i class="fas fa-map-marker-alt me-2"></i>District List</h2>
+                <span class="district-count">{{ $districts->count() }} District{{ $districts->count() === 1 ? '' : 's' }}</span>
             </div>
 
-            <!-- Districts Table -->
-            <table class="table table-striped" id="districtsTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- This is where you will loop through your districts -->
-                    @foreach ($districts as $district)
-                        <tr id="district-{{ $district->id }}">
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $district->name }}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm editDistrictBtn" data-id="{{ $district->id }}"
-                                    data-name="{{ $district->name }}">Edit</button>
-                                <button class="btn btn-danger btn-sm deleteDistrictBtn"
-                                    data-id="{{ $district->id }}">Delete</button>
-                            </td>
+            <div class="district-table-wrap table-responsive">
+                <table class="table table-striped table-hover table-sm" id="districtsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">#</th>
+                            <th>Name</th>
+                            <th style="width: 190px;">Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($districts as $district)
+                            <tr id="district-{{ $district->id }}">
+                                <td>{{ $loop->iteration }}</td>
+                                <td class="district-name district-name-cell">{{ $district->name }}</td>
+                                <td>
+                                    <div class="district-actions">
+                                        <button class="btn btn-warning btn-sm editDistrictBtn" data-id="{{ $district->id }}"
+                                            data-name="{{ $district->name }}">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm deleteDistrictBtn"
+                                            data-id="{{ $district->id }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Fullscreen Modal for Create/Edit District -->
@@ -50,14 +211,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="district-modal-note">Enter the district name exactly as it should appear in forms and reports.</p>
                         <form id="districtForm" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="districtName" class="form-label">District Name</label>
-                                <input type="text" class="form-control" id="districtName" name="name">
+                                <input type="text" class="form-control" id="districtName" name="name" placeholder="Example: Khulna">
                             </div>
-                            <div class="mb-3 text-end custombtn">
-                                <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
+                            <div class="mb-0 text-end custombtn">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <i class="fas fa-save"></i>
+                                    Save
+                                </button>
                             </div>
                         </form>
                     </div>

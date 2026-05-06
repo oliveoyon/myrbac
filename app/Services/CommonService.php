@@ -50,8 +50,8 @@ class CommonService
         $courtFields = [
             'custody_status', 'charges_details', 'arrest_date', 'case_no', 'family_communication_date',
             'legal_representation', 'legal_representation_date', 'collected_vokalatnama_date',
-            'collected_case_doc', 'identify_sureties', 'witness_communication_date', 'medical_report_date',
-            'legal_assistance_date', 'assistance_under_custody_date', 'referral_service',
+            'collected_case_doc', 'identify_sureties', 'identify_sureties_date', 'witness_communication_date', 'medical_report_date',
+            'legal_assistance_date', 'assistance_under_custody_date', 'referral_service', 'referral_service_details',
             'referral_service_date', 'resolved_dispute_date', 'appoint_lawyer_date', 'release_status',
             'fine_amount', 'release_status_date', 'application_mode', 'application_mode_date',
             'received_application', 'reference_no', 'type_of_service', 'type_of_service_date', 'service_description'
@@ -71,8 +71,8 @@ class CommonService
         $policeFields = [
             'custody_status', 'charges_details', 'arrest_date', 'case_no', 'family_communication_date',
             'legal_representation', 'legal_representation_date', 'collected_vokalatnama_date',
-            'collected_case_doc', 'identify_sureties', 'witness_communication_date', 'medical_report_date',
-            'legal_assistance_date', 'assistance_under_custody_date', 'referral_service',
+            'collected_case_doc', 'identify_sureties', 'identify_sureties_date', 'witness_communication_date', 'medical_report_date',
+            'legal_assistance_date', 'assistance_under_custody_date', 'referral_service', 'referral_service_details',
             'referral_service_date', 'resolved_dispute_date', 'appoint_lawyer_date', 'release_status',
             'fine_amount', 'release_status_date', 'application_mode', 'application_mode_date',
             'received_application', 'reference_no', 'type_of_service', 'type_of_service_date', 'service_description'

@@ -5,40 +5,57 @@
 
 
 @section('content')
-    <section>
-        <div class="container-fluid">
-            <div class="row mb-3">
-                <div class="col">
-                    <button class="btn btn-success btn-sm" id="createRoleBtn"><i class="fas fa-plus-square mr-1"></i> Create
-                        Role</button>
-                </div>
+    <section class="management-page">
+        <div class="management-header">
+            <div>
+                <h1>Role Management</h1>
+                <p>Create and maintain user roles before assigning permissions to them.</p>
+            </div>
+            <button class="btn btn-success" id="createRoleBtn">
+                <i class="fas fa-plus-square"></i>
+                Create Role
+            </button>
+        </div>
+
+        <div class="management-card">
+            <div class="management-card-header">
+                <h2><i class="fas fa-user-tag me-2"></i>Role List</h2>
+                <span class="management-count">{{ $roles->count() }} Role{{ $roles->count() === 1 ? '' : 's' }}</span>
             </div>
 
-            <!-- Roles Table -->
-            <table class="table table-striped" id="rolesTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- This is where you will loop through your roles -->
-                    @foreach ($roles as $role)
-                        <tr id="role-{{ $role->id }}">
-                            <td>{{ $loop->iteration }} </td>
-                            <td>{{ $role->name }}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm editRoleBtn" data-id="{{ $role->id }}"
-                                    data-name="{{ $role->name }}">Edit</button>
-                                <button class="btn btn-danger btn-sm deleteRoleBtn"
-                                    data-id="{{ $role->id }}">Delete</button>
-                            </td>
+            <div class="management-table-wrap table-responsive">
+                <table class="table table-striped table-hover table-sm management-table" id="rolesTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">#</th>
+                            <th>Name</th>
+                            <th style="width: 190px;">Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($roles as $role)
+                            <tr id="role-{{ $role->id }}">
+                                <td>{{ $loop->iteration }} </td>
+                                <td class="role-name management-name-cell">{{ $role->name }}</td>
+                                <td>
+                                    <div class="management-actions">
+                                        <button class="btn btn-warning btn-sm editRoleBtn" data-id="{{ $role->id }}"
+                                            data-name="{{ $role->name }}">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm deleteRoleBtn"
+                                            data-id="{{ $role->id }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Fullscreen Modal for Create/Edit Role -->
@@ -50,14 +67,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="management-modal-note">Use a role name that clearly describes what the user can do.</p>
                         <form id="roleForm" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="roleName" class="form-label">Role Name</label>
-                                <input type="text" class="form-control" id="roleName" name="name">
+                                <input type="text" class="form-control" id="roleName" name="name" placeholder="Example: District Project Officer">
                             </div>
-                            <div class="mb-3 text-end custombtn">
-                                <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
+                            <div class="mb-0 text-end custombtn">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <i class="fas fa-save"></i>
+                                    Save
+                                </button>
                             </div>
                         </form>
                     </div>

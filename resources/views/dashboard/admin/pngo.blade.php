@@ -1,44 +1,61 @@
 @extends('dashboard.layouts.admin-layout')
 
-@section('title', 'Pngo Management')
+@section('title', 'PNGO Management')
 
 
 
 @section('content')
-    <section>
-        <div class="container-fluid">
-            <div class="row mb-3">
-                <div class="col">
-                    <button class="btn btn-success btn-sm" id="createPngoBtn"><i class="fas fa-plus-square mr-1"></i> Add New
-                        PNGO</button>
-                </div>
+    <section class="management-page">
+        <div class="management-header">
+            <div>
+                <h1>PNGO Management</h1>
+                <p>Create and maintain partner NGO names used in users, cases, filters, and reports.</p>
+            </div>
+            <button class="btn btn-success" id="createPngoBtn">
+                <i class="fas fa-plus-square"></i>
+                Add New PNGO
+            </button>
+        </div>
+
+        <div class="management-card">
+            <div class="management-card-header">
+                <h2><i class="fas fa-handshake me-2"></i>PNGO List</h2>
+                <span class="management-count">{{ $pngos->count() }} PNGO{{ $pngos->count() === 1 ? '' : 's' }}</span>
             </div>
 
-            <!-- Pngos Table -->
-            <table class="table table-striped" id="pngosTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- This is where you will loop through your pngos -->
-                    @foreach ($pngos as $pngo)
-                        <tr id="pngo-{{ $pngo->id }}">
-                            <td>{{ $loop->iteration }} </td>
-                            <td>{{ $pngo->name }}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm editPngoBtn" data-id="{{ $pngo->id }}"
-                                    data-name="{{ $pngo->name }}">Edit</button>
-                                <button class="btn btn-danger btn-sm deletePngoBtn"
-                                    data-id="{{ $pngo->id }}">Delete</button>
-                            </td>
+            <div class="management-table-wrap table-responsive">
+                <table class="table table-striped table-hover table-sm management-table" id="pngosTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">#</th>
+                            <th>Name</th>
+                            <th style="width: 190px;">Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($pngos as $pngo)
+                            <tr id="pngo-{{ $pngo->id }}">
+                                <td>{{ $loop->iteration }} </td>
+                                <td class="pngo-name management-name-cell">{{ $pngo->name }}</td>
+                                <td>
+                                    <div class="management-actions">
+                                        <button class="btn btn-warning btn-sm editPngoBtn" data-id="{{ $pngo->id }}"
+                                            data-name="{{ $pngo->name }}">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm deletePngoBtn"
+                                            data-id="{{ $pngo->id }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Fullscreen Modal for Create/Edit Pngo -->
@@ -50,14 +67,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="management-modal-note">Enter the PNGO name exactly as it should appear in forms and reports.</p>
                         <form id="pngoForm" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="pngoName" class="form-label">Pngo Name</label>
-                                <input type="text" class="form-control" id="pngoName" name="name">
+                                <label for="pngoName" class="form-label">PNGO Name</label>
+                                <input type="text" class="form-control" id="pngoName" name="name" placeholder="Example: Partner NGO">
                             </div>
-                            <div class="mb-3 text-end custombtn">
-                                <button type="submit" class="btn btn-success btn-primary" id="submitBtn">Save</button>
+                            <div class="mb-0 text-end custombtn">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-success btn-primary" id="submitBtn">
+                                    <i class="fas fa-save"></i>
+                                    Save
+                                </button>
                             </div>
                         </form>
                     </div>

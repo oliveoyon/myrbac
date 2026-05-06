@@ -15,49 +15,258 @@
         /* Keeps content scrollable within the full-screen modal */
     }
 
-    /* Styling for each category box */
     .category-box {
-        padding: 20px;
+        margin-bottom: 14px;
         background-color: #ffffff;
-        border: 1px solid #ddd;
+        border: 1px solid #e0e6ed;
         border-radius: 8px;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        /* Add space between categories */
+        overflow: hidden;
     }
 
-    /* Category Header Styling */
     .category-header {
-        font-size: 18px;
-        font-weight: bold;
-        color: #2c3e50;
-        margin-bottom: 15px;
+        margin: 0;
+        padding: 12px 14px;
+        border-bottom: 1px solid #f0d2cf;
+        background: #fff7f6;
+        color: #c30f08;
+        font-size: 15px;
+        font-weight: 800;
     }
 
-    /* Permissions Grid inside each category */
     .permissions-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 15px;
-        /* Space between permission items */
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 8px;
+        padding: 12px;
     }
 
-    /* Individual Permission Item Styling */
     .permission-item {
-        padding: 10px 15px;
-        background-color: #f4f7fc;
-        border-left: 5px solid #4CAF50;
-        margin-bottom: 10px;
-        color: #333;
-        font-size: 15px;
-        border-radius: 8px;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
+        min-height: 38px;
+        padding: 8px 10px;
+        background-color: #fff;
+        border: 1px solid #d8dee6;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 6px;
     }
 
     .permission-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+        border-color: #c30f08;
+        background: #fff7f6;
+    }
+
+    #permissionsViewModal .modal-body {
+        background: #f8fafc;
+    }
+
+    .permission-view-shell {
+        display: grid;
+        gap: 14px;
+    }
+
+    .permission-view-summary {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border: 1px solid #e1e5ea;
+        border-left: 4px solid #c30f08;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+    .permission-view-summary h6 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .permission-view-summary p {
+        margin: 4px 0 0;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .permission-view-count {
+        padding: 4px 10px;
+        border: 1px solid #f0d2cf;
+        border-radius: 999px;
+        background: #fff7f6;
+        color: #9d0c06;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .permission-view-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 12px;
+    }
+
+    #permissionsViewModal .category-box {
+        margin-bottom: 0;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    }
+
+    #permissionsViewModal .category-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: #fff !important;
+    }
+
+    .category-header-count {
+        padding: 3px 8px;
+        border: 1px solid #f0d2cf;
+        border-radius: 999px;
+        background: #fff;
+        color: #7f1d1d;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    #permissionsViewModal .permissions-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 10px;
+    }
+
+    #permissionsViewModal .permission-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 34px;
+        padding: 7px 9px;
+        font-weight: 600;
+    }
+
+    #permissionsViewModal .permission-item i {
+        color: #c30f08;
+        font-size: 11px;
+    }
+
+    .permission-view-empty {
+        padding: 16px;
+        border: 1px dashed #d8dee6;
+        border-radius: 8px;
+        background: #fff;
+        color: #6b7280;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    #userPermissionsModal .modal-body {
+        background: #f8fafc;
+    }
+
+    .permission-edit-shell {
+        display: grid;
+        gap: 12px;
+    }
+
+    #userPermissionsModal .category-box {
+        margin-bottom: 0;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    }
+
+    #userPermissionsModal .category-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: #fff !important;
+    }
+
+    #userPermissionsModal .permissions-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 10px;
+    }
+
+    #userPermissionsModal .permission-item {
+        min-height: 34px;
+        padding: 0;
+    }
+
+    #userPermissionsModal .permission-item label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        width: 100%;
+        min-height: 30px;
+        margin: 0;
+        padding: 6px 8px;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    #userPermissionsModal .permission-item input[type="checkbox"] {
+        width: 13px;
+        height: 13px;
+        margin: 0;
+        accent-color: #c30f08;
+        flex: 0 0 auto;
+    }
+
+    #userPermissionsModal .permission-item:has(input[type="checkbox"]:checked) {
+        border-color: #f1b7b3;
+        background: #fffafa;
+    }
+
+    #userPermissionsModal .permission-item:has(input[type="checkbox"]:checked) label {
+        color: #7f1d1d;
+        font-weight: 700;
+    }
+
+    #user-table .management-actions {
+        flex-wrap: nowrap;
+        gap: 4px;
+    }
+
+    #user-table .management-actions .btn {
+        min-width: auto;
+        padding: 4px 7px;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.2;
+        white-space: nowrap;
+        box-shadow: none;
+    }
+
+    #user-table .management-actions .btn i {
+        margin-right: 2px;
+        font-size: 11px;
+    }
+
+    #user-table .management-actions .btn-info {
+        background: #eef6ff;
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+    }
+
+    #user-table .management-actions .btn-success {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+        color: #166534;
+    }
+
+    #user-table .management-actions .btn-warning {
+        background: #fff7f6;
+        border-color: #f0d2cf;
+        color: #9d0c06;
+    }
+
+    #user-table .management-actions .btn:hover {
+        transform: none;
+        filter: brightness(0.98);
     }
 
     /* Custom Styling for the Edit Permissions Form */
@@ -68,18 +277,18 @@
         color: #2c3e50;
     }
 
-    .category-box {
-        background-color: #f9fafb;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-
-
     /* Ensuring the grid remains neat on smaller screens */
     @media (max-width: 768px) {
         .permissions-grid {
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+
+        .permission-view-summary {
+            flex-direction: column;
+        }
+
+        .permission-view-grid {
+            grid-template-columns: 1fr;
         }
     }
 
@@ -105,30 +314,38 @@
 
     /* Category Title */
     .classic-category-title {
-        font-size: 18px;
-        font-weight: bold;
-        color: #e74c3c;
-        margin-bottom: 10px;
+        padding: 12px 14px;
+        border: 1px solid #f0d2cf;
+        border-radius: 8px 8px 0 0;
+        background: #fff7f6;
+        color: #c30f08 !important;
+        font-size: 15px;
+        font-weight: 800;
+        margin-bottom: 0;
     }
 
     /* Grid Layout for Permission Items */
     .classic-row {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        /* Auto-fit columns with a minimum width of 120px */
-        gap: 16px;
-        /* Space between checkboxes */
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 8px;
+        padding: 12px;
+        border: 1px solid #e0e6ed;
+        border-top: 0;
+        border-radius: 0 0 8px 8px;
         margin-bottom: 20px;
-        /* Space between categories */
     }
 
     /* Permission Items */
     .form-check {
         display: flex;
         align-items: center;
-        /* Vertically align checkbox with label */
         justify-content: flex-start;
-        /* Align items to the start */
+        min-height: 38px;
+        padding: 8px 10px;
+        border: 1px solid #d8dee6;
+        border-radius: 6px;
+        background: #fff;
     }
 
     /* Column Control for Grid Layout */
@@ -169,71 +386,85 @@
 
 
 @section('content')
-<section>
-    <div class="container-fluid table-responsive">
-        <div class="row mb-3">
-            <div class="col">
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                    <i class="fas fa-plus-square mr-1"></i> Add User
-                </button>
+<section class="management-page">
+    <div class="management-header">
+        <div>
+            <h1>User Management</h1>
+            <p>Create users, assign organization scope, and manage role or direct permissions.</p>
+        </div>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
+            <i class="fas fa-plus-square"></i>
+            Add User
+        </button>
+    </div>
+
+    <div class="management-card">
+        <div class="management-card-header">
+            <h2><i class="fas fa-user me-2"></i>User List</h2>
+            <span class="management-count">{{ $users->count() }} User{{ $users->count() === 1 ? '' : 's' }}</span>
+        </div>
+
+        <div class="management-table-wrap table-responsive">
+            <div class="alert alert-danger" id="errorAlert" style="display: none;">
+                <ul id="errorList">
+                    <!-- Error messages will be inserted here dynamically -->
+                </ul>
             </div>
+
+            <table class="table table-bordered table-striped table-hover table-sm management-table" id="user-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">#</th>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>District</th>
+                        <th>PNGO</th>
+                        <th>Status</th>
+                        <th style="width: 260px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($users as $user)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td class="management-name-cell">{{ $user->name }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->district ? $user->district->name : 'No District' }}</td>
+                        <td>{{ $user->pngo ? $user->pngo->name : 'No PNGO' }}</td>
+                        <td>
+                            <span class="badge {{ $user->status == 1 ? 'bg-success' : 'bg-secondary' }}">
+                                {{ $user->status == 1 ? 'Active' : 'Inactive' }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="management-actions">
+                                <button type="button" class="btn btn-info btn-sm" data-id="{{ $user->id }}"
+                                    id="editUserBtn">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </button>
+
+                                <button type="button" class="btn btn-success btn-sm view-permissions"
+                                    data-toggle="modal" data-id="{{ $user->id }}" data-name="{{ $user->name }}">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </button>
+                                <button class="btn btn-warning btn-sm edit-user-permissions"
+                                    data-id="{{ $user->id }}" data-name="{{ $user->name }}">
+                                    <i class="fas fa-pencil-alt"></i>
+                                    Permissions
+                                </button>
+                            </div>
+                        </td>
+
+                    </tr>
+                    @endforeach
+
+                </tbody>
+            </table>
         </div>
-
-
-        <div class="alert alert-danger" id="errorAlert" style="display: none;">
-            <ul id="errorList">
-                <!-- Error messages will be inserted here dynamically -->
-            </ul>
-        </div>
-        <table class="table table-bordered table-striped table-hover table-sm" id="user-table">
-            <thead style="border-top: 1px solid #b4b4b4">
-                <th style="width: 10px">#</th>
-                <th>User Name</th>
-                <th>Email</th>
-                <th>District</th>
-                <th>PNGO</th>
-                <th>Status</th>
-                <th style="width: 40px">Action</th>
-            </thead>
-            <tbody>
-                @foreach ($users as $user)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->district ? $user->district->name : 'No District' }}</td>
-                    <td>{{ $user->pngo ? $user->pngo->name : 'No PNGO' }}</td>
-                    <td>
-                        <span class="badge {{ $user->status == 1 ? 'bg-success' : 'bg-secondary' }}">
-                            {{ $user->status == 1 ? 'Active' : 'Inactive' }}
-                        </span>
-                    </td>
-
-                    <td>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-info btn-sm" data-id="{{ $user->id }}"
-                                id="editUserBtn">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-
-                            <!-- Button to trigger the modal -->
-                            <button type="button" class="btn btn-success btn-sm view-permissions"
-                                data-toggle="modal" data-id="{{ $user->id }}">
-                                <i class="fas fa-eye"></i> View Permissions
-                            </button>
-                            <button class="btn btn-default btn-sm edit-user-permissions"
-                                data-id="{{ $user->id }}" data-name="{{ $user->name }}">
-                                <i class="fas fa-pencil-alt"></i> Edit Permissions
-                            </button>
-                        </div>
-                    </td>
-
-                </tr>
-                @endforeach
-
-            </tbody>
-        </table>
-
+    </div>
         <!-- Modal -->
         <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -404,8 +635,6 @@
             </div>
         </div>
 
-
-    </div>
 </section>
 
 
@@ -486,6 +715,7 @@
         // When the 'View Permissions' button is clicked
         $('.view-permissions').on('click', function() {
             var userId = $(this).data('id'); // Get the user ID from the button's data attribute
+            var userName = $(this).data('name');
             $.ajax({
                 url: '/mne/users/' + userId +
                     '/permissions', // Make the AJAX request to fetch user permissions
@@ -493,25 +723,47 @@
                 success: function(response) {
                     var permissionsList =
                         ''; // Initialize an empty string for the permissions
+                    var totalPermissions = 0;
+                    var categoryCount = Object.keys(response.permissions || {}).length;
 
                     // Loop through the grouped permissions returned in the response
                     $.each(response.permissions, function(category, permissions) {
+                        totalPermissions += permissions.length;
                         permissionsList +=
                             '<div class="category-box">'; // Start of category box
-                        permissionsList += '<div class="category-header">' +
-                            category + '</div>'; // Category name header
+                        permissionsList += '<div class="category-header"><span>' +
+                            category + '</span><span class="category-header-count">' + permissions.length +
+                            '</span></div>'; // Category name header
                         permissionsList +=
                             '<div class="permissions-grid">'; // Start of permission grid
 
                         permissions.forEach(function(permission) {
                             permissionsList +=
-                                '<div class="permission-item">' + permission
-                                .name + '</div>'; // Display permission name
+                                '<div class="permission-item"><i class="fas fa-check-circle"></i><span>' + permission
+                                .name + '</span></div>'; // Display permission name
                         });
 
                         permissionsList +=
                             '</div></div>'; // Close permissions grid and category box
                     });
+
+                    if (!totalPermissions) {
+                        permissionsList = '<div class="permission-view-empty">No direct permissions assigned to this user.</div>';
+                    } else {
+                        permissionsList = '<div class="permission-view-grid">' + permissionsList + '</div>';
+                    }
+
+                    permissionsList =
+                        '<div class="permission-view-shell">' +
+                            '<div class="permission-view-summary">' +
+                                '<div>' +
+                                    '<h6>' + userName + '</h6>' +
+                                    '<p>' + categoryCount + ' categories with assigned permissions</p>' +
+                                '</div>' +
+                                '<span class="permission-view-count">' + totalPermissions + ' Permissions</span>' +
+                            '</div>' +
+                            permissionsList +
+                        '</div>';
 
                     // Inject the generated HTML into the modal body
                     $('#permissionsViewModal .modal-body').html(permissionsList);
@@ -705,9 +957,12 @@
                 method: 'GET',
                 success: function(response) {
                     if (response && response.user && response.allPermissions) {
-                        var editForm = '<form id="editUserPermissionsForm">';
-                        editForm += '<input type="hidden" name="user_id" value="' + userId +
-                            '">';
+                        var editForm = '<form id="editUserPermissionsForm" class="permission-view-shell">';
+                        var permissionGroups = '';
+                        var totalPermissions = 0;
+                        var categoryCount = 0;
+
+                        editForm += '<input type="hidden" name="user_id" value="' + userId + '">';
 
                         var groupedPermissions = {};
 
@@ -722,12 +977,17 @@
 
                         // Render grouped permissions
                         $.each(groupedPermissions, function(category, permissions) {
-                            editForm += '<div class="mb-4">';
-                            editForm +=
-                                '<h5 class="text-danger classic-category-title">' +
-                                category + '</h5>';
-                            editForm +=
-                                '<div class="classic-row">'; // Apply the grid layout
+                            totalPermissions += permissions.length;
+                            categoryCount++;
+
+                            permissionGroups +=
+                                '<div class="category-box">';
+                            permissionGroups +=
+                                '<div class="category-header"><span>' +
+                                category + '</span><span class="category-header-count">' + permissions.length +
+                                '</span></div>';
+                            permissionGroups +=
+                                '<div class="permissions-grid">';
 
                             $.each(permissions, function(index, permission) {
                                 var checked = response.userPermissions[
@@ -736,18 +996,32 @@
                                         p => p.id === permission.id) ?
                                     'checked' : '';
 
-                                editForm += `
-                            <div class="col-md-4">
-                                <div class="form-check">
+                                permissionGroups += `
+                            <div class="permission-item">
+                                <label for="permission-${permission.id}">
                                     <input class="form-check-input classic-checkbox" type="checkbox" name="permissions[]" value="${permission.id}" ${checked} id="permission-${permission.id}">
-                                    <label for="permission-${permission.id}" class="classic-checkbox-label">${permission.name}</label>
-                                </div>
+                                    <span>${permission.name}</span>
+                                </label>
                             </div>`;
                             });
 
-                            editForm +=
-                                '</div></div>'; // Close the row and category div
+                            permissionGroups +=
+                                '</div></div>';
                         });
+
+                        if (totalPermissions) {
+                            editForm +=
+                                '<div class="permission-view-summary">' +
+                                    '<div>' +
+                                        '<h6>' + userName + '</h6>' +
+                                        '<p>' + categoryCount + ' categories available for assignment</p>' +
+                                    '</div>' +
+                                    '<span class="permission-view-count">' + totalPermissions + ' Permissions</span>' +
+                                '</div>' +
+                                '<div class="permission-view-grid">' + permissionGroups + '</div>';
+                        } else {
+                            editForm += '<div class="permission-view-empty">No permissions available to assign.</div>';
+                        }
 
                         editForm += '</form>';
                         $('#editUserPermissionsContent').html(editForm);
