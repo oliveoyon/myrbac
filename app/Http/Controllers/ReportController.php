@@ -235,6 +235,14 @@ class ReportController extends Controller
             'referral_service',
             'referral_service_details',
             'referral_service_date',
+            'resolved_dispute_date',
+            'case_resolved_date',
+            'appoint_lawyer_date',
+            'release_status',
+            'fine_amount',
+            'release_status_date',
+            'other_result_details',
+            'other_result_date',
         ];
 
         $districtId = 1; // Set your district ID
@@ -286,12 +294,12 @@ class ReportController extends Controller
             'special_condition' => $request->special_condition,
             'status' => $request->status,
             'application_mode' => $request->application_mode,
-            'type_of_service' => $request->type_of_service,
         ];
         $whr = array_filter($whr); // Remove null/empty values
+        $typeOfService = $request->type_of_service;
 
         // Fix: Pass $whr inside the closure
-        $results = collect($flatFields)->map(function ($field) use ($whr) {
+        $results = collect($flatFields)->map(function ($field) use ($whr, $typeOfService) {
             return FormalCase::selectRaw("
                 '$field' AS field,
                 SUM(CASE WHEN sex = 'Male' AND age >= 18 THEN 1 ELSE 0 END) AS adult_males,
@@ -302,6 +310,12 @@ class ReportController extends Controller
             ")
             ->whereNotNull($field) 
             ->where($whr)  // Correctly passing $whr
+            ->when($typeOfService, function ($query, $service) {
+                $query->where(function ($serviceQuery) use ($service) {
+                    $serviceQuery->where('type_of_service', $service)
+                        ->orWhere('type_of_service', 'like', '%"' . $service . '"%');
+                });
+            })
             ->first();
         });
 

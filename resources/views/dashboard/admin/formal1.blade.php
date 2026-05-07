@@ -373,8 +373,10 @@
                 <a href="#collapseSeven" data-bs-toggle="collapse" data-bs-target="#collapseSeven">7. Case</a>
                 <a href="#collapseEight" data-bs-toggle="collapse" data-bs-target="#collapseEight">8. Assistance</a>
                 <a href="#collapseNine" data-bs-toggle="collapse" data-bs-target="#collapseNine">9. Result</a>
-                <a href="#collapseTwelve" data-bs-toggle="collapse" data-bs-target="#collapseTwelve">11. Prison Case</a>
-                <a href="#collapseFourteen" data-bs-toggle="collapse" data-bs-target="#collapseFourteen">13. Prison Assistance</a>
+                <a href="#collapseTwelve" data-bs-toggle="collapse" data-bs-target="#collapseTwelve">10. Prison Case</a>
+                <a href="#collapseFourteen" data-bs-toggle="collapse" data-bs-target="#collapseFourteen">12. Prison Assistance</a>
+                <a href="#collapseSixteen" data-bs-toggle="collapse" data-bs-target="#collapseSixteen">15. Service</a>
+                <a href="#collapseFileClosure" data-bs-toggle="collapse" data-bs-target="#collapseFileClosure">16. Closure</a>
                 <a href="#collapseSeventeen" data-bs-toggle="collapse" data-bs-target="#collapseSeventeen">17. Follow-Up</a>
                 <a href="#collapseEighteen" data-bs-toggle="collapse" data-bs-target="#collapseEighteen">18. Uploads</a>
             </nav>
@@ -944,6 +946,12 @@
                                 </div>
 
                                 <div class="col-md-4">
+                                    <label for="case_resolved_date" class="form-label">Case Resolved</label>
+                                    <input type="date" class="form-control" id="case_resolved_date"
+                                        name="case_resolved_date">
+                                </div>
+
+                                <div class="col-md-4">
                                     <label for="appoint_lawyer_date" class="form-label">Appoint Lawyer</label>
                                     <input type="date" class="form-control" id="appoint_lawyer_date"
                                         name="appoint_lawyer_date">
@@ -970,38 +978,29 @@
                                     <input type="date" class="form-control" id="release_status_date"
                                         name="release_status_date">
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Section 10: Description of Service Provided -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingEleven">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
-                            10. Description of Service Provided
-                        </button>
-                    </h2>
-                    <div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven"
-                        data-bs-parent="#caseFormAccordion">
-                        <div class="accordion-body">
-                            <div class="row g-3">
-                                <div class="col-md-12">
-                                    <label for="service_description" class="form-label">Description of Service</label>
-                                    <textarea class="form-control" id="service_description" name="service_description" rows="3"></textarea>
+                                <div class="col-md-8">
+                                    <label for="other_result_details" class="form-label">Other Result</label>
+                                    <input type="text" class="form-control" id="other_result_details"
+                                        name="other_result_details">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="other_result_date" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="other_result_date"
+                                        name="other_result_date">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 11: Basic Case Information -->
+                <!-- Section 10: Basic Case Information -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwelve">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseTwelve" aria-expanded="false" aria-controls="collapseTwelve">
-                            11. Basic Case Information
+                            10. Basic Case Information
                         </button>
                     </h2>
                     <div id="collapseTwelve" class="accordion-collapse collapse" aria-labelledby="headingTwelve"
@@ -1085,13 +1084,13 @@
                     </div>
                 </div>
 
-                <!-- Section 12: Imprisonment Information -->
+                <!-- Section 11: Imprisonment Information -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingThirteen">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseThirteen" aria-expanded="false"
                             aria-controls="collapseThirteen">
-                            12. Imprisonment Information
+                            11. Imprisonment Information
                         </button>
                     </h2>
                     <div id="collapseThirteen" class="accordion-collapse collapse" aria-labelledby="headingThirteen"
@@ -1147,13 +1146,13 @@
                         </div>
                     </div>
                 </div>
-                <!-- Section 13: Nature of Assistance in Prison -->
+                <!-- Section 12: Nature of Assistance in Prison -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingFourteen">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseFourteen" aria-expanded="false"
                             aria-controls="collapseFourteen">
-                            13. Nature of Assistance in Prison
+                            12. Nature of Assistance in Prison
                         </button>
                     </h2>
                     <div id="collapseFourteen" class="accordion-collapse collapse" aria-labelledby="headingFourteen"
@@ -1225,6 +1224,12 @@
                                 </div>
 
                                 <div class="col-md-4">
+                                    <label for="identify_sureties_prison_date" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="identify_sureties_prison_date"
+                                        name="identify_sureties_prison_date">
+                                </div>
+
+                                <div class="col-md-4">
                                     <label for="witness_communication_prison" class="form-label">Communicate with
                                         Witness</label>
                                     <input type="date" class="form-control" id="witness_communication_prison"
@@ -1268,6 +1273,12 @@
                                 </div>
 
                                 <div class="col-md-4">
+                                    <label for="ministerial_communication_details" class="form-label">Details</label>
+                                    <input type="text" class="form-control" id="ministerial_communication_details"
+                                        name="ministerial_communication_details">
+                                </div>
+
+                                <div class="col-md-4">
                                     <label for="other_legal_assistance" class="form-label">Other legal
                                         assistance</label>
                                     <select class="form-select" id="other_legal_assistance"
@@ -1292,13 +1303,13 @@
                     </div>
                 </div>
 
-                <!-- Section 14: Result -->
+                <!-- Section 13: Result -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingFifteen">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseFifteen" aria-expanded="false"
                             aria-controls="collapseFifteen">
-                            14. Result
+                            13. Result
                         </button>
                     </h2>
                     <div id="collapseFifteen" class="accordion-collapse collapse" aria-labelledby="headingFifteen"
@@ -1352,11 +1363,21 @@
                                         name="convicted_length">
                                 </div>
                                 <div class="col-md-4">
+                                    <label for="convicted_length_details" class="form-label">Details</label>
+                                    <input type="text" class="form-control" id="convicted_length_details"
+                                        name="convicted_length_details">
+                                </div>
+                                <div class="col-md-4">
                                     <label for="convicted_sentence_expire" class="form-label">Convicted-Sentence
                                         Expire
                                         on</label>
                                     <input type="date" class="form-control" id="convicted_sentence_expire"
                                         name="convicted_sentence_expire">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="convicted_sentence_expire_details" class="form-label">Details</label>
+                                    <input type="text" class="form-control" id="convicted_sentence_expire_details"
+                                        name="convicted_sentence_expire_details">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="result_of_appeal" class="form-label">Result of Appeal</label>
@@ -1369,6 +1390,16 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4">
+                                    <label for="result_of_appeal_date" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="result_of_appeal_date"
+                                        name="result_of_appeal_date">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="prison_case_resolved_date" class="form-label">Case Resolved</label>
+                                    <input type="date" class="form-control" id="prison_case_resolved_date"
+                                        name="prison_case_resolved_date">
+                                </div>
+                                <div class="col-md-4">
                                     <label for="date_of_reliefe" class="form-label">Date of Released from
                                         Prison</label>
                                     <input type="date" class="form-control" id="date_of_reliefe"
@@ -1378,12 +1409,12 @@
                         </div>
                     </div>
                 </div>
-                <!-- Section 15: District Legal Aid Office Information -->
+                <!-- Section 14: District Legal Aid Office Information -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTen">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
-                            15. District Legal Aid Office Information
+                            14. District Legal Aid Office Information
                         </button>
                     </h2>
                     <div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen"
@@ -1419,8 +1450,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <label for="type_of_service" class="form-label">Type of Service</label>
-                                    <select class="form-select" id="type_of_service" name="type_of_service">
-                                        <option value="">Select</option>
+                                    <select class="form-select" id="type_of_service" name="type_of_service[]" multiple size="4">
                                         <option value="Legal Advice">Legal Advice</option>
                                         <option value="Alternate Dispute Resolution">Alternate Dispute Resolution
                                         </option>
@@ -1437,13 +1467,13 @@
                         </div>
                     </div>
                 </div>
-                <!-- Section 16: Description of Service Provided -->
+                <!-- Section 15: Description of Service Provided -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingSixteen">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseSixteen" aria-expanded="false"
                             aria-controls="collapseSixteen">
-                            16. Description of Service Provided
+                            15. Description of Service Provided
                         </button>
                     </h2>
                     <div id="collapseSixteen" class="accordion-collapse collapse" aria-labelledby="headingSixteen"
@@ -1456,6 +1486,24 @@
                                     <textarea class="form-control" id="result_description" name="result_description" rows="6"></textarea>
                                 </div>
 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 16: File Closure -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFileClosure">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseFileClosure" aria-expanded="false"
+                            aria-controls="collapseFileClosure">
+                            16. File Closure
+                        </button>
+                    </h2>
+                    <div id="collapseFileClosure" class="accordion-collapse collapse" aria-labelledby="headingFileClosure"
+                        data-bs-parent="#caseFormAccordion">
+                        <div class="accordion-body">
+                            <div class="row g-3">
                                 <div class="col-md-4">
                                     <label for="file_closure_date" class="form-label">File Closed Date</label>
                                     <input type="date" class="form-control" id="file_closure_date"
@@ -1623,7 +1671,7 @@
             {
                 id: "custody_status",
                 targets: ["charges_details", "arrest_date", "case_no"],
-                showValue: ["Police Custody", "Court Custody", "Not Applicable"],
+                showValue: ["Police Custody", "Court Custody"],
                 isParentColumn: true
             },
             {
@@ -1659,7 +1707,7 @@
             {
                 id: "prison_legal_representation",
                 targets: ["prison_legal_representation_details_field"],
-                showValue: "Other"
+                showValue: ["NGO Panel Lawyer", "Other"]
             },
             {
                 id: "other_legal_assistance",

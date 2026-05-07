@@ -51,10 +51,14 @@ The current Laravel form broadly follows this sequence with accordion sections.
 
 Current form ordering decision:
 
-- The former Section 11, `Description of Service Provided`, should be displayed as Section 10.
-- The prison sections should follow as Section 11 to Section 14.
-- The former Section 10, `District Legal Aid Office Information`, should move near the end and display as Section 15, just above Section 16.
-- Section 16 remains the final service description/file closed area for prison/result closure.
+- The old standalone Section 10 `service_description` area has been removed from the user-facing form flow.
+- Prison `Basic Case Information` is now Section 10.
+- `Imprisonment Information` is now Section 11.
+- `Nature of Assistance in Prison` is now Section 12.
+- `Result of Prison Assistance` is now Section 13.
+- `District Legal Aid Office Information` is now Section 14.
+- `Description of Service Provided` uses `result_description` and is now Section 15.
+- `File Closed Date` remains field label 16.2 and is now placed in its own Section 16 accordion.
 
 ## Current Database Pattern
 
@@ -68,6 +72,8 @@ Business grouping is represented by column naming, not separate child tables. Ex
 - Female-prisoner child fields: fixed two-child structure using `child_sex`, `child_age`, `child_2_sex`, and `child_2_age`; this is not a repeatable child table.
 - Prison case fields: `source_of_interview`, `prison_reg_no`, `prison_case_no`, `section_no`, `present_court`, `entry_date`
 - Prison assistance fields: `prison_family_communication`, `prison_legal_representation`, `bail_bond_submission`, `court_order_communication`
+- Section 12 additions: `identify_sureties_prison_date` shares `12.5`; `ministerial_communication_details` shares `12.11`.
+- Section 13 additions: `convicted_length_details` and `convicted_sentence_expire_details` share `13.3`; `result_of_appeal_date` shares `13.4`; `prison_case_resolved_date` is `13.5 Case Resolved`; existing `date_of_reliefe` is labeled `13.6`.
 - Prison result fields: `released_on`, `send_to`, `convicted_length`, `result_of_appeal`, `date_of_reliefe`
 
 Follow-up intervention data is stored separately in `follow_up_interventions`.
@@ -124,6 +130,8 @@ Implementation trial:
 - For manual field `8.2`, `legal_representation_details` appears when `legal_representation` is `NGO Panel Lawyer` or `Other`, so the actual panel lawyer/other destination can be recorded without changing the main dropdown value.
 - For manual field `8.5`, `identify_sureties_date` stores the date for identifying sureties, while `identify_sureties` keeps the surety details.
 - For manual field `8.10`, `referral_service_details` appears when `referral_service` is `NGOs/RJ/Mediation` or `Other`; the main dropdown value remains unchanged and the details field stores the specific NGO/RJ/mediation/other destination.
+- Section 9 current numbering: `resolved_dispute_date` is `9.1 Resolved Dispute`; `case_resolved_date` is `9.2 Case Resolved`; `appoint_lawyer_date` is `9.3 Appoint Lawyer`; `release_status`, `fine_amount`, and `release_status_date` are `9.4 Released On`; `other_result_details` and `other_result_date` are `9.5 Other Result`.
+- For manual field `7.1`, dependent fields open only for `Police Custody` and `Court Custody`; `Not Applicable` does not open `7.2` charges, `7.3` arrest date, or `7.4` case number. Court/police `case_no` is labeled as `7.4`; prison `case_no` remains `11.3`.
 - For manual field `4.5`, `guardian_relation_details` appears when `guardian_relation` is `Family Member`, `Relative`, or `Other`, so the user can record Father/Mother/Brother, Uncle/Aunt, or another specific relation without changing the main dropdown values.
 
 Fields with two related inputs:

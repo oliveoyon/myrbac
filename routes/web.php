@@ -83,6 +83,7 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('/edit-file', [FormalController::class, 'fileCaseForm'])->name('edit-file.get')->middleware('permission:View File Formal Case Form');
     Route::post('/edit-file', [FormalController::class, 'fileCase'])->name('edit-file.post')->middleware('permission:File Formal Case');
     Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view')->middleware('permission:View Formal Case Import Page');
+    Route::get('/import-formal-cases/template', [FormalController::class, 'downloadImportTemplate'])->name('import.template')->middleware('permission:View Formal Case Import Page');
     Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store')->middleware('permission:Import Formal Cases');
     Route::get('/formal-cases/export', [ReportController::class, 'exportExcel'])->name('formal.cases.export')->middleware('permission:Export Formal Cases');
     Route::post('/dashboard/search', [ReportController::class, 'search'])->name('dashboard.search')->middleware('permission:Search Dashboard Reports');

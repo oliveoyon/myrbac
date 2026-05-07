@@ -82,18 +82,20 @@ class FormalCaseImport implements ToModel, WithHeadingRow, WithValidation
             'referral_service' => $row['referral_service'] ?? null,
             'referral_service_details' => $row['referral_service_details'] ?? null,
             'referral_service_date' => $row['referral_service_date'] ?? null,
+            'case_resolved_date' => $row['case_resolved_date'] ?? null,
             'resolved_dispute_date' => $row['resolved_dispute_date'] ?? null,
             'appoint_lawyer_date' => $row['appoint_lawyer_date'] ?? null,
             'release_status' => $row['release_status'] ?? null,
             'fine_amount' => $row['fine_amount'] ?? null,
             'release_status_date' => $row['release_status_date'] ?? null,
+            'other_result_details' => $row['other_result_details'] ?? null,
+            'other_result_date' => $row['other_result_date'] ?? null,
             'application_mode' => $row['application_mode'] ?? null,
             'application_mode_date' => $row['application_mode_date'] ?? null,
             'received_application' => $row['received_application'] ?? null,
             'reference_no' => $row['reference_no'] ?? null,
-            'type_of_service' => $row['type_of_service'] ?? null,
+            'type_of_service' => $this->prepareMultiSelectValue($row['type_of_service'] ?? null),
             'type_of_service_date' => $row['type_of_service_date'] ?? null,
-            'service_description' => $row['service_description'] ?? null,
             'source_of_interview' => $row['source_of_interview'] ?? null,
             'source_of_interview_details' => $row['source_of_interview_details'] ?? null,
             'prison_reg_no' => $row['prison_reg_no'] ?? null,
@@ -109,8 +111,14 @@ class FormalCaseImport implements ToModel, WithHeadingRow, WithValidation
             'surrender_date' => $row['surrender_date'] ?? null,
             'prison_legal_representation_details' => $row['prison_legal_representation_details'] ?? null,
             'released_on' => $row['released_on'] ?? null,
+            'identify_sureties_prison_date' => $row['identify_sureties_prison_date'] ?? null,
+            'ministerial_communication_details' => $row['ministerial_communication_details'] ?? null,
             'other_legal_assistance_details' => $row['other_legal_assistance_details'] ?? null,
             'result_of_appeal' => $row['result_of_appeal'] ?? null,
+            'convicted_length_details' => $row['convicted_length_details'] ?? null,
+            'convicted_sentence_expire_details' => $row['convicted_sentence_expire_details'] ?? null,
+            'result_of_appeal_date' => $row['result_of_appeal_date'] ?? null,
+            'prison_case_resolved_date' => $row['prison_case_resolved_date'] ?? null,
             'send_to_details' => $row['send_to_details'] ?? null,
             'date_of_reliefe' => $row['date_of_reliefe'] ?? null,
             'file_closure_date' => $row['file_closure_date'] ?? null,
@@ -127,5 +135,26 @@ class FormalCaseImport implements ToModel, WithHeadingRow, WithValidation
             'fine_amount' => 'nullable|numeric',
             'case_no' => 'nullable|string|max:255',
         ];
+    }
+
+    private function prepareMultiSelectValue($value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+
+            if (is_array($decoded)) {
+                $value = $decoded;
+            } else {
+                $value = array_map('trim', explode(',', $value));
+            }
+        }
+
+        $values = array_values(array_filter((array) $value, fn ($item) => filled($item)));
+
+        return empty($values) ? null : json_encode($values);
     }
 }

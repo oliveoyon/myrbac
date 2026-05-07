@@ -51,9 +51,9 @@ class CommontController extends Controller
             'legal_representation', 'legal_representation_date', 'collected_vokalatnama_date',
             'collected_case_doc', 'identify_sureties', 'identify_sureties_date', 'witness_communication_date', 'medical_report_date',
             'legal_assistance_date', 'assistance_under_custody_date', 'referral_service', 'referral_service_details',
-            'referral_service_date', 'resolved_dispute_date', 'appoint_lawyer_date', 'release_status',
-            'fine_amount', 'release_status_date', 'application_mode', 'application_mode_date',
-            'received_application', 'reference_no', 'type_of_service', 'type_of_service_date', 'service_description'
+            'referral_service_date', 'resolved_dispute_date', 'case_resolved_date', 'appoint_lawyer_date', 'release_status',
+            'fine_amount', 'release_status_date', 'other_result_details', 'other_result_date', 'application_mode', 'application_mode_date',
+            'received_application', 'reference_no', 'type_of_service', 'type_of_service_date'
         ];
 
         $prisonFields = [
@@ -62,9 +62,10 @@ class CommontController extends Controller
             'imprisonment_condition', 'imprisonment_status', 'special_condition', 'surrender_date',
             'prison_family_communication', 'prison_legal_representation', 'prison_legal_representation_date',
             'next_court_collection_date', 'collected_case_doc_prison', 'identify_sureties_prison_nid',
-            'identify_sureties_prison_phone', 'witness_communication_prison', 'bail_bond_submission',
+            'identify_sureties_prison_phone', 'identify_sureties_prison_date', 'witness_communication_prison', 'bail_bond_submission',
             'court_order_communication', 'application_certified_copies', 'appeal_assistance',
-            'ministerial_communication', 'other_legal_assistance', 'other_legal_assistance_date'
+            'ministerial_communication', 'ministerial_communication_details', 'other_legal_assistance', 'other_legal_assistance_date',
+            'convicted_length_details', 'convicted_sentence_expire_details', 'result_of_appeal_date', 'prison_case_resolved_date'
         ];
 
         $policeFields = [
@@ -72,9 +73,9 @@ class CommontController extends Controller
             'legal_representation', 'legal_representation_date', 'collected_vokalatnama_date',
             'collected_case_doc', 'identify_sureties', 'identify_sureties_date', 'witness_communication_date', 'medical_report_date',
             'legal_assistance_date', 'assistance_under_custody_date', 'referral_service', 'referral_service_details',
-            'referral_service_date', 'resolved_dispute_date', 'appoint_lawyer_date', 'release_status',
-            'fine_amount', 'release_status_date', 'application_mode', 'application_mode_date',
-            'received_application', 'reference_no', 'type_of_service', 'type_of_service_date', 'service_description'
+            'referral_service_date', 'resolved_dispute_date', 'case_resolved_date', 'appoint_lawyer_date', 'release_status',
+            'fine_amount', 'release_status_date', 'other_result_details', 'other_result_date', 'application_mode', 'application_mode_date',
+            'received_application', 'reference_no', 'type_of_service', 'type_of_service_date'
         ];
 
         $courtCondition = implode(' OR ', array_map(fn($field) => "$field IS NOT NULL", $courtFields));

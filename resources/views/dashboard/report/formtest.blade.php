@@ -855,7 +855,7 @@
                     </tr>
                     <tr style="height:28.85pt;">
                         <td colspan="5" style="width:479.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">যদি ৭.১ &ldquo;হ্যাঁ&rdquo; হয়, তবে পরবর্তি অংশ ৭.২ এবং ৭.৩ পূরণ করুন&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(If 7.1 &ldquo;Yes&rdquo;, then fill up the 7.2 and 7.3 part)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">যদি ৭.১ পুলিশ/আদালত হেফাজত হয়, তবে পরবর্তি অংশ ৭.২, ৭.৩ এবং ৭.৪ পূরণ করুন&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(If 7.1 is Police/Court Custody, then fill up 7.2, 7.3 and 7.4)</span></p>
                         </td>
                     </tr>
                     <tr style="height:48.65pt;">
@@ -885,7 +885,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">{{ $details->arrest_date }}</span></p>
                         </td>
                         <td colspan="2" style="width:115.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">মামলা নং&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Case Number)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="line-height:115%; font-family:Arial; font-size:10pt;">7.4 </span><span style="font-family:bangla;">মামলা নং&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Case Number)</span></p>
                         </td>
                         <td style="width:97.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:16pt;"><span style="font-family:Arial;"></span>{{ $details->case_no }}</p>
@@ -1145,15 +1145,26 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">9.1</span></p>
                         </td>
                         <td style="width:376.1pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check90" {{ $details->resolved_dispute_date ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:'Times New Roman'; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">বিরোধ মিমাংসা হয়েছে&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Resolved dispute)&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check90" {{ $details->resolved_dispute_date ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:'Times New Roman'; font-size:10pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">Resolved dispute&nbsp;</span></p>
                         </td>
                         <td style="width:92.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><strong><span style="font-family:bangla;"></span></strong>{{ $details->resolved_dispute_date }}</p>
                         </td>
                     </tr>
-                    <tr style="height:21.65pt;">
+                    <tr style="height:19.4pt;">
                         <td style="width:33.95pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">9.2</span></p>
+                        </td>
+                        <td style="width:376.1pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check90" {{ ($details->case_resolved_date ?? null) ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:'Times New Roman'; font-size:10pt;">&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">Case Resolved&nbsp;</span></p>
+                        </td>
+                        <td style="width:92.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><strong><span style="font-family:bangla;"></span></strong>{{ $details->case_resolved_date ?? '' }}</p>
+                        </td>
+                    </tr>
+                    <tr style="height:21.65pt;">
+                        <td style="width:33.95pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">9.3</span></p>
                         </td>
                         <td style="width:376.1pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check90" {{ $details->appoint_lawyer_date ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">আইনজীবী নিয়োগ করা হয়েছে&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Appoint lawyer)</span></p>
@@ -1164,7 +1175,7 @@
                     </tr>
                     <tr style="height:19.35pt;">
                         <td rowspan="4" style="width:33.95pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">9.3</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">9.4</span></p>
                         </td>
                         <td style="width:376.1pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">মুক্ত হওয়া&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Released on)</span></p>
@@ -1199,13 +1210,13 @@
                     </tr>
                     <tr style="height:19.85pt;">
                         <td style="width:33.95pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">9.4</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">9.5</span></p>
                         </td>
                         <td style="width:376.1pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">অন্যান্য ফলাফল, উল্লেখ্ করুন&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Other result, please specify) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->other_result_details ?? null) ? 'checked="checked"' : '' }}><span style="line-height:115%; font-family:Arial; font-size:10pt;">&nbsp;Other result, please specify: {{ $details->other_result_details ?? '' }}</span></p>
                         </td>
                         <td style="width:92.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">{{ $details->other_result_date ?? '' }}</span></p>
                         </td>
                     </tr>
                 </tbody>
@@ -1279,7 +1290,7 @@
                     </tr>
                     <tr style="height:21.75pt;">
                         <td style="width:376.35pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->type_of_service == 'Legal Advice') ? 'checked="checked"' : '' }}><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">আইনগত পরার্মশ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Legal advice)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ in_array('Legal Advice', $details->type_of_service_list ?? []) ? 'checked="checked"' : '' }}><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">আইনগত পরার্মশ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Legal advice)</span></p>
                         </td>
                         <td style="width:92.7pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->type_of_service_date }}</p>
@@ -1287,7 +1298,7 @@
                     </tr>
                     <tr style="height:21.75pt;">
                         <td style="width:376.35pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->type_of_service == 'Alternate Dispute Resolution') ? 'checked="checked"' : '' }}><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">বিকল্প বিরোধ নিষ্পত্তি&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Alternative Dispute Resolution)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ in_array('Alternate Dispute Resolution', $details->type_of_service_list ?? []) ? 'checked="checked"' : '' }}><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">বিকল্প বিরোধ নিষ্পত্তি&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Alternative Dispute Resolution)</span></p>
                         </td>
                         <td style="width:92.7pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;...............</span></p>
@@ -1295,7 +1306,7 @@
                     </tr>
                     <tr style="height:21.75pt;">
                         <td style="width:376.35pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->type_of_service == 'Filing New Lawsuit') ? 'checked="checked"' : '' }}><span style="font-family:bangla;">&nbsp;নতুন মামলা দায়ের&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Filing new lawsuit)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ in_array('Filing New Lawsuit', $details->type_of_service_list ?? []) ? 'checked="checked"' : '' }}><span style="font-family:bangla;">&nbsp;নতুন মামলা দায়ের&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Filing new lawsuit)</span></p>
                         </td>
                         <td style="width:92.7pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;...............</span></p>
@@ -1303,7 +1314,7 @@
                     </tr>
                     <tr style="height:21.75pt;">
                         <td style="width:376.35pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->type_of_service == 'Legal Aid in Existing Case') ? 'checked="checked"' : '' }}><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">বিদ্যমান মামলায় আইনগত সহায়তা</span><span style="line-height:150%; font-family:'bangla'; font-size:10pt;">&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Legal aid in existing cases)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ in_array('Legal Aid in Existing Case', $details->type_of_service_list ?? []) ? 'checked="checked"' : '' }}><span style="line-height:150%; font-family:Arial; font-size:10pt;">&nbsp;</span><span style="font-family:bangla;">বিদ্যমান মামলায় আইনগত সহায়তা</span><span style="line-height:150%; font-family:'bangla'; font-size:10pt;">&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Legal aid in existing cases)</span></p>
                         </td>
                         <td style="width:92.7pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.</span></p>
@@ -1323,7 +1334,7 @@
                         </td>
                         <td style="width:479.7pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">সেবার বিবরণ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Description of Service)</span></p>
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->service_description }}</p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;"></span></p>
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:200%; font-size:10pt;"><span style="font-family:Arial;">&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;...</span></p>
                         </td>
@@ -1662,7 +1673,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:Arial;">Call&rdquo; prisoners from court)</span></p>
                         </td>
                         <td style="width:92.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span>{{ $details->identify_sureties_prison_date ?? '' }}</p>
                         </td>
                     </tr>
                     <tr style="height:8.75pt;">
@@ -1797,7 +1808,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:Arial;">etc. (with contact details) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</span></p>
                         </td>
                         <td style="width:92.8pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span>{{ $details->ministerial_communication }}</p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span>{{ $details->ministerial_communication }} {{ $details->ministerial_communication_details ?? '' }}</p>
                         </td>
                     </tr>
                     <tr style="height:6pt;">
@@ -1907,8 +1918,8 @@
                         </td>
                         <td colspan="2" style="width:376.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->convicted_length) ? 'checked="checked"' : '' }}><strong><span style="line-height:150%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">সাজাপ্রাপ্ত&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Convicted)</span></p>
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><span style="font-family:bangla;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:bangla;">সাজার সময়কাল&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Length of sentence) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</span>{{ $details->convicted_length }}</p>
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><span style="font-family:bangla;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:bangla;">সাজা সমাপ্তির তারিখ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Sentence expires on) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</span>{{ $details->convicted_sentence_expire }}</p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><span style="font-family:bangla;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:bangla;">সাজার সময়কাল&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Length of sentence) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</span>{{ $details->convicted_length }} {{ $details->convicted_length_details ?? '' }}</p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:11pt;"><span style="font-family:bangla;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family:bangla;">সাজা সমাপ্তির তারিখ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Sentence expires on) &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</span>{{ $details->convicted_sentence_expire }} {{ $details->convicted_sentence_expire_details ?? '' }}</p>
                         </td>
                         <td style="width:92.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
@@ -1924,6 +1935,7 @@
                             <p style="margin-top:0pt; margin-left:18.7pt; margin-bottom:0pt; text-indent:-18.7pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->result_of_appeal == 'Acquitted') ? 'checked="checked"' : '' }}><strong><span style="line-height:150%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">খালাস&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Acquitted)&nbsp;</span></p>
                             <p style="margin-top:0pt; margin-left:18.7pt; margin-bottom:0pt; text-indent:-18.7pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->result_of_appeal == 'Sentence Reduced') ? 'checked="checked"' : '' }}><strong><span style="line-height:150%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">সাজা হ্রাস&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Sentence reduced)&nbsp;</span></p>
                             <p style="margin-top:0pt; margin-left:18.7pt; margin-bottom:0pt; text-indent:-18.7pt; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->result_of_appeal == 'Sentence Enhanced') ? 'checked="checked"' : '' }}><strong><span style="line-height:150%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">সাজা বৃদ্ধি&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Sentence enhanced)&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-left:18.7pt; margin-bottom:0pt; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">Appeal result date: {{ $details->result_of_appeal_date ?? '' }}</span></p>
                         </td>
                         <td style="width:92.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span></p>
@@ -1934,24 +1946,24 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">15.5</span></p>
                         </td>
                         <td colspan="2" style="width:376.2pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83"  {{ ($details->date_of_reliefe) ? 'checked="checked"' : '' }}><strong><span style="line-height:150%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">কারামুক্তির তারিখ&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">(Date of released from Prison)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:11pt;"><input type="checkbox" name="Check83"  {{ ($details->prison_case_resolved_date ?? null) ? 'checked="checked"' : '' }}><strong><span style="line-height:150%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:Arial;">Case Resolved</span></p>
                         </td>
                         <td style="width:92.7pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span>{{ $details->date_of_reliefe }}</p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">&nbsp;</span>{{ $details->prison_case_resolved_date ?? '' }}</p>
                         </td>
                     </tr>
                 </tbody>
             </table>
             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:6pt;"><span style="font-family:Arial;">&nbsp;</span></p>
             <p style="margin-top:0pt; margin-bottom:0pt; line-height:150%; font-size:5pt;"><span style="font-family:Arial;">&nbsp;</span></p>
-            <ol start="16" type="1" style="margin:0pt; padding-left:0pt;">
+            <ol start="15" type="1" style="margin:0pt; padding-left:0pt;">
                 <li style="margin-left:36pt; text-align:justify; line-height:115%; font-family:Arial; font-weight:bold;"><span style="line-height:115%; font-family:bangla; font-size:12pt;">&nbsp;</span><span style="line-height:115%; font-family:bangla; font-size:12pt;">প্রদত্ত সেবার বিবরণ&nbsp;</span>(Description of Service Provided)</li>
             </ol>
             <table cellspacing="0" cellpadding="0" style="width:536pt; border:0.75pt solid #000000; border-collapse:collapse;">
                 <tbody>
                     <tr style="height:3.5pt;">
                         <td style="width:32.5pt; border-right-style:solid; border-right-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">16.1</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:150%; font-size:10pt;"><span style="font-family:Arial;">15.1</span></p>
                         </td>
                         <td style="width:481.15pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">সেবার বিবরণ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Description of Service)</span></p>
@@ -1972,7 +1984,7 @@
                 <tbody>
                     <tr>
                         <td style="width:290.45pt; padding-right:5.4pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83"><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:bangla;">ফাইল বন্ধ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(File Closed)</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:11pt;"><input type="checkbox" name="Check83" {{ ($details->file_closure_date ?? null) ? 'checked="checked"' : '' }}><strong><span style="line-height:115%; font-family:Arial; font-size:10pt;"> </span></strong><span style="font-family:Arial;">16.2 </span><span style="font-family:bangla;">ফাইল বন্ধ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(File Closed)</span></p>
                         </td>
                         <td style="width:56.2pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">তারিখ&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Date)</span></p>
@@ -1981,7 +1993,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">:</span></p>
                         </td>
                         <td style="width:142.2pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:6pt;"><span style="font-family:Arial;">&nbsp;</span></p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->file_closure_date ?? '' }}</p>
                         </td>
                     </tr>
                 </tbody>

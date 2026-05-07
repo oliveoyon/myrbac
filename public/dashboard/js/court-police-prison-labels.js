@@ -62,64 +62,72 @@
         referral_service_details: makeEntry('8.10', 'রেফারেলের বিস্তারিত', 'Referral Service Details'),
         referral_service_date: makeEntry('8.10', 'তারিখ', 'Referral Date'),
         resolved_dispute_date: makeEntry('9.1', 'বিরোধ মিমাংসা হয়েছে', 'Resolved Dispute'),
-        appoint_lawyer_date: makeEntry('9.2', 'আইনজীবী নিয়োগ করা হয়েছে', 'Appoint Lawyer'),
-        release_status: makeEntry('9.3', 'মুক্ত হওয়া', 'Released On'),
-        fine_amount: makeEntry('9.3', 'জরিমানার পরিমাণ', 'Fine Amount'),
-        release_status_date: makeEntry('9.3', 'তারিখ', 'Release Date'),
-        service_description: makeEntry('10.1', 'সেবার বিবরণ', 'Description of Service'),
-        source_of_interview: makeEntry('11.1', 'সাক্ষাৎকারের উৎস', 'Source of Interview'),
-        prison_reg_no: makeEntry('11.2', 'রেজিস্ট্রেশন নং', 'Prison Registration No.'),
-        prison_case_no: makeEntry('11.3', 'মামলার নাম্বার', 'Case No(s)'),
-        section_no: makeEntry('11.4', 'ধারার নাম্বার', 'Section No.'),
-        present_court: makeEntry('11.5', 'বর্তমান আদালতের নাম', "Present Court's Name"),
-        lockup_no: makeEntry('11.6', 'লকআপ নাম্বার', 'Lock Up Number'),
-        entry_date: makeEntry('11.7', 'কারাগারে আগমনের তারিখ', 'Date of Entry in Prison'),
-        case_transferred: makeEntry('11.8', 'মামলাটি বদলি হয়েছে কিনা', 'Has the Case Transferred'),
-        current_court: makeEntry('11.9', 'সর্বশেষ আদালতের নাম', "Current Court's Name"),
-        case_status: makeEntry('11.10', 'মামলার বর্তমান অবস্থা', 'Present Status of Case'),
-        co_offenders: makeEntry('11.11', 'সহ-আসামীর সংখ্যা', 'Number of Co-offenders'),
-        facts_of_case: makeEntry('11.13', 'মামলার বিবরণ', 'Facts of the Case'),
-        imprisonment_condition: makeEntry('12.1', 'মৌলিক অবস্থা', 'Basic Condition'),
-        imprisonment_status: makeEntry('12.2', 'কারাবাসের অবস্থা', 'Status of Imprisonment'),
-        special_condition: makeEntry('12.3', 'বিশেষ অবস্থা', 'Special Condition'),
-        surrender_date: makeEntry('12.5', 'আত্মসমর্পণের তারিখ', 'Date of Surrender'),
-        prison_family_communication: makeEntry('13.1', 'পরিবারের সাথে যোগাযোগ', 'Communicate with Families / Relatives'),
-        prison_legal_representation: makeEntry('13.2', 'আইনগত প্রতিনিধিত্বের জন্য প্রেরণ', 'Referred for Legal Representation'),
-        prison_legal_representation_date: makeEntry('13.2', 'তারিখ', 'Legal Representation Date'),
-        next_court_collection_date: makeEntry('13.3', 'পরবর্তী তারিখ সংগ্রহের তারিখ', 'Next Court Date Collection Date'),
-        prison_next_court_date: makeEntry('13.3', 'বন্দীর আদালতে উপস্থিতির পরবর্তী তারিখ', 'Prisoner Next Court Date'),
-        collected_case_doc_prison: makeEntry('13.4', 'আদালত হতে মামলার নথি সংগ্রহ', 'Collected Case Document'),
-        identify_sureties_prison_nid: makeEntry('13.5', 'জামিনদারের জাতীয় পরিচয়পত্র', 'Surety National ID Details'),
-        identify_sureties_prison_phone: makeEntry('13.5', 'জামিনদারের ফোন নাম্বার', 'Surety Phone Details'),
-        witness_communication_prison: makeEntry('13.6', 'সাক্ষীর সাথে যোগাযোগ', 'Communicate with Witness'),
-        bail_bond_submission: makeEntry('13.7', 'জামিননামা কারাগারে প্রেরণের জন্য যোগাযোগ', 'Submission of Bail Bond'),
-        court_order_communication: makeEntry('13.8', 'আদালতের আদেশনামা প্রেরণের জন্য যোগাযোগ', 'Conveying Court Orders'),
-        application_certified_copies: makeEntry('13.9', 'সই-মোহরের নকল সংগ্রহের আবেদন', 'Application for Certified Copies'),
-        appeal_assistance: makeEntry('13.10', 'আপিলে সহায়তা', 'Assistance in Appeal'),
-        ministerial_communication: makeEntry('13.11', 'মন্ত্রণালয় / দূতাবাস / সংস্থার সাথে যোগাযোগ', 'Communicate with Ministries / Embassy / Organizations'),
-        other_legal_assistance: makeEntry('13.12', 'অন্যান্য আইনগত সহায়তা', 'Other Legal Assistance'),
-        other_legal_assistance_date: makeEntry('13.12', 'তারিখ', 'Other Legal Assistance Date'),
-        released_on: makeEntry('14.1', 'মুক্ত হওয়া', 'Released On'),
-        released_on_date: makeEntry('14.1', 'তারিখ', 'Release Date'),
-        send_to: makeEntry('14.2', 'প্রেরণ', 'Send To'),
-        send_to_date: makeEntry('14.2', 'তারিখ', 'Send Date'),
-        convicted_length: makeEntry('14.3', 'সাজার সময়কাল', 'Length of Sentence'),
-        convicted_sentence_expire: makeEntry('14.3', 'সাজা সমাপ্তির তারিখ', 'Sentence Expires On'),
-        result_of_appeal: makeEntry('14.4', 'আপিলের ফলাফল', 'Result of the Appeal'),
-        date_of_reliefe: makeEntry('14.5', 'কারামুক্তির তারিখ', 'Date Released from Prison'),
-        application_mode: makeEntry('15.1', 'জেলা লিগ্যাল এইড সেবার আবেদনের ধরণ', 'Mode of Application'),
-        application_mode_date: makeEntry('15.1', 'তারিখ', 'Application Date'),
-        received_application: makeEntry('15.2', 'আবেদন গৃহীত হয়েছে কিনা', 'Application Received'),
-        reference_no: makeEntry('15.2', 'রেফারেন্স নাম্বার', 'Reference No.'),
-        type_of_service: makeEntry('15.3', 'প্রাপ্ত সেবার ধরণ', 'Type of Service Received'),
-        type_of_service_date: makeEntry('15.3', 'তারিখ', 'Service Date'),
-        result_description: makeEntry('16.1', 'সেবার বিবরণ', 'Description of Service'),
+        case_resolved_date: makeEntry('9.2', 'মামলা নিষ্পত্তি হয়েছে', 'Case Resolved'),
+        appoint_lawyer_date: makeEntry('9.3', 'আইনজীবী নিয়োগ করা হয়েছে', 'Appoint Lawyer'),
+        release_status: makeEntry('9.4', 'মুক্ত হওয়া', 'Released On'),
+        fine_amount: makeEntry('9.4', 'জরিমানার পরিমাণ', 'Fine Amount'),
+        release_status_date: makeEntry('9.4', 'তারিখ', 'Release Date'),
+        other_result_details: makeEntry('9.5', 'অন্যান্য ফলাফল, উল্লেখ করুন', 'Other result, please specify'),
+        other_result_date: makeEntry('9.5', 'তারিখ', 'Other Result Date'),
+        source_of_interview: makeEntry('10.1', 'সাক্ষাৎকারের উৎস', 'Source of Interview'),
+        prison_reg_no: makeEntry('10.2', 'রেজিস্ট্রেশন নং', 'Prison Registration No.'),
+        prison_case_no: makeEntry('10.3', 'মামলার নাম্বার', 'Case No(s)'),
+        section_no: makeEntry('10.4', 'ধারার নাম্বার', 'Section No.'),
+        present_court: makeEntry('10.5', 'বর্তমান আদালতের নাম', "Present Court's Name"),
+        lockup_no: makeEntry('10.6', 'লকআপ নাম্বার', 'Lock Up Number'),
+        entry_date: makeEntry('10.7', 'কারাগারে আগমনের তারিখ', 'Date of Entry in Prison'),
+        case_transferred: makeEntry('10.8', 'মামলাটি বদলি হয়েছে কিনা', 'Has the Case Transferred'),
+        current_court: makeEntry('10.9', 'সর্বশেষ আদালতের নাম', "Current Court's Name"),
+        case_status: makeEntry('10.10', 'মামলার বর্তমান অবস্থা', 'Present Status of Case'),
+        co_offenders: makeEntry('10.11', 'সহ-আসামীর সংখ্যা', 'Number of Co-offenders'),
+        facts_of_case: makeEntry('10.13', 'মামলার বিবরণ', 'Facts of the Case'),
+        imprisonment_condition: makeEntry('11.1', 'মৌলিক অবস্থা', 'Basic Condition'),
+        imprisonment_status: makeEntry('11.2', 'কারাবাসের অবস্থা', 'Status of Imprisonment'),
+        special_condition: makeEntry('11.3', 'বিশেষ অবস্থা', 'Special Condition'),
+        surrender_date: makeEntry('11.5', 'আত্মসমর্পণের তারিখ', 'Date of Surrender'),
+        prison_family_communication: makeEntry('12.1', 'পরিবারের সাথে যোগাযোগ', 'Communicate with Families / Relatives'),
+        prison_legal_representation: makeEntry('12.2', 'আইনগত প্রতিনিধিত্বের জন্য প্রেরণ', 'Referred for Legal Representation'),
+        prison_legal_representation_date: makeEntry('12.2', 'তারিখ', 'Legal Representation Date'),
+        next_court_collection_date: makeEntry('12.3', 'পরবর্তী তারিখ সংগ্রহের তারিখ', 'Next Court Date Collection Date'),
+        prison_next_court_date: makeEntry('12.3', 'বন্দীর আদালতে উপস্থিতির পরবর্তী তারিখ', 'Prisoner Next Court Date'),
+        collected_case_doc_prison: makeEntry('12.4', 'আদালত হতে মামলার নথি সংগ্রহ', 'Collected Case Document'),
+        identify_sureties_prison_nid: makeEntry('12.5', 'জামিনদারের জাতীয় পরিচয়পত্র', 'Surety National ID Details'),
+        identify_sureties_prison_phone: makeEntry('12.5', 'জামিনদারের ফোন নাম্বার', 'Surety Phone Details'),
+        identify_sureties_prison_date: makeEntry('12.5', 'তারিখ', 'Surety Identification Date'),
+        witness_communication_prison: makeEntry('12.6', 'সাক্ষীর সাথে যোগাযোগ', 'Communicate with Witness'),
+        bail_bond_submission: makeEntry('12.7', 'জামিননামা কারাগারে প্রেরণের জন্য যোগাযোগ', 'Submission of Bail Bond'),
+        court_order_communication: makeEntry('12.8', 'আদালতের আদেশনামা প্রেরণের জন্য যোগাযোগ', 'Conveying Court Orders'),
+        application_certified_copies: makeEntry('12.9', 'সই-মোহরের নকল সংগ্রহের আবেদন', 'Application for Certified Copies'),
+        appeal_assistance: makeEntry('12.10', 'আপিলে সহায়তা', 'Assistance in Appeal'),
+        ministerial_communication: makeEntry('12.11', 'মন্ত্রণালয় / দূতাবাস / সংস্থার সাথে যোগাযোগ', 'Communicate with Ministries / Embassy / Organizations'),
+        ministerial_communication_details: makeEntry('12.11', 'বিস্তারিত', 'Details'),
+        other_legal_assistance: makeEntry('12.12', 'অন্যান্য আইনগত সহায়তা', 'Other Legal Assistance'),
+        other_legal_assistance_date: makeEntry('12.12', 'তারিখ', 'Other Legal Assistance Date'),
+        released_on: makeEntry('13.1', 'মুক্ত হওয়া', 'Released On'),
+        released_on_date: makeEntry('13.1', 'তারিখ', 'Release Date'),
+        send_to: makeEntry('13.2', 'প্রেরণ', 'Send To'),
+        send_to_date: makeEntry('13.2', 'তারিখ', 'Send Date'),
+        convicted_length: makeEntry('13.3', 'সাজার সময়কাল', 'Length of Sentence'),
+        convicted_length_details: makeEntry('13.3', 'সাজার সময়কাল, উল্লেখ করুন', 'Length of Sentence Details'),
+        convicted_sentence_expire: makeEntry('13.3', 'সাজা সমাপ্তির তারিখ', 'Sentence Expires On'),
+        convicted_sentence_expire_details: makeEntry('13.3', 'সাজা সমাপ্তির বিস্তারিত', 'Sentence Expiry Details'),
+        result_of_appeal: makeEntry('13.4', 'আপিলের ফলাফল', 'Result of the Appeal'),
+        result_of_appeal_date: makeEntry('13.4', 'আপিলের ফলাফলের তারিখ', 'Appeal Result Date'),
+        prison_case_resolved_date: makeEntry('13.5', 'মামলা নিষ্পত্তি হয়েছে', 'Case Resolved'),
+        date_of_reliefe: makeEntry('13.6', 'কারামুক্তির তারিখ', 'Date Released from Prison'),
+        application_mode: makeEntry('14.1', 'জেলা লিগ্যাল এইড সেবার আবেদনের ধরণ', 'Mode of Application'),
+        application_mode_date: makeEntry('14.1', 'তারিখ', 'Application Date'),
+        received_application: makeEntry('14.2', 'আবেদন গৃহীত হয়েছে কিনা', 'Application Received'),
+        reference_no: makeEntry('14.2', 'রেফারেন্স নাম্বার', 'Reference No.'),
+        type_of_service: makeEntry('14.3', 'প্রাপ্ত সেবার ধরণ', 'Type of Service Received'),
+        type_of_service_date: makeEntry('14.3', 'তারিখ', 'Service Date'),
+        result_description: makeEntry('15.1', 'সেবার বিবরণ', 'Description of Service'),
         file_closure_date: makeEntry('16.2', 'ফাইল বন্ধের তারিখ', 'File Closed Date'),
-        source_of_interview_details: makeEntry('11.1', 'সাক্ষাৎকারের উৎসের বিস্তারিত', 'Source of Interview Details'),
-        special_condition_details: makeEntry('12.3', 'বিশেষ অবস্থার বিস্তারিত', 'Special Condition Details'),
-        prison_legal_representation_details: makeEntry('13.2', 'আইনগত প্রতিনিধিত্বের বিস্তারিত', 'Prison Legal Representation Details'),
-        other_legal_assistance_details: makeEntry('13.12', 'অন্যান্য আইনগত সহায়তার বিস্তারিত', 'Other Legal Assistance Details'),
-        send_to_details: makeEntry('14.2', 'প্রেরণের বিস্তারিত', 'Send To Details'),
+        source_of_interview_details: makeEntry('10.1', 'সাক্ষাৎকারের উৎসের বিস্তারিত', 'Source of Interview Details'),
+        special_condition_details: makeEntry('11.3', 'বিশেষ অবস্থার বিস্তারিত', 'Special Condition Details'),
+        prison_legal_representation_details: makeEntry('12.2', 'আইনগত প্রতিনিধিত্বের বিস্তারিত', 'Prison Legal Representation Details'),
+        other_legal_assistance_details: makeEntry('12.12', 'অন্যান্য আইনগত সহায়তার বিস্তারিত', 'Other Legal Assistance Details'),
+        send_to_details: makeEntry('13.2', 'প্রেরণের বিস্তারিত', 'Send To Details'),
         intervention_taken: makeEntry('17.1', 'পদক্ষেপ নেয়া হয়েছে', 'Interventions Taken'),
         intervention_taken_date: makeEntry('17.1', 'তারিখ', 'Intervention Taken Date'),
         intervention_to_be_taken: makeEntry('17.2', 'পদক্ষেপ নিতে হবে', 'Interventions To Be Taken'),
@@ -138,13 +146,13 @@
         collapseSeven: makeEntry('7', 'মামলা বা গ্রেফতার সম্পর্কিত তথ্য', 'Case Information'),
         collapseEight: makeEntry('8', 'সহায়তার ধরণ', 'Nature of Assistance'),
         collapseNine: makeEntry('9', 'ফলাফল', 'Result'),
-        collapseEleven: makeEntry('10', 'প্রদত্ত সেবার বিবরণ', 'Description of Service Provided'),
-        collapseTwelve: makeEntry('11', 'মামলার মৌলিক তথ্য', 'Basic Case Information'),
-        collapseThirteen: makeEntry('12', 'কারাবাসের ধরণ', 'Imprisonment Information'),
-        collapseFourteen: makeEntry('13', 'কারাগারে সহায়তার ধরণ', 'Nature of Assistance in Prison'),
-        collapseFifteen: makeEntry('14', 'কারাগারে সহায়তার ফলাফল', 'Result of Prison Assistance'),
-        collapseTen: makeEntry('15', 'জেলা লিগ্যাল এইড অফিস তথ্য', 'District Legal Aid Office Information'),
-        collapseSixteen: makeEntry('16', 'প্রদত্ত সেবার বিবরণ / ফাইল বন্ধ', 'Description of Service / File Closed'),
+        collapseTwelve: makeEntry('10', 'মামলার মৌলিক তথ্য', 'Basic Case Information'),
+        collapseThirteen: makeEntry('11', 'কারাবাসের ধরণ', 'Imprisonment Information'),
+        collapseFourteen: makeEntry('12', 'কারাগারে সহায়তার ধরণ', 'Nature of Assistance in Prison'),
+        collapseFifteen: makeEntry('13', 'কারাগারে সহায়তার ফলাফল', 'Result of Prison Assistance'),
+        collapseTen: makeEntry('14', 'জেলা লিগ্যাল এইড অফিস তথ্য', 'District Legal Aid Office Information'),
+        collapseSixteen: makeEntry('15', 'প্রদত্ত সেবার বিবরণ', 'Description of Service Provided'),
+        collapseFileClosure: makeEntry('16', 'ফাইল বন্ধ', 'File Closure'),
         collapseSeventeen: makeEntry('17', 'ফলোআপ শিট', 'Follow-up Sheet'),
         collapseEighteen: makeEntry('18', 'সংযুক্তি', 'Upload Additional Documents')
     };
@@ -303,7 +311,7 @@
     };
 
     function findControl(label) {
-        const fieldWrap = label.closest('.col-md-12, .col-md-6, .col-md-4, .col-md-3');
+        const fieldWrap = label.closest('.col-md-12, .col-md-8, .col-md-6, .col-md-4, .col-md-3');
         return fieldWrap ? fieldWrap.querySelector('input, select, textarea') : null;
     }
 
@@ -322,19 +330,19 @@
 
     function resolveEntry(name, section) {
         if (name === 'arrest_date') {
-            return section === 'collapseThirteen' ? makeEntry('12.4', 'গ্রেফতারের তারিখ', 'Date of Arrest') : makeEntry('7.3', 'গ্রেফতারের তারিখ', 'Date of Arrest');
+            return section === 'collapseThirteen' ? makeEntry('11.4', 'গ্রেফতারের তারিখ', 'Date of Arrest') : makeEntry('7.3', 'গ্রেফতারের তারিখ', 'Date of Arrest');
         }
 
         if (name === 'case_no') {
-            return section === 'collapseTwelve' ? makeEntry('11.3', 'মামলার নাম্বার', 'Case No(s)') : makeEntry('7.3', 'মামলা নং', 'Case Number');
+            return section === 'collapseTwelve' ? makeEntry('10.3', 'মামলার নাম্বার', 'Case No(s)') : makeEntry('7.4', 'মামলা নং', 'Case Number');
         }
 
         if (name === 'next_court_date') {
             if (section === 'collapseFourteen') {
-                return makeEntry('13.3', 'বন্দীর আদালতে উপস্থিতির পরবর্তী তারিখ', 'Prisoner Next Court Date');
+                return makeEntry('12.3', 'বন্দীর আদালতে উপস্থিতির পরবর্তী তারিখ', 'Prisoner Next Court Date');
             }
 
-            return makeEntry('11.12', 'পরবর্তী হাজিরার তারিখ', 'Next Court Date');
+            return makeEntry('10.12', 'পরবর্তী হাজিরার তারিখ', 'Next Court Date');
         }
 
         return labels[name];
@@ -425,7 +433,7 @@
     }
 
     function fieldLabel(control) {
-        const fieldWrap = control.closest('.col-md-12, .col-md-6, .col-md-4, .col-md-3');
+        const fieldWrap = control.closest('.col-md-12, .col-md-8, .col-md-6, .col-md-4, .col-md-3');
         const bn = fieldWrap ? fieldWrap.querySelector('.manual-label-bn') : null;
         const en = fieldWrap ? fieldWrap.querySelector('.manual-label-en') : null;
         const no = fieldWrap ? fieldWrap.querySelector('.manual-label-no') : null;
@@ -505,6 +513,48 @@
         });
     }
 
+    function setupDistrictLegalAidSectionVisibility() {
+        const section = document.getElementById('collapseTen');
+        const header = document.getElementById('headingTen');
+
+        if (!section || !header) {
+            return;
+        }
+
+        const item = section.closest('.accordion-item') || header.closest('.accordion-item');
+        const triggerIds = ['legal_representation', 'referral_service', 'prison_legal_representation'];
+        const dlaoValues = ['District Legal Aid Office', 'District Legal Aid Offic'];
+
+        function hasDistrictLegalAidSelected() {
+            return triggerIds.some(function (id) {
+                const field = document.getElementById(id);
+                return field && dlaoValues.includes(field.value);
+            });
+        }
+
+        function syncVisibility() {
+            const show = hasDistrictLegalAidSelected();
+            const target = item || section;
+
+            target.style.display = show ? '' : 'none';
+
+            if (!show && window.bootstrap && window.bootstrap.Collapse) {
+                window.bootstrap.Collapse.getOrCreateInstance(section, { toggle: false }).hide();
+            }
+        }
+
+        triggerIds.forEach(function (id) {
+            const field = document.getElementById(id);
+
+            if (field && field.dataset.dlaoVisibilityApplied !== 'true') {
+                field.addEventListener('change', syncVisibility);
+                field.dataset.dlaoVisibilityApplied = 'true';
+            }
+        });
+
+        syncVisibility();
+    }
+
     window.applyCourtPolicePrisonManualLabels = function () {
         applyOptionLabels();
 
@@ -536,5 +586,6 @@
         });
 
         setupRequiredSubmitNotice();
+        setupDistrictLegalAidSectionVisibility();
     };
 })();
