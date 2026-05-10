@@ -122,7 +122,7 @@ class ReportController extends Controller
 
     public function districtWiseCaselistDetaild(Request $request)
     {
-        $whr = ['district_id' => $request->district_id,'pngo_id' => $request->pngo_id,];
+        $whr = ['district_id' => $request->district_id, 'pngo_id' => $request->pngo_id,];
         $whr = array_filter($whr);
         $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])->where($whr)->get();
         return response()->json(['cases' => $cases]);
@@ -136,14 +136,14 @@ class ReportController extends Controller
             'pngo_id' => $request->pngo_id,
             'status' => $request->status,
         ];
-        
+
         $whr = array_filter($whr);
         $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])->where($whr);
-        
+
         if ($request->filled('from_date') && $request->filled('to_date')) {
             $fromDate = \Carbon\Carbon::createFromFormat('Y-m-d', $request->from_date)->startOfDay();
             $toDate = \Carbon\Carbon::createFromFormat('Y-m-d', $request->to_date)->endOfDay();
-            
+
             // Apply the date filter
             $cases->whereBetween('created_at', [$fromDate, $toDate]);
         }
@@ -162,26 +162,9 @@ class ReportController extends Controller
         $fname = $request->input('fname');
         $fontDirs = (new ConfigVariables())->getDefaults()['fontDir'];
         $fontData = (new FontVariables())->getDefaults()['fontdata'];
-        $appFontDir = resource_path('fonts');
-        $appBanglaFont = $appFontDir . DIRECTORY_SEPARATOR . 'SolaimanLipi.ttf';
-        $windowsFontDir = 'C:/Windows/Fonts';
-        $windowsBanglaFont = $windowsFontDir . '/kalpurush.ttf';
-        $banglaFontAvailable = false;
-
-        if (is_file($appBanglaFont)) {
-            $fontDirs[] = $appFontDir;
-            $fontData['bangla'] = [
-                'R' => 'SolaimanLipi.ttf',
-                'useOTL' => 0xFF,
-            ];
-            $banglaFontAvailable = true;
-        } elseif (is_file($windowsBanglaFont)) {
-            $fontDirs[] = $windowsFontDir;
-            $fontData['bangla'] = [
-                'R' => 'kalpurush.ttf',
-                'useOTL' => 0xFF,
-            ];
-            $banglaFontAvailable = true;
+        $mpdfTempDir = storage_path('app/mpdf');
+        if (!is_dir($mpdfTempDir)) {
+            mkdir($mpdfTempDir, 0775, true);
         }
 
         $mpdf = new Mpdf([
@@ -191,11 +174,22 @@ class ReportController extends Controller
             'margin_top' => 5,
             'margin_bottom' => 5,
             'margin_header' => 5,
-            'fontDir' => $fontDirs,
-            'fontdata' => $fontData,
-            'default_font' => $banglaFontAvailable ? 'bangla' : 'dejavusans',
-            'autoScriptToLang' => true,
-            'autoLangToFont' => true,
+            'fontDir' => array_merge($fontDirs, [
+                resource_path('fonts'),
+            ]),
+            'fontdata' => $fontData + [
+                'bangla' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+                'solaimanlipi' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+            ],
+            'default_font' => 'bangla',
+            'cacheCleanupInterval' => false,
+            'tempDir' => $mpdfTempDir,
         ]);
 
         $mpdf->setAutoBottomMargin = 'stretch';
@@ -227,22 +221,12 @@ class ReportController extends Controller
             'collected_vokalatnama_date',
             'collected_case_doc',
             'identify_sureties',
-            'identify_sureties_date',
             'witness_communication_date',
             'medical_report_date',
             'legal_assistance_date',
             'assistance_under_custody_date',
             'referral_service',
-            'referral_service_details',
             'referral_service_date',
-            'resolved_dispute_date',
-            'case_resolved_date',
-            'appoint_lawyer_date',
-            'release_status',
-            'fine_amount',
-            'release_status_date',
-            'other_result_details',
-            'other_result_date',
         ];
 
         $districtId = 1; // Set your district ID
@@ -257,15 +241,15 @@ class ReportController extends Controller
                 SUM(CASE WHEN age < 18 THEN 1 ELSE 0 END) AS under_18,
                 COUNT(*) AS total
             ")
-            ->whereNotNull($field)
-            // ->where('district_id', $districtId)
-            // ->where('pngo_id', $pngoId)
-            ->first();
+                ->whereNotNull($field)
+                // ->where('district_id', $districtId)
+                // ->where('pngo_id', $pngoId)
+                ->first();
         });
 
         return response()->json($results);
     }
-    
+
     public function customReport()
     {
         $districts = District::all();
@@ -279,27 +263,42 @@ class ReportController extends Controller
         $fields = $request->input('fields', []); // 'fields' is the name of the checkbox array in your form
         $flatFields = collect($fields)->flatMap(function ($fieldGroup) {
             return is_array($fieldGroup) ? $fieldGroup : [$fieldGroup];
-        })->all(); 
+        })->all();
 
         if (empty($flatFields)) {
             return redirect()->back()->with('error', 'No fields selected');
         }
 
-        // Fix: Define $whr properly
         $whr = [
             'district_id' => $request->district_id,
             'pngo_id' => $request->pngo_id,
             'institute' => $request->institute,
-            'education_level' => $request->education_level,
-            'special_condition' => $request->special_condition,
-            'status' => $request->status,
             'application_mode' => $request->application_mode,
         ];
-        $whr = array_filter($whr); // Remove null/empty values
-        $typeOfService = $request->type_of_service;
+        $whr = array_filter($whr);
+
+        $appliedFilters = [];
+
+        if ($request->filled('district_id')) {
+            $districtName = District::whereKey($request->district_id)->value('name');
+            $appliedFilters['District'] = $districtName ?: $request->district_id;
+        }
+
+        if ($request->filled('pngo_id')) {
+            $pngoName = Pngo::whereKey($request->pngo_id)->value('name');
+            $appliedFilters['PNGO'] = $pngoName ?: $request->pngo_id;
+        }
+
+        if ($request->filled('institute')) {
+            $appliedFilters['Institute'] = $request->institute;
+        }
+
+        if ($request->filled('application_mode')) {
+            $appliedFilters['Application Mode'] = $request->application_mode;
+        }
 
         // Fix: Pass $whr inside the closure
-        $results = collect($flatFields)->map(function ($field) use ($whr, $typeOfService) {
+        $results = collect($flatFields)->map(function ($field) use ($whr) {
             return FormalCase::selectRaw("
                 '$field' AS field,
                 SUM(CASE WHEN sex = 'Male' AND age >= 18 THEN 1 ELSE 0 END) AS adult_males,
@@ -308,15 +307,9 @@ class ReportController extends Controller
                 SUM(CASE WHEN age < 18 THEN 1 ELSE 0 END) AS under_18,
                 COUNT(*) AS total
             ")
-            ->whereNotNull($field) 
-            ->where($whr)  // Correctly passing $whr
-            ->when($typeOfService, function ($query, $service) {
-                $query->where(function ($serviceQuery) use ($service) {
-                    $serviceQuery->where('type_of_service', $service)
-                        ->orWhere('type_of_service', 'like', '%"' . $service . '"%');
-                });
-            })
-            ->first();
+                ->whereNotNull($field)
+                ->where($whr)  // Correctly passing $whr
+                ->first();
         });
 
         // Load field names
@@ -327,7 +320,7 @@ class ReportController extends Controller
             $flattenedFields = array_merge($flattenedFields, $category);
         }
 
-        return view('dashboard.report.result-custom-report', compact('results', 'flattenedFields'));
+        return view('dashboard.report.result-custom-report', compact('results', 'flattenedFields', 'appliedFilters'));
     }
 
     public function districtSummery()
@@ -348,22 +341,22 @@ class ReportController extends Controller
     {
         $districtId = Auth::user()->district_id;
         $pngoId = Auth::user()->pngo_id;
-        $whr = ['district_id' => $districtId,'pngo_id' => $pngoId];
+        $whr = ['district_id' => $districtId, 'pngo_id' => $pngoId];
         $whr = array_filter($whr);
-        
+
         $query = $request->input('query');
         $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])
             ->where(function ($q) use ($query) {
                 $q->where('central_id', 'like', "%{$query}%")
-                ->orWhere('full_name', 'like', "%{$query}%")
-                ->orWhere('phone_number', 'like', "%{$query}%");
+                    ->orWhere('full_name', 'like', "%{$query}%")
+                    ->orWhere('phone_number', 'like', "%{$query}%");
             })
             ->where($whr)
             ->get();
         return view('dashboard.report.search-list', compact('cases'));
         // return response()->json(['cases' => $cases1]);
     }
-    
+
     public function exportExcel()
     {
         // Log the export action
@@ -375,22 +368,13 @@ class ReportController extends Controller
         // Proceed with the Excel download
         return Excel::download(new FormalCaseExport, 'formal_cases.xlsx');
     }
-
-
-
-
-
-
-
-
-
 }
 
 
 
 
 
-        // $data = FormalCase::select('institute', 
+        // $data = FormalCase::select('institute',
         //             DB::raw('COUNT(*) as total'),
         //             DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 THEN 1 END) as male'),
         //             DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 THEN 1 END) as female'),
@@ -399,23 +383,23 @@ class ReportController extends Controller
         //         )
         //         ->groupBy('institute')
         //         ->get();
-        
+
         // Data only be counted when institute is court, and one of some of column are filled. will be following prison and police
-        
-        // $data = FormalCase::select('institute', 
-        //     DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
+
+        // $data = FormalCase::select('institute',
+        //     DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL))
+        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL))
         //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as male'),
-        //     DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
+        //     DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL))
+        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL))
         //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as female'),
-        //     DB::raw('COUNT(CASE WHEN sex = "Transgender" AND age >= 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
+        //     DB::raw('COUNT(CASE WHEN sex = "Transgender" AND age >= 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL))
+        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL))
         //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as transgender'),
-        //     DB::raw('COUNT(CASE WHEN age < 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
+        //     DB::raw('COUNT(CASE WHEN age < 18 AND (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL))
+        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL))
         //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as under_18'),
-        //     DB::raw('COUNT(CASE WHEN (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL)) 
-        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL)) 
+        //     DB::raw('COUNT(CASE WHEN (institute = "Court" AND (a IS NOT NULL OR b IS NOT NULL))
+        //                         OR (institute = "Prison" AND (c IS NOT NULL OR d IS NOT NULL))
         //                         OR (institute = "Police Station" AND (e IS NOT NULL OR f IS NOT NULL)) THEN 1 END) as total')
         //     )->groupBy('institute')->get();

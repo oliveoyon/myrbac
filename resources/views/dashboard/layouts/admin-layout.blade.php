@@ -26,8 +26,8 @@
     <!-- Sidebar -->
     <aside class="sidebar app-sidebar" id="sidebar" aria-label="Main navigation">
         <div class="logo">
-            <span class="brand-mark">D</span>
-            <span class="brand-text">DigiTrack</span>
+            <span class="brand-mark">A</span>
+            <span class="brand-text">A2J4W</span>
         </div>
         <form action="{{ route('dashboard.search') }}" method="POST" class="search-form">
             @csrf
@@ -66,6 +66,12 @@
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">Manage Data Entry</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
                     <li><a class="nav-link nav-sublink" href="{{ route('form.index') }}"><i class="fas fa-database"></i><span class="nav-text">Data Entry Forms</span></a></li>
+                    @can('View LSID Register')
+                    <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.index') }}"><i class="fas fa-info-circle"></i><span class="nav-text">LSID Register</span></a></li>
+                    @endcan
+                    @can('View LSID Management')
+                    <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.manage') }}"><i class="fas fa-table-list"></i><span class="nav-text">LSID Management</span></a></li>
+                    @endcan
                     <li><a class="nav-link nav-sublink" href="{{ route('import.view') }}"><i class="fas fa-database"></i><span class="nav-text">Bulk Data Entry</span></a></li>
                 </ul>
             </li>
@@ -74,6 +80,9 @@
                 <ul class="submenu">
                     <li><a class="nav-link nav-sublink" href="{{ route('case_list') }}"><i class="fas fa-chart-bar"></i><span class="nav-text">Case List</span></a></li>
                     <li><a class="nav-link nav-sublink" href="{{ route('customReport') }}"><i class="fas fa-chart-bar"></i><span class="nav-text">Intervention Report</span></a></li>
+                    @can('View LSID Report')
+                    <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.report') }}"><i class="fas fa-clipboard-list"></i><span class="nav-text">LSID Report</span></a></li>
+                    @endcan
                     <li><a class="nav-link nav-sublink" href="{{ route('district.summery') }}"><i class="fas fa-user-clock"></i><span class="nav-text">District Summery</span></a></li>
                     <li><a class="nav-link nav-sublink" href="{{ route('pngo.summery') }}"><i class="fas fa-lock"></i><span class="nav-text">PNGO Summery</span></a></li>
                     <li><a class="nav-link nav-sublink" href="{{ route('formal.cases.export') }}"><i class="fa fa-download"></i><span class="nav-text">Download Excel</span></a></li>

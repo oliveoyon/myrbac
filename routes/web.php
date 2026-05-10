@@ -11,6 +11,7 @@ use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\FormalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\LsidRegisterController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -85,6 +86,13 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view')->middleware('permission:View Formal Case Import Page');
     Route::get('/import-formal-cases/template', [FormalController::class, 'downloadImportTemplate'])->name('import.template')->middleware('permission:View Formal Case Import Page');
     Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store')->middleware('permission:Import Formal Cases');
+    Route::get('/lsid-register', [LsidRegisterController::class, 'index'])->name('lsid-register.index')->middleware('permission:View LSID Register');
+    Route::post('/lsid-register', [LsidRegisterController::class, 'store'])->name('lsid-register.store')->middleware('permission:Create LSID Register');
+    Route::get('/lsid-management', [LsidRegisterController::class, 'manage'])->name('lsid-register.manage')->middleware('permission:View LSID Management');
+    Route::put('/lsid-management/{lsidRegister}', [LsidRegisterController::class, 'update'])->name('lsid-register.update')->middleware('permission:Edit LSID Register');
+    Route::delete('/lsid-management/{lsidRegister}', [LsidRegisterController::class, 'destroy'])->name('lsid-register.destroy')->middleware('permission:Delete LSID Register');
+    Route::get('/lsid-report', [LsidRegisterController::class, 'report'])->name('lsid-register.report')->middleware('permission:View LSID Report');
+    Route::post('/lsid-report/pdf', [ReportController::class, 'generatePdf'])->name('lsid-register.report.pdf')->middleware('permission:Generate LSID Report');
     Route::get('/formal-cases/export', [ReportController::class, 'exportExcel'])->name('formal.cases.export')->middleware('permission:Export Formal Cases');
     Route::post('/dashboard/search', [ReportController::class, 'search'])->name('dashboard.search')->middleware('permission:Search Dashboard Reports');
     
@@ -94,6 +102,9 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::post('/generate-pdf', [ReportController::class, 'generatePdf'])->name('generate-pdf');
     Route::post('/generate-pdf-chart', [ReportController::class, 'generatePdfChart'])->name('generate-pdf-chart');
     Route::post('/generate-form', [ReportController::class, 'generateForm'])->name('generate-form');
+    Route::get('/newform-demo', function () {
+        return view('newform');
+    })->name('newform.demo');
 
     Route::get('district-list-report', [ReportController::class, 'district_report'])->name('district-list-report')->middleware('permission:View District List Report');
     Route::get('case-list', [ReportController::class, 'districtWiseCaselist'])->name('case_list')->middleware('permission:View Case List Report');

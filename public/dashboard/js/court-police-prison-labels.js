@@ -555,6 +555,133 @@
         syncVisibility();
     }
 
+    function setupProgressiveDependentFields() {
+        const rules = [
+            { trigger: 'guardian_relation', targets: ['guardian_relation_details_field'], showValues: ['Family Member', 'Relative', 'Other'] },
+            { trigger: 'lawyer_type', targets: ['lawyer_type_details_field'], showValues: ['Other'] },
+            { trigger: 'legal_representation', targets: ['legal_representation_date'] },
+            { trigger: 'legal_representation', targets: ['legal_representation_details_field'], showValues: ['NGO Panel Lawyer', 'Other'] },
+            { trigger: 'identify_sureties', targets: ['identify_sureties_date'], events: ['input', 'change'] },
+            { trigger: 'referral_service', targets: ['referral_service_date'] },
+            { trigger: 'referral_service', targets: ['referral_service_details_field'], showValues: ['NGOs/RJ/Mediation', 'Other'] },
+            { trigger: 'release_status', targets: ['release_status_date'] },
+            { trigger: 'release_status', targets: ['fine_field'], showValues: ['With Fine'] },
+            { trigger: 'other_result_details', targets: ['other_result_date'], events: ['input', 'change'] },
+            { trigger: 'source_of_interview', targets: ['source_of_interview_details_field'], showValues: ['Other'] },
+            { trigger: 'case_transferred', targets: ['current_court_name'], showValues: ['Yes'] },
+            { trigger: 'special_condition', targets: ['special_condition_details_field'], showValues: ['Other'] },
+            { trigger: 'application_mode', targets: ['application_mode_date'] },
+            { trigger: 'received_application', targets: ['reference_no'], showValues: ['Yes'] },
+            { trigger: 'type_of_service', targets: ['type_of_service_date'] },
+            { trigger: 'prison_legal_representation', targets: ['prison_legal_representation_date'] },
+            { trigger: 'prison_legal_representation', targets: ['prison_legal_representation_details_field'], showValues: ['NGO Panel Lawyer', 'Other'] },
+            { trigger: 'next_court_collection_date', targets: ['prison_next_court_date_field'], events: ['input', 'change'] },
+            { trigger: 'identify_sureties_prison_nid', targets: ['identify_sureties_prison_phone', 'identify_sureties_prison_date'], events: ['input', 'change'] },
+            { trigger: 'ministerial_communication', targets: ['ministerial_communication_details'], events: ['input', 'change'] },
+            { trigger: 'other_legal_assistance', targets: ['other_legal_assistance_date'] },
+            { trigger: 'other_legal_assistance', targets: ['other_legal_assistance_details_field'], showValues: ['other'] },
+            { trigger: 'released_on', targets: ['released_on_date'] },
+            { trigger: 'send_to', targets: ['send_to_date'] },
+            { trigger: 'send_to', targets: ['send_to_details_field'], showValues: ['Other'] },
+            { trigger: 'convicted_length', targets: ['convicted_length_details', 'convicted_sentence_expire'], events: ['input', 'change'] },
+            { trigger: 'convicted_sentence_expire', targets: ['convicted_sentence_expire_details'], events: ['input', 'change'] },
+            { trigger: 'result_of_appeal', targets: ['result_of_appeal_date'] }
+        ];
+
+        function fieldHasValue(field) {
+            if (!field) {
+                return false;
+            }
+
+            if (!['INPUT', 'SELECT', 'TEXTAREA'].includes(field.tagName)) {
+                return Array.from(field.querySelectorAll('input, select, textarea')).some(fieldHasValue);
+            }
+
+            if (field.tagName === 'SELECT' && field.multiple) {
+                return Array.from(field.selectedOptions).some(function (option) {
+                    return option.value !== '';
+                });
+            }
+
+            return String(field.value || '').trim() !== '';
+        }
+
+        function targetColumn(field) {
+            return field ? field.closest('.col-md-12, .col-md-8, .col-md-6, .col-md-4, .col-md-3') : null;
+        }
+
+        function triggerColumn(field) {
+            return field ? field.closest('.col-md-12, .col-md-8, .col-md-6, .col-md-4, .col-md-3') : null;
+        }
+
+        function shouldShowRule(rule, trigger, target) {
+            if (rule.showValues) {
+                return rule.showValues.includes(trigger.value) || fieldHasValue(target);
+            }
+
+            return fieldHasValue(trigger) || fieldHasValue(target);
+        }
+
+        function syncRule(rule) {
+            const trigger = document.getElementById(rule.trigger);
+
+            if (!trigger) {
+                return;
+            }
+
+            const targets = rule.targets.map(function (id) {
+                return document.getElementById(id);
+            }).filter(Boolean);
+
+            if (!targets.length) {
+                return;
+            }
+
+            const anchor = triggerColumn(trigger);
+
+            if (anchor) {
+                targets.map(targetColumn).filter(Boolean).reverse().forEach(function (column) {
+                    if (column !== anchor && column.parentNode === anchor.parentNode) {
+                        anchor.insertAdjacentElement('afterend', column);
+                    }
+                });
+            }
+
+            function sync() {
+                targets.forEach(function (target) {
+                    const column = targetColumn(target);
+                    const shouldShow = shouldShowRule(rule, trigger, target);
+
+                    if (column) {
+                        column.style.display = shouldShow ? '' : 'none';
+                        column.classList.toggle('dependent-field-column', shouldShow && rule.accent !== false);
+                    }
+                });
+            }
+
+            (rule.events || ['change']).forEach(function (eventName) {
+                trigger.addEventListener(eventName, sync);
+            });
+
+            targets.forEach(function (target) {
+                ['input', 'change'].forEach(function (eventName) {
+                    target.addEventListener(eventName, sync);
+                });
+            });
+
+            sync();
+        }
+
+        if (!document.getElementById('progressive-dependent-field-style')) {
+            const style = document.createElement('style');
+            style.id = 'progressive-dependent-field-style';
+            style.textContent = '.dependent-field-column .manual-label-no{border-color:#b9dfc6;background:#effaf3;color:#17643a;box-shadow:0 0 0 2px rgba(25,135,84,.06);}';
+            document.head.appendChild(style);
+        }
+
+        rules.forEach(syncRule);
+    }
+
     window.applyCourtPolicePrisonManualLabels = function () {
         applyOptionLabels();
 
@@ -587,5 +714,6 @@
 
         setupRequiredSubmitNotice();
         setupDistrictLegalAidSectionVisibility();
+        setupProgressiveDependentFields();
     };
 })();

@@ -70,6 +70,44 @@
         white-space: nowrap;
     }
 
+    .case-message-stack {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .case-message {
+        border: 1px solid;
+        border-radius: 8px;
+        padding: 12px 14px;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .case-message strong {
+        display: block;
+        margin-bottom: 3px;
+        font-weight: 800;
+    }
+
+    .case-message ul {
+        margin: 6px 0 0 18px;
+        padding: 0;
+    }
+
+    .case-message-success {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+        color: #166534;
+    }
+
+    .case-message-error {
+        background: #fff7f6;
+        border-color: #f0d2cf;
+        color: #9d0c06;
+    }
+
     .case-section-nav {
         position: sticky;
         top: 68px;
@@ -336,19 +374,32 @@
 
 <section class="case-entry-page">
     <div class="container-fluid case-form-shell">
-        @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-        @endif
+        @if (session('success') || session('error') || $errors->any())
+        <div class="case-message-stack" data-case-message-stack>
+            @if (session('success'))
+            <div class="case-message case-message-success" role="alert" data-case-message>
+                <strong>Saved successfully</strong>
+                {{ session('success') }}
+            </div>
+            @endif
 
-        @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+            @if (session('error'))
+            <div class="case-message case-message-error" role="alert" data-case-message>
+                <strong>Could not save the form</strong>
+                {{ session('error') }}
+            </div>
+            @endif
+
+            @if ($errors->any())
+            <div class="case-message case-message-error" role="alert" data-case-message>
+                <strong>Please fix the following fields</strong>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
         </div>
         @endif
 
@@ -1194,7 +1245,7 @@
                                     <input type="date" class="form-control" id="next_court_collection_date"
                                         name="next_court_collection_date">
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-4" id="prison_next_court_date_field">
                                     <label for="prison_next_court_date" class="form-label">Next Court Date</label>
                                     <input type="date" class="form-control" id="prison_next_court_date"
                                         name="prison_next_court_date">
@@ -1529,7 +1580,10 @@
                                 <!-- Intervention Taken -->
                                 <div class="col-md-12">
                                     <label for="intervention_taken" class="form-label">Intervention Taken</label>
-                                    <textarea class="form-control" id="intervention_taken" name="intervention_taken" rows="4"></textarea>
+                                    <textarea class="form-control @error('intervention_taken') is-invalid @enderror" id="intervention_taken" name="intervention_taken" rows="4">{{ old('intervention_taken') }}</textarea>
+                                    @error('intervention_taken')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <!-- Intervention Taken Date -->
@@ -1593,6 +1647,116 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         window.applyCourtPolicePrisonManualLabels();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const oldInput = @json(session()->getOldInput());
+        const validationErrorFields = @json($errors->keys());
+
+        function safeCssName(value) {
+            if (window.CSS && typeof window.CSS.escape === 'function') {
+                return window.CSS.escape(value);
+            }
+
+            return String(value).replace(/["\\]/g, '\\$&');
+        }
+
+        function findControlByName(name) {
+            const escapedName = safeCssName(name);
+            return document.querySelector('[name="' + escapedName + '"], [name="' + escapedName + '[]"]');
+        }
+
+        const firstMessage = document.querySelector('[data-case-message]');
+        if (firstMessage) {
+            setTimeout(function() {
+                firstMessage.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 150);
+        }
+
+        if (!oldInput || Object.keys(oldInput).length === 0) {
+            if (validationErrorFields.length > 0) {
+                const firstErrorControl = findControlByName(validationErrorFields[0]);
+                if (firstErrorControl) {
+                    const accordionPane = firstErrorControl.closest('.accordion-collapse');
+                    if (accordionPane && window.bootstrap) {
+                        window.bootstrap.Collapse.getOrCreateInstance(accordionPane, {
+                            toggle: false
+                        }).show();
+                    }
+
+                    setTimeout(function() {
+                        firstErrorControl.focus({
+                            preventScroll: true
+                        });
+                    }, 350);
+                }
+            }
+
+            return;
+        }
+
+        Object.entries(oldInput).forEach(function([name, value]) {
+            if (name === '_token' || name === 'fileUpload') {
+                return;
+            }
+
+            const escapedName = safeCssName(name);
+            const controls = document.querySelectorAll('[name="' + escapedName + '"], [name="' + escapedName + '[]"]');
+
+            controls.forEach(function(control) {
+                if (control.type === 'file') {
+                    return;
+                }
+
+                if (control.type === 'checkbox' || control.type === 'radio') {
+                    const values = Array.isArray(value) ? value : [value];
+                    control.checked = values.includes(control.value);
+                    return;
+                }
+
+                if (control.tagName === 'SELECT' && control.multiple) {
+                    const values = Array.isArray(value) ? value : [value];
+                    Array.from(control.options).forEach(function(option) {
+                        option.selected = values.includes(option.value);
+                    });
+                } else {
+                    control.value = value ?? '';
+                }
+
+                control.dispatchEvent(new Event('input', { bubbles: true }));
+                control.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
+
+        if (window.applyCourtPolicePrisonManualLabels) {
+            window.applyCourtPolicePrisonManualLabels();
+        }
+
+        if (validationErrorFields.length > 0) {
+            const firstErrorControl = findControlByName(validationErrorFields[0]);
+            if (firstErrorControl) {
+                const accordionPane = firstErrorControl.closest('.accordion-collapse');
+                if (accordionPane && window.bootstrap) {
+                    window.bootstrap.Collapse.getOrCreateInstance(accordionPane, {
+                        toggle: false
+                    }).show();
+                }
+
+                setTimeout(function() {
+                    firstErrorControl.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    firstErrorControl.focus({
+                        preventScroll: true
+                    });
+                }, 350);
+            }
+        }
     });
 </script>
 <script>

@@ -92,22 +92,6 @@
         font-weight: bold;
         line-height: 12px;
     }
-    .pdf-section-8 p,
-    .pdf-section-8 span {
-        font-size: 10pt !important;
-        line-height: 115% !important;
-    }
-
-    .pdf-section-8 span[style*="font-family:bangla"],
-    .pdf-section-8 span[style*="font-family: bangla"] {
-        font-size: 11pt !important;
-    }
-
-    .pdf-section-8 td {
-        padding-top: 4pt !important;
-        padding-bottom: 4pt !important;
-        vertical-align: top;
-    }
 </style>
     </head> 
     <body>
@@ -921,7 +905,7 @@
             <ol start="8" type="1" style="margin:0pt; padding-left:0pt;">
                 <li style="margin-left:32.17pt; text-align:justify; line-height:115%; padding-left:3.83pt; font-family:Arial; font-weight:bold;"><span style="line-height:115%; font-family:bangla; font-size:12pt;">সহায়তার ধরণ&nbsp;</span>(Nature of Assistance)</li>
             </ol>
-            <table class="pdf-section-8" cellspacing="0" cellpadding="0" style="width:536pt; border:0.75pt solid #000000; border-collapse:collapse;">
+            <table cellspacing="0" cellpadding="0" style="width:536pt; border:0.75pt solid #000000; border-collapse:collapse;">
                 <thead>
                     <tr>
                         <td style="width:33.95pt; border-right-style:solid; border-right-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; background-color:#f2f2f2;">
@@ -1087,7 +1071,7 @@
                         </td>
                     </tr>
                     <tr style="height:3.45pt;">
-                        <td rowspan="6" style="width:33.95pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
+                        <td rowspan="5" style="width:33.95pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:Arial;">8.10</span></p>
                         </td>
                         <td style="width:376.1pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">

@@ -71,6 +71,16 @@
                             <ul id="errorList"></ul>
                         </div>
                         <div id="reportDiv">
+                            @if(!empty($appliedFilters))
+                                <div style="margin-bottom: 12px; padding: 10px 12px; border: 1px solid #d8e6de; background: #f6fbf8; border-radius: 6px;">
+                                    <strong>Applied Filters:</strong>
+                                    @foreach($appliedFilters as $label => $value)
+                                        <span style="display: inline-block; margin: 4px 6px 0 0; padding: 3px 8px; border-radius: 999px; background: #e8f5ee; color: #17643a; font-size: 12px;">
+                                            {{ $label }}: {{ $value }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
                             <table class="table table-bordered table-striped table-hover table-sm" id="class-table">
                             <thead>
                                 <tr>

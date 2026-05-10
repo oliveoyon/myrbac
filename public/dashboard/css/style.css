@@ -700,18 +700,19 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
+    width: 36px;
     height: 34px;
     border-radius: 8px;
-    background: #c30f08;
+    background: linear-gradient(135deg, #c30f08, #e0473e);
     color: #fff;
-    font-size: 17px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 800;
     box-shadow: 0 10px 24px rgba(195, 15, 8, 0.28);
 }
 
 .brand-text {
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0.2px;
 }
 
 .sidebar.app-sidebar .search-form {
@@ -858,16 +859,22 @@ body {
     background: rgba(40, 167, 69, 0.18);
 }
 
-.sidebar.app-sidebar li.menu-active > .nav-link,
 .sidebar.app-sidebar li.show > .submenu-toggle {
     color: #fff;
-    background: rgba(195, 15, 8, 0.92);
-    box-shadow: 0 10px 22px rgba(195, 15, 8, 0.18);
+    background: rgba(195, 15, 8, 0.42);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.sidebar.app-sidebar li.menu-active > .nav-link {
+    color: #fff;
+    background: rgba(195, 15, 8, 0.34);
+    box-shadow: 0 8px 18px rgba(195, 15, 8, 0.1);
 }
 
 .sidebar.app-sidebar .submenu .submenu-active {
     color: #fff;
-    background: rgba(40, 167, 69, 0.9);
+    background: rgba(40, 167, 69, 0.26);
+    box-shadow: inset 3px 0 0 rgba(40, 167, 69, 0.62);
 }
 
 .sidebar.app-sidebar li.menu-active::before,

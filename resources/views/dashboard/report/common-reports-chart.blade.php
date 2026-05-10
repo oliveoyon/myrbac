@@ -20,12 +20,18 @@
         }
 
         .header {
-            margin-bottom: 30px;
+            margin-bottom: 12px;
         }
 
         .school_info {
             text-align: center;
             width: 100%;
+        }
+
+        .report-header-image {
+            width: 100%;
+            max-height: 80px;
+            object-fit: contain;
         }
 
         h1,
@@ -87,9 +93,7 @@
         <htmlpageheader name="myheader">
             <div class="header">
                 <div class="school_info">
-                    <h1>GIZ Bangladesh</h1>
-                    <p>Dhaka, Phone: 01712105580, 01258457854</p>
-                    <p>Email: arifur@gmail.com, Web: {{url('/')}}</p>
+                    <img class="report-header-image" src="{{ public_path('reportHeader.png') }}" alt="Report Header">
                 </div>
             </div>
         </htmlpageheader>

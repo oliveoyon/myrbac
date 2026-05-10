@@ -1238,7 +1238,7 @@
                                     </div>
 
                                     <!-- Next Court Date -->
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" id="prison_next_court_date_field">
                                         <label for="next_court_date" class="form-label">Next Court Date</label>
                                         <input type="date" class="form-control" id="next_court_date" name="next_court_date" value="{{ old('next_court_date', $caseData->next_court_date) }}">
                                     </div>
@@ -1753,7 +1753,7 @@
         {
             id: "release_status",
             targets: ["fine_field"],
-            showValue: "fine"
+            showValue: "With Fine"
         },
         {
             id: "received_application",
