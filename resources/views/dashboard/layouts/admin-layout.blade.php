@@ -38,6 +38,9 @@
             @can('Admin Dashboard')
             <li><a class="nav-link" href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i><span class="nav-text">Dashboard</span></a></li>
             @endcan
+            @can('View ToDo List')
+            <li><a class="nav-link" href="{{ route('todos.index') }}"><i class="fas fa-list-check"></i><span class="nav-text">ToDo List</span></a></li>
+            @endcan
         
             @can('View Districts')
             <li class="has-submenu">

@@ -9,7 +9,12 @@ class Pngo extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'district_id'];
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
 
     public function users()
     {

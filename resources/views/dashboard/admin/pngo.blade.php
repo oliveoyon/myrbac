@@ -9,7 +9,7 @@
         <div class="management-header">
             <div>
                 <h1>PNGO Management</h1>
-                <p>Create and maintain partner NGO names used in users, cases, filters, and reports.</p>
+                <p>Create district-specific partner NGO records. The same PNGO name can be used in different districts.</p>
             </div>
             <button class="btn btn-success" id="createPngoBtn">
                 <i class="fas fa-plus-square"></i>
@@ -29,6 +29,7 @@
                         <tr>
                             <th style="width: 70px;">#</th>
                             <th>Name</th>
+                            <th>District</th>
                             <th style="width: 190px;">Actions</th>
                         </tr>
                     </thead>
@@ -37,10 +38,12 @@
                             <tr id="pngo-{{ $pngo->id }}">
                                 <td>{{ $loop->iteration }} </td>
                                 <td class="pngo-name management-name-cell">{{ $pngo->name }}</td>
+                                <td class="pngo-district">{{ $pngo->district->name ?? 'Not mapped' }}</td>
                                 <td>
                                     <div class="management-actions">
                                         <button class="btn btn-warning btn-sm editPngoBtn" data-id="{{ $pngo->id }}"
-                                            data-name="{{ $pngo->name }}">
+                                            data-name="{{ $pngo->name }}"
+                                            data-district-id="{{ $pngo->district_id }}">
                                             <i class="fas fa-edit"></i>
                                             Edit
                                         </button>
@@ -67,12 +70,23 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p class="management-modal-note">Enter the PNGO name exactly as it should appear in forms and reports.</p>
+                        <p class="management-modal-note">Enter the PNGO name and assign the district. Duplicate names are allowed across districts, but not inside the same district.</p>
                         <form id="pngoForm" method="POST">
                             @csrf
+                            <input type="hidden" name="_method" id="pngoMethod" value="PUT" disabled>
                             <div class="mb-3">
                                 <label for="pngoName" class="form-label">PNGO Name</label>
                                 <input type="text" class="form-control" id="pngoName" name="name" placeholder="Example: Partner NGO">
+                            </div>
+                            <div class="mb-3">
+                                <label for="pngoDistrict" class="form-label">District</label>
+                                <select class="form-control" id="pngoDistrict" name="district_id" required>
+                                    <option value="">Select District</option>
+                                    @foreach ($districts as $district)
+                                        <option value="{{ $district->id }}">{{ $district->name }}</option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">This mapping is used for dependent PNGO dropdowns in filters and forms.</small>
                             </div>
                             <div class="mb-0 text-end custombtn">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -95,6 +109,7 @@
             document.getElementById('pngoForm').reset();
             document.getElementById('pngoForm').setAttribute('action', '{{ route('pngos.add') }}');
             document.getElementById('pngoForm').setAttribute('method', 'POST');
+            document.getElementById('pngoMethod').disabled = true;
             document.getElementById('pngoModalLabel').textContent = 'Add New Pngo';
             var pngoModal = new bootstrap.Modal(document.getElementById('pngoModal'));
             pngoModal.show();
@@ -104,18 +119,15 @@
             button.addEventListener('click', function() {
                 var pngoId = this.getAttribute('data-id');
                 var pngoName = this.getAttribute('data-name');
+                var districtId = this.getAttribute('data-district-id') || '';
 
                 document.getElementById('pngoName').value = pngoName;
+                document.getElementById('pngoDistrict').value = districtId;
                 document.getElementById('pngoModalLabel').textContent = 'Edit Pngo';
                 document.getElementById('pngoForm').setAttribute('action',
                     '{{ route('pngos.update', ':pngoId') }}'.replace(':pngoId', pngoId));
                 document.getElementById('pngoForm').setAttribute('method', 'POST');
-
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = '_method';
-                input.value = 'PUT';
-                document.getElementById('pngoForm').appendChild(input);
+                document.getElementById('pngoMethod').disabled = false;
 
                 var pngoModal = new bootstrap.Modal(document.getElementById('pngoModal'));
                 pngoModal.show();
@@ -178,6 +190,7 @@
             var action = this.getAttribute('action');
             var method = this.getAttribute('method');
             var formData = new FormData(this);
+            var isUpdate = formData.get('_method') === 'PUT';
             var pngoModalElement = document.getElementById('pngoModal');
             var pngoModal = bootstrap.Modal.getInstance(pngoModalElement);
 
@@ -185,11 +198,23 @@
                     method: method,
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
+                .then(response => response.json().then(data => ({ status: response.status, data: data })))
+                .then(({ status, data }) => {
+                    if (status === 422) {
+                        var messages = Object.values(data.errors || {}).flat();
+                        Swal.fire({
+                            title: 'Please check the form.',
+                            text: messages[0] || data.message || 'Validation failed.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
                     if (data.success) {
                         if (pngoModal) {
                             pngoModal.hide(); // Hide modal first
@@ -198,8 +223,8 @@
                         // Show Swal message for at least 2 seconds
                         let swalInstance = Swal.fire({
                             title: 'Success!',
-                            text: method === 'POST' ? 'Pngo added successfully.' :
-                                'Pngo updated successfully.',
+                            text: isUpdate ? 'Pngo updated successfully.' :
+                                'Pngo added successfully.',
                             icon: 'success',
                             position: 'top-end',
                             toast: true,
@@ -210,13 +235,16 @@
 
                         // Update UI instantly
                         setTimeout(() => {
-                            if (method === 'POST') {
+                            if (!isUpdate) {
                                 location.reload(); // Reload page after Swal message finishes
                             } else {
-                                let pngoRow = document.getElementById('pngo-' + data.id);
+                                let pngoRow = document.getElementById('pngo-' + data.pngo.id);
                                 if (pngoRow) {
-                                    pngoRow.querySelector('.pngo-name').textContent = formData.get(
-                                        'pngo_name');
+                                    pngoRow.querySelector('.pngo-name').textContent = data.pngo.name;
+                                    pngoRow.querySelector('.pngo-district').textContent = data.pngo.district ? data.pngo.district.name : 'Not mapped';
+                                    var editButton = pngoRow.querySelector('.editPngoBtn');
+                                    editButton.setAttribute('data-name', data.pngo.name);
+                                    editButton.setAttribute('data-district-id', data.pngo.district_id || '');
                                 }
                             }
                         }, 500); // Delay UI update slightly for smoothness

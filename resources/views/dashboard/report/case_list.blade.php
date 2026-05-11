@@ -96,7 +96,7 @@
                                     <div class="col-md-1">
                                         <div class="form-group">
                                             <select class="form-control form-control-sm pngo_id" name="pngo_id"
-                                                id="pngo_id">
+                                                id="pngo_id" data-selected-pngo="{{ auth()->user()->pngo_id }}" data-fixed-district="{{ auth()->user()->district_id }}">
                                                 @php
                                                 $userPngoId = auth()->user()->pngo_id;
                                                 @endphp
@@ -110,10 +110,7 @@
                                                 @endif
                                                 @endforeach
                                                 @else
-                                                <option value="">All PNGO</option>
-                                                @foreach ($pngos as $pngo)
-                                                <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
-                                                @endforeach
+                                                <option value="">Select District First</option>
                                                 @endif
                                             </select>
                                         </div>
@@ -257,6 +254,39 @@
 
 
     $(document).ready(function() {
+        const caseListPngos = @json($pngos->map(fn ($pngo) => ['id' => $pngo->id, 'name' => $pngo->name, 'district_id' => $pngo->district_id])->values());
+
+        function syncCaseListPngoDropdown() {
+            const districtSelect = document.getElementById('district_id');
+            const pngoSelect = document.getElementById('pngo_id');
+
+            if (!districtSelect || !pngoSelect) {
+                return;
+            }
+
+            const selectedPngo = pngoSelect.getAttribute('data-selected-pngo') || pngoSelect.value;
+            const districtId = districtSelect.value || pngoSelect.getAttribute('data-fixed-district') || '';
+            const availablePngos = caseListPngos.filter(function(pngo) {
+                return districtId && String(pngo.district_id) === String(districtId);
+            });
+
+            pngoSelect.innerHTML = '<option value="">' + (districtId ? 'All PNGO' : 'Select District First') + '</option>';
+            availablePngos.forEach(function(pngo) {
+                const option = document.createElement('option');
+                option.value = pngo.id;
+                option.textContent = pngo.name;
+                option.selected = String(selectedPngo) === String(pngo.id);
+                pngoSelect.appendChild(option);
+            });
+        }
+
+        $('#district_id').on('change', function() {
+            $('#pngo_id').attr('data-selected-pngo', '');
+            syncCaseListPngoDropdown();
+        });
+
+        syncCaseListPngoDropdown();
+
         $('#get-case-list').submit(function(e) {
             e.preventDefault();
 

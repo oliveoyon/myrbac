@@ -15,4 +15,9 @@ class District extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function pngos()
+    {
+        return $this->hasMany(Pngo::class);
+    }
 }

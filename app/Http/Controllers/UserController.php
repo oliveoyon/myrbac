@@ -19,13 +19,45 @@ use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
     // Display a listing of the users
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('roles')->get(); // Load user roles
-        $districts = District::all();
-        $pngos = Pngo::all();
-        $roles = Role::all();
-        return view('dashboard.admin.users', compact('users', 'districts', 'pngos', 'roles'));
+        $filters = $request->only(['name', 'full_name', 'district_id', 'pngo_id', 'role_name']);
+        $filterRequested = collect($filters)->filter(function ($value) {
+            return $value !== null && $value !== '';
+        })->isNotEmpty();
+
+        $usersQuery = User::with(['roles', 'district:id,name', 'pngo:id,name'])
+            ->latest('id');
+
+        if ($filterRequested) {
+            $usersQuery
+                ->when($request->filled('name'), function ($query) use ($request) {
+                    $query->where('name', 'like', '%' . $request->name . '%');
+                })
+                ->when($request->filled('full_name'), function ($query) use ($request) {
+                    $query->where('full_name', 'like', '%' . $request->full_name . '%');
+                })
+                ->when($request->filled('district_id'), function ($query) use ($request) {
+                    $query->where('district_id', $request->district_id);
+                })
+                ->when($request->filled('pngo_id'), function ($query) use ($request) {
+                    $query->where('pngo_id', $request->pngo_id);
+                })
+                ->when($request->filled('role_name'), function ($query) use ($request) {
+                    $query->whereHas('roles', function ($roleQuery) use ($request) {
+                        $roleQuery->where('name', $request->role_name);
+                    });
+                });
+        } else {
+            $usersQuery->whereRaw('1 = 0');
+        }
+
+        $users = $usersQuery->paginate(25)->withQueryString();
+        $districts = District::orderBy('name')->get();
+        $pngos = Pngo::with('district:id,name')->orderBy('name')->get();
+        $roles = Role::orderBy('name')->get();
+
+        return view('dashboard.admin.users', compact('users', 'districts', 'pngos', 'roles', 'filters', 'filterRequested'));
     }
 
     // Add a new user and assign roles
@@ -34,11 +66,30 @@ class UserController extends Controller
         // Validate incoming request
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:users,name',
+            'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
+            'district_id' => 'required|exists:districts,id',
+            'pngo_id' => 'required|exists:pngos,id',
             'status' => 'required',
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^])[A-Za-z\d@$!%*#?&^]{8,}$/'
+            ],
             'role_name' => 'required|array',
             'role_name.*' => 'exists:roles,name'
+        ], [
+            'password.regex' => 'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.',
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $pngo = Pngo::find($request->pngo_id);
+
+            if ($pngo && (int) $pngo->district_id !== (int) $request->district_id) {
+                $validator->errors()->add('pngo_id', 'The selected PNGO does not belong to the selected district.');
+            }
+        });
 
         // If validation fails, return error response
         if ($validator->fails()) {
@@ -48,6 +99,7 @@ class UserController extends Controller
         try {
             // Create new user
             $user = new User();
+            $user->full_name = $request->full_name;
             $user->name = $request->name;
             $user->email = $request->email;
             $user->password = Hash::make('12345678'); // Default password
@@ -64,6 +116,7 @@ class UserController extends Controller
                 // Log the user creation action
                 LogService::logAction('Add User', [
                     'user_id' => $user->id,
+                    'full_name' => $user->full_name,
                     'user_name' => $user->name,
                     'roles' => implode(',', $request->role_name),
                     'district_id' => $user->district_id,
@@ -104,6 +157,7 @@ class UserController extends Controller
             return response()->json([
                 'details' => [
                     'id' => $userDetails->id,
+                    'full_name' => $userDetails->full_name,
                     'name' => $userDetails->name,
                     'email' => $userDetails->email,
                     'district_id' => $userDetails->district_id,
@@ -137,11 +191,22 @@ class UserController extends Controller
         // Validate incoming data
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:users,name,' . $user_id . ',id',
+            'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user_id . ',id',
+            'district_id' => 'required|exists:districts,id',
+            'pngo_id' => 'required|exists:pngos,id',
             'status' => 'required',
             'role_name' => 'required|array',
             'role_name.*' => 'exists:roles,name'
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $pngo = Pngo::find($request->pngo_id);
+
+            if ($pngo && (int) $pngo->district_id !== (int) $request->district_id) {
+                $validator->errors()->add('pngo_id', 'The selected PNGO does not belong to the selected district.');
+            }
+        });
 
         // If validation fails, return the errors
         if ($validator->fails()) {
@@ -149,6 +214,7 @@ class UserController extends Controller
         }
 
         // Update user details
+        $user->full_name = $request->full_name;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->district_id = $request->district_id;
@@ -157,7 +223,15 @@ class UserController extends Controller
 
         // If password is provided, update it
         if ($request->has('password') && !empty($request->password)) {
+            if (! auth()->user()->can('Change User Password')) {
+                return response()->json([
+                    'code' => 0,
+                    'error' => ['password' => ['You do not have permission to change user passwords.']],
+                ]);
+            }
+
             $user->password = Hash::make($request->password);
+            $user->status = 2;
         }
 
         try {
@@ -169,6 +243,7 @@ class UserController extends Controller
                 // Log the successful update
                 LogService::logAction('Update User', [
                     'user_id' => $user->id,
+                    'full_name' => $user->full_name,
                     'user_name' => $user->name,
                     'roles' => implode(',', $request->role_name),
                     'district_id' => $user->district_id,

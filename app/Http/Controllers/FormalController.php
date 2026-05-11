@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FormalCase;
 use App\Models\FollowUpIntervention;
 use App\Models\FileUpload; 
+use App\Models\Pngo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -23,11 +24,19 @@ class FormalController extends Controller
 {
     public function index()
     {
+        if ($scopeError = $this->formalCaseScopeError()) {
+            return redirect()->route('dashboard.index')->with('error', $scopeError);
+        }
+
         return view('dashboard.admin.formal1');
     }
 
     public function courtPolicePrison(Request $request)
     {
+        if ($scopeError = $this->formalCaseScopeError()) {
+            return redirect()->back()->withInput()->with('error', $scopeError);
+        }
+
         $validator = Validator::make($request->all(), [
             'institute' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
@@ -78,7 +87,6 @@ class FormalController extends Controller
         }
         
         $districtName = (optional(auth()->user()->district)->name);
-        $pngoName = (optional(auth()->user()->pngo)->name);
         $districtId = Auth::user()->district_id;
         $pngoId = Auth::user()->pngo_id;
         $existingCentralIds = FormalCase::where('district_id', $districtId)
@@ -358,7 +366,8 @@ class FormalController extends Controller
         
         }
         $id = $request->id;
-        $case = FormalCase::find($id);
+        $case = FormalCase::findOrFail($id);
+        $this->authorizeFormalCaseScope($case);
         
         $case->institute = $request->institute;
         $case->full_name = $request->full_name;
@@ -564,6 +573,9 @@ class FormalController extends Controller
 
     public function editCase(Request $request)
     {
+        $case = FormalCase::findOrFail($request->edit_id);
+        $this->authorizeFormalCaseScope($case);
+
         Session::put('edit_id', $request->edit_id);
         return response()->json(['success' => true, 'redirect_url' => route('edit-case.get')]);
     }
@@ -575,7 +587,8 @@ class FormalController extends Controller
         if (!$editId) {
             return redirect()->route('case_list');
         }
-        $caseData = FormalCase::find($editId);
+        $caseData = FormalCase::findOrFail($editId);
+        $this->authorizeFormalCaseScope($caseData);
 
         return view('dashboard.admin.edit-case', compact('caseData'));
     }
@@ -899,6 +912,7 @@ private function prepareMultiSelectValue($value): ?string
 
         // Find the case and update the status
         $case = FormalCase::findOrFail($request->id);
+        $this->authorizeFormalCaseScope($case);
         $oldStatus = $case->status; // Store the previous status
 
         if ((int) $oldStatus !== FormalCase::STATUS_SUBMITTED) {
@@ -938,6 +952,7 @@ private function prepareMultiSelectValue($value): ?string
     
         // Find the case and update the status
         $case = FormalCase::findOrFail($request->id);
+        $this->authorizeFormalCaseScope($case);
         $oldStatus = $case->status; // Store the previous status
 
         if ((int) $oldStatus !== FormalCase::STATUS_DPO_VERIFIED) {
@@ -959,6 +974,35 @@ private function prepareMultiSelectValue($value): ?string
         ]);
     
         return response()->json(['success' => true, 'message' => 'Case verified successfully by MNEO.']);
+    }
+
+    private function formalCaseScopeError(): ?string
+    {
+        $user = Auth::user();
+
+        if (! $user->district_id || ! $user->pngo_id) {
+            return 'Your user account must be assigned to both a district and a PNGO before entering court, police, or prison case data.';
+        }
+
+        $pngo = Pngo::find($user->pngo_id);
+
+        if (! $pngo) {
+            return 'Your assigned PNGO could not be found. Please contact the administrator.';
+        }
+
+        if ((int) $pngo->district_id !== (int) $user->district_id) {
+            return 'Your assigned PNGO is not mapped to your assigned district. Please contact the administrator to correct your user profile.';
+        }
+
+        return null;
+    }
+
+    private function authorizeFormalCaseScope(FormalCase $case): void
+    {
+        $user = Auth::user();
+
+        abort_if($user->district_id && (int) $case->district_id !== (int) $user->district_id, 403);
+        abort_if($user->pngo_id && (int) $case->pngo_id !== (int) $user->pngo_id, 403);
     }
     
 

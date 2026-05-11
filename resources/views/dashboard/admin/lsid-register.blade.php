@@ -1,6 +1,6 @@
 @extends('dashboard.layouts.admin-layout')
 
-@section('title', 'LSID Register')
+@section('title', isset($register) ? 'Edit LSID Register' : 'LSID Register')
 
 @push('styles')
 <style>
@@ -297,17 +297,28 @@
 
 @section('content')
 <section class="lsid-page">
+    @php
+        $isEdit = isset($register);
+        $selectedDistrictId = old('district_id', $isEdit ? $register->district_id : '');
+        $selectedPngoId = old('pngo_id', $isEdit ? $register->pngo_id : '');
+        $selectedSex = old('sex', $isEdit ? $register->sex : '');
+        $selectedOtherInformation = old('other_information', $isEdit ? ($register->other_information ?? []) : []);
+        $selectedReceiverTypes = old('receiver_types', $isEdit ? ($register->receiver_types ?? []) : []);
+        $selectedInterventions = old('interventions_taken', $isEdit ? ($register->interventions_taken ?? []) : []);
+        $selectedServiceTypes = old('service_types', $isEdit ? ($register->service_types ?? []) : []);
+    @endphp
+
     <div class="lsid-header">
         <div>
             <div class="lsid-kicker">Legal Service Information Desk</div>
             <h1>লিগ্যাল সার্ভিস ইনফরমেশন ডেস্ক রেজিস্টার</h1>
-            <p>Record information/service receiver details and the type of support provided from the information desk.</p>
+            <p>{{ $isEdit ? 'Update information/service receiver details within your permitted scope.' : 'Record information/service receiver details and the type of support provided from the information desk.' }}</p>
             <div class="lsid-meta">
                 <span>Separate Register</span>
                 <span>District/PNGO scoped</span>
             </div>
         </div>
-        <span class="lsid-status-pill">Draft entry form</span>
+        <span class="lsid-status-pill">{{ $isEdit ? 'Edit entry' : 'Draft entry form' }}</span>
     </div>
 
     @if (session('success'))
@@ -325,8 +336,11 @@
         </div>
     @endif
 
-    <form action="{{ route('lsid-register.store') }}" method="POST" autocomplete="off">
+    <form action="{{ $isEdit ? route('lsid-register.update', $register) : route('lsid-register.store') }}" method="POST" autocomplete="off">
         @csrf
+        @if ($isEdit)
+            @method('PUT')
+        @endif
 
         <div class="lsid-card">
             <div class="lsid-card-header">
@@ -337,10 +351,10 @@
                     @if (!auth()->user()->district_id)
                         <div class="col-md-3">
                             <label class="form-label">District</label>
-                            <select name="district_id" class="form-control">
+                            <select name="district_id" class="form-control" data-lsid-district-select>
                                 <option value="">Select District</option>
                                 @foreach ($districts as $district)
-                                    <option value="{{ $district->id }}" {{ (string) old('district_id') === (string) $district->id ? 'selected' : '' }}>{{ $district->name }}</option>
+                                    <option value="{{ $district->id }}" {{ (string) $selectedDistrictId === (string) $district->id ? 'selected' : '' }}>{{ $district->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -348,7 +362,7 @@
                     @if (!auth()->user()->pngo_id)
                         <div class="col-md-3">
                             <label class="form-label">PNGO</label>
-                            <select name="pngo_id" class="form-control">
+                            <select name="pngo_id" class="form-control" data-lsid-pngo-select data-selected-pngo="{{ $selectedPngoId }}" data-fixed-district="{{ auth()->user()->district_id }}">
                                 <option value="">Select PNGO</option>
                                 @foreach ($pngos as $pngo)
                                     <option value="{{ $pngo->id }}" {{ (string) old('pngo_id') === (string) $pngo->id ? 'selected' : '' }}>{{ $pngo->name }}</option>
@@ -358,22 +372,22 @@
                     @endif
                     <div class="col-md-3">
                         <label class="form-label">তারিখ (Date) <span class="text-danger">*</span></label>
-                        <input type="date" name="service_date" class="form-control" value="{{ old('service_date', now()->toDateString()) }}" required>
+                        <input type="date" name="service_date" class="form-control" value="{{ old('service_date', $isEdit ? optional($register->service_date)->format('Y-m-d') : now()->toDateString()) }}" required>
                     </div>
                     <div class="col-md-5">
                         <label class="form-label">তথ্য/সেবা গ্রহণকারীর নাম (Information/Service Receiver Name) <span class="text-danger">*</span></label>
-                        <input type="text" name="receiver_name" class="form-control" value="{{ old('receiver_name') }}" required>
+                        <input type="text" name="receiver_name" class="form-control" value="{{ old('receiver_name', $isEdit ? $register->receiver_name : '') }}" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">মোবাইল নম্বর (Mobile Number)</label>
-                        <input type="text" name="mobile_number" class="form-control" value="{{ old('mobile_number') }}">
+                        <input type="text" name="mobile_number" class="form-control" value="{{ old('mobile_number', $isEdit ? $register->mobile_number : '') }}">
                     </div>
                     <div class="col-12">
                         <h3 class="lsid-section-title">লিঙ্গ (Sex) <span class="text-danger">*</span></h3>
                         <div class="lsid-check-grid">
                             @foreach ($sexOptions as $value => $label)
                                 <label class="lsid-check-card">
-                                    <input type="radio" name="sex" value="{{ $value }}" {{ old('sex') === $value ? 'checked' : '' }} required>
+                                    <input type="radio" name="sex" value="{{ $value }}" {{ $selectedSex === $value ? 'checked' : '' }} required>
                                     <span>{{ $label }}</span>
                                 </label>
                             @endforeach
@@ -394,7 +408,7 @@
                         <div class="lsid-check-grid">
                             @foreach ($otherInformationOptions as $value => $label)
                                 <label class="lsid-check-card">
-                                    <input type="checkbox" name="other_information[]" value="{{ $value }}" {{ in_array($value, old('other_information', []), true) ? 'checked' : '' }}>
+                                    <input type="checkbox" name="other_information[]" value="{{ $value }}" {{ in_array($value, $selectedOtherInformation, true) ? 'checked' : '' }}>
                                     <span>{{ $label }}</span>
                                 </label>
                             @endforeach
@@ -405,7 +419,7 @@
                         <div class="lsid-check-grid">
                             @foreach ($interventionOptions as $value => $label)
                                 <label class="lsid-check-card">
-                                    <input type="checkbox" name="interventions_taken[]" value="{{ $value }}" {{ in_array($value, old('interventions_taken', []), true) ? 'checked' : '' }}>
+                                    <input type="checkbox" name="interventions_taken[]" value="{{ $value }}" {{ in_array($value, $selectedInterventions, true) ? 'checked' : '' }}>
                                     <span>{{ $label }}</span>
                                 </label>
                             @endforeach
@@ -417,14 +431,14 @@
                             <div class="lsid-check-grid">
                                 @foreach ($receiverTypeOptions as $value => $label)
                                     <label class="lsid-check-card">
-                                        <input type="checkbox" name="receiver_types[]" value="{{ $value }}" {{ in_array($value, old('receiver_types', []), true) ? 'checked' : '' }}>
+                                        <input type="checkbox" name="receiver_types[]" value="{{ $value }}" {{ in_array($value, $selectedReceiverTypes, true) ? 'checked' : '' }}>
                                         <span>{{ $label }}</span>
                                     </label>
                                 @endforeach
                             </div>
                             <div class="lsid-dependent-field" data-dependent-field="receiver-type-other">
                                 <label class="form-label">অন্যান্য ব্যক্তি, উল্লেখ করুন (Other People, please specify)</label>
-                                <input type="text" name="receiver_type_other" class="form-control" value="{{ old('receiver_type_other') }}">
+                                <input type="text" name="receiver_type_other" class="form-control" value="{{ old('receiver_type_other', $isEdit ? $register->receiver_type_other : '') }}">
                             </div>
                         </div>
                     </div>
@@ -434,14 +448,14 @@
                             <div class="lsid-check-grid">
                                 @foreach ($serviceTypeOptions as $value => $label)
                                     <label class="lsid-check-card">
-                                        <input type="checkbox" name="service_types[]" value="{{ $value }}" {{ in_array($value, old('service_types', []), true) ? 'checked' : '' }}>
+                                        <input type="checkbox" name="service_types[]" value="{{ $value }}" {{ in_array($value, $selectedServiceTypes, true) ? 'checked' : '' }}>
                                         <span>{{ $label }}</span>
                                     </label>
                                 @endforeach
                             </div>
                             <div class="lsid-dependent-field" data-dependent-field="service-type-other">
                                 <label class="form-label">অন্যান্য, উল্লেখ করুন (Other, please specify)</label>
-                                <input type="text" name="service_type_other" class="form-control" value="{{ old('service_type_other') }}">
+                                <input type="text" name="service_type_other" class="form-control" value="{{ old('service_type_other', $isEdit ? $register->service_type_other : '') }}">
                             </div>
                         </div>
                     </div>
@@ -452,8 +466,11 @@
         <div class="lsid-action-row">
             <button type="submit" class="btn btn-success">
                 <i class="fas fa-save"></i>
-                Save Register Entry
+                {{ $isEdit ? 'Save Changes' : 'Save Register Entry' }}
             </button>
+            @if ($isEdit)
+                <a href="{{ route('lsid-register.manage') }}" class="btn btn-light">Back to Management</a>
+            @endif
         </div>
     </form>
 </section>
@@ -461,6 +478,45 @@
 
 @push('scripts')
 <script>
+    const lsidPngos = @json($pngos->map(fn ($pngo) => ['id' => $pngo->id, 'name' => $pngo->name, 'district_id' => $pngo->district_id])->values());
+
+    function syncLsidPngoDropdown(root) {
+        var districtSelect = root.querySelector('[data-lsid-district-select]');
+        var pngoSelect = root.querySelector('[data-lsid-pngo-select]');
+
+        if (!pngoSelect) {
+            return;
+        }
+
+        var selectedPngo = pngoSelect.getAttribute('data-selected-pngo') || pngoSelect.value;
+        var districtId = districtSelect ? districtSelect.value : (pngoSelect.getAttribute('data-fixed-district') || '');
+        var availablePngos = lsidPngos.filter(function(pngo) {
+            return districtId && String(pngo.district_id) === String(districtId);
+        });
+
+        pngoSelect.innerHTML = '<option value="">' + (districtId ? 'Select PNGO' : 'Select District First') + '</option>';
+        availablePngos.forEach(function(pngo) {
+            var option = document.createElement('option');
+            option.value = pngo.id;
+            option.textContent = pngo.name;
+            option.selected = String(selectedPngo) === String(pngo.id);
+            pngoSelect.appendChild(option);
+        });
+    }
+
+    document.querySelectorAll('[data-lsid-district-select]').forEach(function(select) {
+        select.addEventListener('change', function() {
+            var form = select.closest('form') || document;
+            var pngoSelect = form.querySelector('[data-lsid-pngo-select]');
+            if (pngoSelect) {
+                pngoSelect.setAttribute('data-selected-pngo', '');
+            }
+            syncLsidPngoDropdown(form);
+        });
+    });
+
+    syncLsidPngoDropdown(document);
+
     function syncLsidDependentFields() {
         var receiverOther = document.querySelector('input[name="receiver_types[]"][value="Other People"]');
         var serviceOther = document.querySelector('input[name="service_types[]"][value="Other"]');

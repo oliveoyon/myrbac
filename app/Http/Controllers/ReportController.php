@@ -24,6 +24,13 @@ class ReportController extends Controller
         $send['data'] = $request->input('pdf_data');
         $send['title'] = $request->input('title');
         $fname = $request->input('fname');
+        $fontDirs = (new ConfigVariables())->getDefaults()['fontDir'];
+        $fontData = (new FontVariables())->getDefaults()['fontdata'];
+        $mpdfTempDir = storage_path('app/mpdf');
+        if (!is_dir($mpdfTempDir)) {
+            mkdir($mpdfTempDir, 0775, true);
+        }
+
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4',
@@ -31,6 +38,22 @@ class ReportController extends Controller
             'margin_top' => 30,
             'margin_bottom' => 5,
             'margin_header' => 5,
+            'fontDir' => array_merge($fontDirs, [
+                resource_path('fonts'),
+            ]),
+            'fontdata' => $fontData + [
+                'bangla' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+                'solaimanlipi' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+            ],
+            'default_font' => 'bangla',
+            'cacheCleanupInterval' => false,
+            'tempDir' => $mpdfTempDir,
         ]);
 
         $mpdf->setAutoBottomMargin = 'stretch';
@@ -115,8 +138,8 @@ class ReportController extends Controller
 
     public function districtWiseCaselist()
     {
-        $districts = District::all();
-        $pngos = Pngo::all();
+        $districts = District::orderBy('name')->get();
+        $pngos = Pngo::orderBy('name')->get();
         return view('dashboard.report.case_list', compact('districts', 'pngos'));
     }
 

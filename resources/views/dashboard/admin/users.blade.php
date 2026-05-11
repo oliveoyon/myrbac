@@ -269,6 +269,66 @@
         filter: brightness(0.98);
     }
 
+    .user-filter-panel {
+        margin-bottom: 16px;
+        padding: 16px;
+        border: 1px solid #e3e8ef;
+        border-radius: 8px;
+        background: #fbfcfd;
+    }
+
+    .user-filter-panel .form-label {
+        color: #475569;
+        font-size: 12px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .user-filter-panel .form-control,
+    .user-filter-panel .form-select {
+        border-color: #d8dee6;
+        font-size: 13px;
+        min-height: 38px;
+    }
+
+    .user-filter-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        align-items: end;
+        height: 100%;
+    }
+
+    .user-filter-actions .btn {
+        min-height: 38px;
+        padding: 7px 13px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow: none;
+    }
+
+    .user-filter-empty {
+        padding: 28px 18px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        color: #64748b;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .user-filter-empty i {
+        display: block;
+        margin-bottom: 8px;
+        color: #94a3b8;
+        font-size: 24px;
+    }
+
+    .user-pagination-wrap {
+        padding: 12px 0 0;
+    }
+
     /* Custom Styling for the Edit Permissions Form */
     .edit-permission-header {
         font-size: 22px;
@@ -401,8 +461,68 @@
     <div class="management-card">
         <div class="management-card-header">
             <h2><i class="fas fa-user me-2"></i>User List</h2>
-            <span class="management-count">{{ $users->count() }} User{{ $users->count() === 1 ? '' : 's' }}</span>
+            <span class="management-count">{{ $filterRequested ? $users->total() : 0 }} User{{ ($filterRequested ? $users->total() : 0) === 1 ? '' : 's' }}</span>
         </div>
+
+        <form method="GET" action="{{ route('users.index') }}" class="user-filter-panel">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label" for="filter_name">User Name</label>
+                    <input type="text" class="form-control" id="filter_name" name="name"
+                        value="{{ $filters['name'] ?? '' }}" placeholder="Search username">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="filter_full_name">Full Name</label>
+                    <input type="text" class="form-control" id="filter_full_name" name="full_name"
+                        value="{{ $filters['full_name'] ?? '' }}" placeholder="Search full name">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="filter_district_id">District</label>
+                    <select class="form-select" id="filter_district_id" name="district_id">
+                        <option value="">All Districts</option>
+                        @foreach ($districts as $district)
+                        <option value="{{ $district->id }}" {{ (string)($filters['district_id'] ?? '') === (string)$district->id ? 'selected' : '' }}>
+                            {{ $district->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="filter_pngo_id">PNGO</label>
+                    <select class="form-select" id="filter_pngo_id" name="pngo_id">
+                        <option value="">All PNGOs</option>
+                        @foreach ($pngos as $pngo)
+                        <option value="{{ $pngo->id }}" data-district-id="{{ $pngo->district_id }}" {{ (string)($filters['pngo_id'] ?? '') === (string)$pngo->id ? 'selected' : '' }}>
+                            {{ $pngo->name }}{{ $pngo->district ? ' - ' . $pngo->district->name : '' }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="filter_role_name">Role</label>
+                    <select class="form-select" id="filter_role_name" name="role_name">
+                        <option value="">All Roles</option>
+                        @foreach ($roles as $role)
+                        <option value="{{ $role->name }}" {{ ($filters['role_name'] ?? '') === $role->name ? 'selected' : '' }}>
+                            {{ $role->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-12">
+                    <div class="user-filter-actions">
+                        <a href="{{ route('users.index') }}" class="btn btn-light border">
+                            <i class="fas fa-undo-alt"></i>
+                            Reset
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            Search Users
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
 
         <div class="management-table-wrap table-responsive">
             <div class="alert alert-danger" id="errorAlert" style="display: none;">
@@ -411,10 +531,22 @@
                 </ul>
             </div>
 
+            @if (! $filterRequested)
+            <div class="user-filter-empty">
+                <i class="fas fa-filter"></i>
+                Use one or more filters to load users.
+            </div>
+            @elseif ($users->isEmpty())
+            <div class="user-filter-empty">
+                <i class="fas fa-search"></i>
+                No users matched the selected filters.
+            </div>
+            @else
             <table class="table table-bordered table-striped table-hover table-sm management-table" id="user-table">
                 <thead>
                     <tr>
                         <th style="width: 70px;">#</th>
+                        <th>Full Name</th>
                         <th>User Name</th>
                         <th>Email</th>
                         <th>District</th>
@@ -426,7 +558,8 @@
                 <tbody>
                     @foreach ($users as $user)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $users->firstItem() + $loop->index }}</td>
+                        <td>{{ $user->full_name ?: '-' }}</td>
                         <td class="management-name-cell">{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->district ? $user->district->name : 'No District' }}</td>
@@ -463,6 +596,10 @@
 
                 </tbody>
             </table>
+            <div class="user-pagination-wrap">
+                {{ $users->links('pagination::bootstrap-5') }}
+            </div>
+            @endif
         </div>
     </div>
         <!-- Modal -->
@@ -478,6 +615,11 @@
                             @csrf
                             <div class="row">
                                 <div class="mb-3 col-md-6">
+                                    <label class="form-label required" for="full_name">Full Name</label>
+                                    <input type="text" class="form-control" name="full_name" id="full_name" placeholder="Enter full name">
+                                    <span class="text-danger error-text full_name_error"></span>
+                                </div>
+                                <div class="mb-3 col-md-6">
                                     <label class="form-label required" for="name">User Name</label>
                                     <input type="text" class="form-control" name="name" id="name" placeholder="Enter name">
                                     <span class="text-danger error-text name_error"></span>
@@ -491,7 +633,7 @@
 
                                 <div class="mb-3 col-md-6">
                                     <label class="form-label required" for="district_id">District</label>
-                                    <select class="form-control" name="district_id" id="district_id">
+                                    <select class="form-control user-district-select" name="district_id" id="district_id">
                                         <option value="">Select District</option>
                                         @foreach ($districts as $district)
                                         <option value="{{ $district->id }}">{{ $district->name }}</option>
@@ -502,10 +644,10 @@
 
                                 <div class="mb-3 col-md-6">
                                     <label class="form-label required" for="pngo_id">PNGO</label>
-                                    <select class="form-control" name="pngo_id" id="pngo_id">
-                                        <option value="">Select PNGO</option>
+                                    <select class="form-control user-pngo-select" name="pngo_id" id="pngo_id">
+                                        <option value="">Select District First</option>
                                         @foreach ($pngos as $pngo)
-                                        <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
+                                        <option value="{{ $pngo->id }}" data-district-id="{{ $pngo->district_id }}">{{ $pngo->name }}</option>
                                         @endforeach
                                     </select>
                                     <span class="text-danger error-text pngo_id_error"></span>
@@ -560,6 +702,13 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
+                                        <label class="form-label required" for="full_name">Full Name</label>
+                                        <input type="text" class="form-control" name="full_name" id="full_name" placeholder="Enter full name">
+                                        <span class="text-danger error-text full_name_error"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
                                         <label class="form-label required" for="name">User Name</label>
                                         <input type="text" class="form-control" name="name" id="name" placeholder="Enter name">
                                         <span class="text-danger error-text name_error"></span>
@@ -577,7 +726,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label required" for="district_id">District</label>
-                                        <select class="form-control" name="district_id" id="district_id">
+                                        <select class="form-control user-district-select" name="district_id" id="district_id">
                                             <option value="">Select District</option>
                                             @foreach ($districts as $district)
                                             <option value="{{ $district->id }}">{{ $district->name }}</option>
@@ -603,10 +752,10 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label required" for="pngo_id">PNGO</label>
-                                        <select class="form-control" name="pngo_id" id="pngo_id">
-                                            <option value="">Select PNGO</option>
+                                        <select class="form-control user-pngo-select" name="pngo_id" id="pngo_id">
+                                            <option value="">Select District First</option>
                                             @foreach ($pngos as $pngo)
-                                            <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
+                                            <option value="{{ $pngo->id }}" data-district-id="{{ $pngo->district_id }}">{{ $pngo->name }}</option>
                                             @endforeach
                                         </select>
                                         <span class="text-danger error-text pngo_id_error"></span>
@@ -618,11 +767,22 @@
                                         <label class="form-label required" for="status">Status</label>
                                         <select class="form-control" name="status" id="status">
                                             <option value="1">Active</option>
+                                            <option value="2">Active - Must Change Password</option>
                                             <option value="0">Inactive</option>
                                         </select>
                                         <span class="text-danger error-text status_error"></span>
                                     </div>
                                 </div>
+                                @can('Change User Password')
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="password">Reset Password</label>
+                                        <input type="password" class="form-control" name="password" id="password" placeholder="Leave blank to keep current password">
+                                        <small class="text-muted">If changed, user must change password after login.</small>
+                                        <span class="text-danger error-text password_error"></span>
+                                    </div>
+                                </div>
+                                @endcan
                             </div>
 
                             <div class="modal-footer">
@@ -707,9 +867,71 @@
     });
 
     $(document).ready(function() {
+        function syncUserPngoOptions(form, selectedPngoId = null) {
+            const districtId = String(form.find('select[name="district_id"]').val() || '');
+            const pngoSelect = form.find('select[name="pngo_id"]');
+            const currentValue = selectedPngoId !== null ? String(selectedPngoId || '') : String(pngoSelect.val() || '');
+            let hasSelectedOption = false;
+
+            pngoSelect.find('option').each(function() {
+                const option = $(this);
+                const optionDistrictId = String(option.data('district-id') || '');
+                const isPlaceholder = option.val() === '';
+                const isAllowed = isPlaceholder || (districtId && optionDistrictId === districtId);
+
+                option.prop('disabled', !isAllowed);
+                option.prop('hidden', !isAllowed);
+
+                if (!isPlaceholder && isAllowed && String(option.val()) === currentValue) {
+                    hasSelectedOption = true;
+                }
+            });
+
+            pngoSelect.find('option[value=""]').text(districtId ? 'Select PNGO' : 'Select District First');
+            pngoSelect.val(hasSelectedOption ? currentValue : '');
+        }
+
+        function syncFilterPngoOptions() {
+            const districtId = String($('#filter_district_id').val() || '');
+            const pngoSelect = $('#filter_pngo_id');
+            const currentValue = String(pngoSelect.val() || '');
+            let hasSelectedOption = currentValue === '';
+
+            pngoSelect.find('option').each(function() {
+                const option = $(this);
+                const optionDistrictId = String(option.data('district-id') || '');
+                const isPlaceholder = option.val() === '';
+                const isAllowed = isPlaceholder || !districtId || optionDistrictId === districtId;
+
+                option.prop('disabled', !isAllowed);
+                option.prop('hidden', !isAllowed);
+
+                if (!isPlaceholder && isAllowed && String(option.val()) === currentValue) {
+                    hasSelectedOption = true;
+                }
+            });
+
+            pngoSelect.find('option[value=""]').text(districtId ? 'All PNGOs in selected district' : 'All PNGOs');
+            if (!hasSelectedOption) {
+                pngoSelect.val('');
+            }
+        }
+
+        syncFilterPngoOptions();
+        $('#filter_district_id').on('change', syncFilterPngoOptions);
+
+        $('.user-district-select').on('change', function() {
+            syncUserPngoOptions($(this).closest('form'));
+        });
+
+        $('#addUserModal').on('shown.bs.modal', function() {
+            syncUserPngoOptions($('#add-user-form'));
+        });
+
         // Clear error messages on modal close
         $('#addUserModal').on('hidden.bs.modal', function() {
             $('#add-user-form').find('span.error-text').text('');
+            syncUserPngoOptions($('#add-user-form'));
         });
 
         // When the 'View Permissions' button is clicked
@@ -861,10 +1083,11 @@
                 const modal = $('.editUser');
 
                 modal.find('input[name="uid"]').val(data.details.id);
+                modal.find('input[name="full_name"]').val(data.details.full_name);
                 modal.find('input[name="name"]').val(data.details.name);
                 modal.find('input[name="email"]').val(data.details.email);
                 modal.find('select[name="district_id"]').val(data.details.district_id);
-                modal.find('select[name="pngo_id"]').val(data.details.pngo_id);
+                syncUserPngoOptions(modal.find('form'), data.details.pngo_id);
                 modal.find('select[name="status"]').val(data.details.status);
 
                 // ✅ Set Select2 roles

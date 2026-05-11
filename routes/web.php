@@ -12,6 +12,7 @@ use App\Http\Controllers\FormalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\LsidRegisterController;
+use App\Http\Controllers\TodoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,6 +31,10 @@ Route::get('privacy-policy', function () {
 Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('permission:Admin Dashboard');
+    Route::get('/todos', [TodoController::class, 'index'])->name('todos.index')->middleware('permission:View ToDo List');
+    Route::post('/todos', [TodoController::class, 'store'])->name('todos.store')->middleware('permission:Create ToDo Task');
+    Route::patch('/todos/{todo}/status', [TodoController::class, 'updateStatus'])->name('todos.status')->middleware('permission:Update ToDo Task');
+    Route::patch('/follow-up-tasks/{followUpIntervention}/status', [TodoController::class, 'updateFollowUpStatus'])->name('follow-up-tasks.status')->middleware('permission:Update ToDo Task');
 
     Route::get('category-management', [CategoryController::class, 'categories'])->name('dashboard.categories')->middleware('permission:View Categories');  
     Route::post('categories', [CategoryController::class, 'categoryAdd'])->name('categories.add')->middleware('permission:Add Category');  
@@ -89,6 +94,7 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('/lsid-register', [LsidRegisterController::class, 'index'])->name('lsid-register.index')->middleware('permission:View LSID Register');
     Route::post('/lsid-register', [LsidRegisterController::class, 'store'])->name('lsid-register.store')->middleware('permission:Create LSID Register');
     Route::get('/lsid-management', [LsidRegisterController::class, 'manage'])->name('lsid-register.manage')->middleware('permission:View LSID Management');
+    Route::get('/lsid-management/{lsidRegister}/edit', [LsidRegisterController::class, 'edit'])->name('lsid-register.edit')->middleware('permission:Edit LSID Register');
     Route::put('/lsid-management/{lsidRegister}', [LsidRegisterController::class, 'update'])->name('lsid-register.update')->middleware('permission:Edit LSID Register');
     Route::delete('/lsid-management/{lsidRegister}', [LsidRegisterController::class, 'destroy'])->name('lsid-register.destroy')->middleware('permission:Delete LSID Register');
     Route::get('/lsid-report', [LsidRegisterController::class, 'report'])->name('lsid-register.report')->middleware('permission:View LSID Report');

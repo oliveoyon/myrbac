@@ -12,7 +12,7 @@ class LsidRegisterController extends Controller
 {
     public const SEX_OPTIONS = [
         'Male' => 'পুরুষ (Male)',
-        'Female' => 'মহিলা (Female)',
+        'Female' => 'নারী (Female)',
         'Transgender Person' => 'তৃতীয় লিঙ্গ (Transgender Person)',
     ];
 
@@ -50,8 +50,8 @@ class LsidRegisterController extends Controller
     public function index()
     {
         return view('dashboard.admin.lsid-register', [
-            'districts' => District::all(),
-            'pngos' => Pngo::all(),
+            'districts' => District::orderBy('name')->get(),
+            'pngos' => Pngo::orderBy('name')->get(),
             'sexOptions' => self::SEX_OPTIONS,
             'otherInformationOptions' => self::OTHER_INFORMATION_OPTIONS,
             'receiverTypeOptions' => self::RECEIVER_TYPE_OPTIONS,
@@ -100,29 +100,46 @@ class LsidRegisterController extends Controller
 
     public function manage(Request $request)
     {
-        $registers = $this->scopedQuery()
-            ->with(['district:id,name', 'pngo:id,name'])
-            ->when($request->filled('district_id') && ! Auth::user()->district_id, function ($query) use ($request) {
-                $query->where('district_id', $request->district_id);
-            })
-            ->when($request->filled('pngo_id') && ! Auth::user()->pngo_id, function ($query) use ($request) {
-                $query->where('pngo_id', $request->pngo_id);
-            })
-            ->when($request->filled('from_date'), function ($query) use ($request) {
-                $query->whereDate('service_date', '>=', $request->from_date);
-            })
-            ->when($request->filled('to_date'), function ($query) use ($request) {
-                $query->whereDate('service_date', '<=', $request->to_date);
-            })
+        $managementRequested = $request->query->count() > 0;
+
+        $query = $this->scopedQuery()
+            ->with(['district:id,name', 'pngo:id,name']);
+
+        if ($managementRequested) {
+            $query
+                ->when($request->filled('district_id') && ! Auth::user()->district_id, function ($query) use ($request) {
+                    $query->where('district_id', $request->district_id);
+                })
+                ->when($request->filled('pngo_id') && ! Auth::user()->pngo_id, function ($query) use ($request) {
+                    $query->where('pngo_id', $request->pngo_id);
+                })
+                ->when($request->filled('sex'), function ($query) use ($request) {
+                    $query->where('sex', $request->sex);
+                })
+                ->when($request->filled('from_date'), function ($query) use ($request) {
+                    $query->whereDate('service_date', '>=', $request->from_date);
+                })
+                ->when($request->filled('to_date'), function ($query) use ($request) {
+                    $query->whereDate('service_date', '<=', $request->to_date);
+                })
+                ->when($request->filled('intervention'), function ($query) use ($request) {
+                    $query->whereJsonContains('interventions_taken', $request->intervention);
+                });
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+
+        $registers = $query
             ->latest('service_date')
             ->paginate(25)
             ->withQueryString();
 
         return view('dashboard.admin.lsid-management', $this->viewData([
             'registers' => $registers,
-            'districts' => District::all(),
-            'pngos' => Pngo::all(),
-            'filters' => $request->only(['district_id', 'pngo_id', 'from_date', 'to_date']),
+            'districts' => District::orderBy('name')->get(),
+            'pngos' => Pngo::orderBy('name')->get(),
+            'filters' => $request->only(['district_id', 'pngo_id', 'sex', 'from_date', 'to_date', 'intervention']),
+            'managementRequested' => $managementRequested,
         ]));
     }
 
@@ -152,8 +169,19 @@ class LsidRegisterController extends Controller
         $lsidRegister->update($this->applyUserScopeToData($validated));
 
         return redirect()
-            ->route('lsid-register.manage', $request->only(['district_id', 'pngo_id', 'from_date', 'to_date']))
+            ->route('lsid-register.manage', $request->only(['district_id', 'pngo_id', 'sex', 'from_date', 'to_date', 'intervention']))
             ->with('success', 'LSID register entry updated successfully.');
+    }
+
+    public function edit(LsidRegister $lsidRegister)
+    {
+        $this->authorizeScope($lsidRegister);
+
+        return view('dashboard.admin.lsid-register', $this->viewData([
+            'register' => $lsidRegister,
+            'districts' => District::orderBy('name')->get(),
+            'pngos' => Pngo::orderBy('name')->get(),
+        ]));
     }
 
     public function destroy(LsidRegister $lsidRegister)
@@ -168,30 +196,51 @@ class LsidRegisterController extends Controller
 
     public function report(Request $request)
     {
+        $reportRequested = $request->query->count() > 0;
+        $districtSelected = Auth::user()->district_id || $request->filled('district_id');
+
         $query = $this->scopedQuery()
-            ->with(['district:id,name', 'pngo:id,name'])
+            ->with(['district:id,name', 'pngo:id,name', 'creator:id,name'])
             ->when($request->filled('district_id') && ! Auth::user()->district_id, function ($query) use ($request) {
                 $query->where('district_id', $request->district_id);
             })
             ->when($request->filled('pngo_id') && ! Auth::user()->pngo_id, function ($query) use ($request) {
                 $query->where('pngo_id', $request->pngo_id);
             })
+            ->when($request->filled('sex'), function ($query) use ($request) {
+                $query->where('sex', $request->sex);
+            })
             ->when($request->filled('from_date'), function ($query) use ($request) {
                 $query->whereDate('service_date', '>=', $request->from_date);
             })
             ->when($request->filled('to_date'), function ($query) use ($request) {
                 $query->whereDate('service_date', '<=', $request->to_date);
+            })
+            ->when($request->filled('intervention'), function ($query) use ($request) {
+                $query->whereJsonContains('interventions_taken', $request->intervention);
             });
 
-        $registers = $query->latest('service_date')->get();
-        $appliedFilters = $this->appliedFilters($request);
+        $registers = ($reportRequested && $districtSelected)
+            ? $query->latest('service_date')->get()
+            : collect();
+        $appliedFilters = ($reportRequested && $districtSelected) ? $this->appliedFilters($request) : [];
+        $reportDistrictName = Auth::user()->district_id
+            ? District::whereKey(Auth::user()->district_id)->value('name')
+            : ($request->filled('district_id') ? District::whereKey($request->district_id)->value('name') : null);
+        $reportPngoName = Auth::user()->pngo_id
+            ? Pngo::whereKey(Auth::user()->pngo_id)->value('name')
+            : ($request->filled('pngo_id') ? Pngo::whereKey($request->pngo_id)->value('name') : 'All PNGO');
 
         return view('dashboard.report.lsid-report', $this->viewData([
             'registers' => $registers,
-            'districts' => District::all(),
-            'pngos' => Pngo::all(),
-            'filters' => $request->only(['district_id', 'pngo_id', 'from_date', 'to_date']),
+            'districts' => District::orderBy('name')->get(),
+            'pngos' => Pngo::orderBy('name')->get(),
+            'filters' => $request->only(['district_id', 'pngo_id', 'sex', 'from_date', 'to_date', 'intervention']),
             'appliedFilters' => $appliedFilters,
+            'reportRequested' => $reportRequested,
+            'districtSelected' => $districtSelected,
+            'reportDistrictName' => $reportDistrictName,
+            'reportPngoName' => $reportPngoName,
         ]));
     }
 
@@ -252,11 +301,19 @@ class LsidRegisterController extends Controller
         }
 
         if ($request->filled('from_date')) {
-            $filters['From Date'] = $request->from_date;
+            $filters['From Date'] = \Carbon\Carbon::parse($request->from_date)->format('j M, Y');
         }
 
         if ($request->filled('to_date')) {
-            $filters['To Date'] = $request->to_date;
+            $filters['To Date'] = \Carbon\Carbon::parse($request->to_date)->format('j M, Y');
+        }
+
+        if ($request->filled('intervention')) {
+            $filters['Intervention Taken'] = self::INTERVENTION_OPTIONS[$request->intervention] ?? $request->intervention;
+        }
+
+        if ($request->filled('sex')) {
+            $filters['Sex'] = self::SEX_OPTIONS[$request->sex] ?? $request->sex;
         }
 
         return array_filter($filters);

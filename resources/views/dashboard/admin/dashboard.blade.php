@@ -1,462 +1,482 @@
 @extends('dashboard.layouts.admin-layout')
+
 @section('title', 'Dashboard')
+
+@push('styles')
+<style>
+    .smart-dashboard {
+        display: grid;
+        gap: 16px;
+        color: #17202a;
+    }
+
+    .dash-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 20px 22px;
+        border: 1px solid #d8e5df;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f7fbf8 0%, #ffffff 52%, #f6f8ff 100%);
+        box-shadow: 0 8px 24px rgba(16, 24, 40, .06);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dash-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 5px;
+        background: linear-gradient(180deg, #2f7d62, #6b8fd6, #d9a441);
+    }
+
+    .dash-hero > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .dash-hero h1 {
+        margin: 0 0 5px;
+        color: #111827;
+        font-size: 24px;
+        font-weight: 800;
+    }
+
+    .dash-hero p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .dash-kicker {
+        display: inline-flex;
+        margin-bottom: 7px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #e8f5ee;
+        color: #17643a;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .dash-date-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 11px;
+        border-radius: 6px;
+        background: #eef7f1;
+        color: #285d49;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .dash-quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+    }
+
+    .dash-quick-actions .btn {
+        border-radius: 7px;
+        font-weight: 700;
+    }
+
+    .dash-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .dash-stat-card {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 104px;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 8px 18px rgba(16, 24, 40, .05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dash-stat-card::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 4px;
+        background: var(--accent, #78a891);
+    }
+
+    .dash-stat-card span {
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .dash-stat-card strong {
+        display: block;
+        margin-top: 6px;
+        color: #111827;
+        font-size: 30px;
+        line-height: 1;
+        font-weight: 850;
+    }
+
+    .dash-stat-icon {
+        display: inline-flex;
+        width: 38px;
+        height: 38px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: var(--accent-soft, #f1f5f9);
+        color: var(--accent-dark, #356854);
+        flex: 0 0 auto;
+    }
+
+    .dash-stat-card.total {
+        --accent: #2f7d62;
+        --accent-soft: #e8f5ee;
+        --accent-dark: #17643a;
+    }
+
+    .dash-stat-card.male {
+        --accent: #4f7dd9;
+        --accent-soft: #edf3ff;
+        --accent-dark: #315cae;
+    }
+
+    .dash-stat-card.female {
+        --accent: #b86fa0;
+        --accent-soft: #fbf0f7;
+        --accent-dark: #8b4c77;
+    }
+
+    .dash-stat-card.child {
+        --accent: #d9a441;
+        --accent-soft: #fff7e5;
+        --accent-dark: #9a6e19;
+    }
+
+    .dash-panel {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 8px 18px rgba(16, 24, 40, .05);
+        overflow: hidden;
+    }
+
+    .dash-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: #f8faf9;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .dash-panel-header h2 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .dash-panel-header small {
+        color: #64748b;
+    }
+
+    .dash-panel-body {
+        padding: 14px 16px;
+    }
+
+    .dash-calendar-row {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .dash-day {
+        display: block;
+        min-height: 76px;
+        padding: 9px;
+        border: 1px solid #dde7e1;
+        border-radius: 8px;
+        color: #1f2937;
+        text-decoration: none;
+        background: #fff;
+        transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .dash-day:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(16, 24, 40, .06);
+    }
+
+    .dash-day.has-task {
+        background: #f1faf5;
+        border-color: #a9c9b9;
+    }
+
+    .dash-day small {
+        display: block;
+        color: #64748b;
+        font-weight: 800;
+    }
+
+    .dash-day-count {
+        display: inline-flex;
+        margin-top: 8px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: #e8f5ee;
+        color: #17643a;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .dash-table {
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .dash-table th {
+        white-space: nowrap;
+        color: #374151;
+        background: #f8fafc;
+    }
+
+    .dash-table td {
+        vertical-align: middle;
+    }
+
+    .dash-empty {
+        padding: 16px;
+        color: #64748b;
+        text-align: center;
+        border: 1px dashed #d7dee3;
+        border-radius: 8px;
+        background: #fbfcfd;
+    }
+
+    .dash-rank {
+        display: inline-flex;
+        width: 22px;
+        height: 22px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #315cae;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    @media (max-width: 992px) {
+        .dash-stat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .dash-calendar-row {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 576px) {
+        .dash-hero {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .dash-stat-grid,
+        .dash-calendar-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
-<section>
-    <div class="container-fluid">
-        <!-- Key Metrics Section -->
-        <div class="dashboard-stats">
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <div class="stat-box">
-                        <div class="inner">
-                            <h3>{{ $districtWise->sum('total') }}</h3>
-                            <p>Total Cases</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-users"></i> <!-- Changed icon to fa-users -->
-                        </div>
-                    </div>
-                </div>
-        
-                <div class="col-md-3 mb-3">
-                    <div class="stat-box">
-                        <div class="inner">
-                            <h3>{{ $districtWise->sum('male') }}</h3>
-                            <p>Male</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-male"></i> <!-- Changed icon to fa-male -->
-                        </div>
-                    </div>
-                </div>
-        
-                <div class="col-md-3 mb-3">
-                    <div class="stat-box">
-                        <div class="inner">
-                            <h3>{{ $districtWise->sum('female') }}</h3>
-                            <p>Female</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-female"></i> <!-- Changed icon to fa-female -->
-                        </div>
-                    </div>
-                </div>
-        
-                <div class="col-md-3 mb-3">
-                    <div class="stat-box">
-                        <div class="inner">
-                            <h3>{{ $districtWise->sum('under_18') }}</h3>
-                            <p>Under 18</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-child"></i> <!-- Changed icon to fa-child -->
-                        </div>
-                    </div>
-                </div>
+@php
+    $totalCases = $districtWise->sum('total');
+    $totalMale = $districtWise->sum('male');
+    $totalFemale = $districtWise->sum('female');
+    $totalUnder18 = $districtWise->sum('under_18');
+    $topDistricts = $districtWise->sortByDesc('total')->take(6);
+    $topPngos = $pngoWise->sortByDesc('total')->take(6);
+@endphp
+
+<section class="smart-dashboard">
+    <div class="dash-hero">
+        <div>
+            <span class="dash-kicker">A2J4W Monitoring</span>
+            <h1>Dashboard</h1>
+            <p>A quick operational view of cases, ToDos, and partner activity.</p>
+            <div class="dash-quick-actions">
+                @can('View Formal Cases Form')
+                    <a href="{{ route('form.index') }}" class="btn btn-success btn-sm"><i class="fas fa-plus"></i> New Case</a>
+                @endcan
+                @can('View ToDo List')
+                    <a href="{{ route('todos.index') }}" class="btn btn-outline-success btn-sm"><i class="fas fa-list-check"></i> ToDo</a>
+                @endcan
+                @can('View Case List Report')
+                    <a href="{{ route('case_list') }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-table"></i> Case List</a>
+                @endcan
             </div>
         </div>
+        <span class="dash-date-pill">{{ now()->format('j M, Y') }}</span>
+    </div>
 
-        <div class="row mt-4">
-            <!-- District-wise Data -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header text-bg-secondary">
-                        <h5>District-wise Data Overview</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Bar Chart -->
-                        <div class="chart-container">
-                            <canvas id="districtBarChart"></canvas>
-                        </div>
-                        <!-- Summary Table -->
-                        <div class="mt-4 table-responsive">
-                            <h6>District Summary</h6>
-                            <table class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>District</th>
-                                        <th>Male</th>
-                                        <th>Female</th>
-                                        <th>Transgender</th>
-                                        <th>Under 18</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($districtWise as $row)
-                                        <tr>
-                                            <td>{{ $row['district_name'] }}</td>
-                                            <td>{{ $row['male'] }}</td>
-                                            <td>{{ $row['female'] }}</td>
-                                            <td>{{ $row['transgender'] }}</td>
-                                            <td>{{ $row['under_18'] }}</td>
-                                            <td>{{ $row['total'] }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+    <div class="dash-stat-grid">
+        <div class="dash-stat-card total">
+            <div>
+                <span>Total Cases</span>
+                <strong>{{ $totalCases }}</strong>
             </div>
-            
+            <div class="dash-stat-icon"><i class="fas fa-briefcase"></i></div>
+        </div>
+        <div class="dash-stat-card male">
+            <div>
+                <span>Male</span>
+                <strong>{{ $totalMale }}</strong>
+            </div>
+            <div class="dash-stat-icon"><i class="fas fa-male"></i></div>
+        </div>
+        <div class="dash-stat-card female">
+            <div>
+                <span>Female</span>
+                <strong>{{ $totalFemale }}</strong>
+            </div>
+            <div class="dash-stat-icon"><i class="fas fa-female"></i></div>
+        </div>
+        <div class="dash-stat-card child">
+            <div>
+                <span>Under 18</span>
+                <strong>{{ $totalUnder18 }}</strong>
+            </div>
+            <div class="dash-stat-icon"><i class="fas fa-child"></i></div>
+        </div>
+    </div>
 
-            <!-- PNGO-wise Data -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header text-bg-secondary">
-                        <h5>PNGO-wise Contributions</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Doughnut Chart -->
-                        <div class="chart-container">
-                            <canvas id="pngoBarChart"></canvas>
-                        </div>
-                        <!-- Details Table -->
-                        <div class="mt-4 table-responsive">
-                            <h6>PNGO Breakdown</h6>
-                            <table class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>PNGO</th>
-                                        <th>Male</th>
-                                        <th>Female</th>
-                                        <th>Transgender</th>
-                                        <th>Under 18</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($pngoWise as $row)
-                                        <tr>
-                                            <td>{{ $row['pngo_name'] }}</td>
-                                            <td>{{ $row['male'] }}</td>
-                                            <td>{{ $row['female'] }}</td>
-                                            <td>{{ $row['transgender'] }}</td>
-                                            <td>{{ $row['under_18'] }}</td>
-                                            <td>{{ $row['total'] }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+    @can('View ToDo List')
+    <div class="dash-panel">
+        <div class="dash-panel-header">
+            <div>
+                <h2>ToDo Calendar</h2>
+                <small>Personal and follow-up tasks needing action</small>
+            </div>
+            <a href="{{ route('todos.index') }}" class="btn btn-success btn-sm">Open ToDo</a>
+        </div>
+        <div class="dash-panel-body">
+            <div class="dash-calendar-row">
+                @foreach ($todoSummary['upcoming'] as $day)
+                    <a href="{{ route('todos.index', ['task_date' => $day['date']]) }}" class="dash-day {{ $day['total'] ? 'has-task' : '' }}">
+                        <small>{{ $day['day'] }}</small>
+                        <strong>{{ $day['label'] }}</strong>
+                        <br>
+                        <span class="dash-day-count">{{ $day['total'] }} task{{ $day['total'] === 1 ? '' : 's' }}</span>
+                    </a>
+                @endforeach
+            </div>
+            <div class="mt-2 text-muted">
+                Today: <strong>{{ $todoSummary['today_total'] }}</strong> active task{{ $todoSummary['today_total'] === 1 ? '' : 's' }}.
             </div>
         </div>
+    </div>
+    @endcan
 
-        <!-- Progress Section -->
-        {{-- <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Overall Project Progress</h5>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="dash-panel h-100">
+                <div class="dash-panel-header">
+                    <div>
+                        <h2>District Summary</h2>
+                        <small>Top districts by total cases</small>
                     </div>
-                    <div class="card-body">
-                        <div class="progress-group">
-                            <span class="progress-title">Post-release Counseling</span>
-                            <span class="float-right"><b>80%</b></span>
-                            <div class="progress">
-                                <div class="progress-bar bg-success" style="width: 80%"></div>
-                            </div>
-                        </div>
-                        <div class="progress-group mt-3">
-                            <span class="progress-title">Follow-up Cases</span>
-                            <span class="float-right"><b>60%</b></span>
-                            <div class="progress">
-                                <div class="progress-bar bg-warning" style="width: 60%"></div>
-                            </div>
-                        </div>
-                        <div class="progress-group mt-3">
-                            <span class="progress-title">Contact with Families</span>
-                            <span class="float-right"><b>90%</b></span>
-                            <div class="progress">
-                                <div class="progress-bar bg-primary" style="width: 90%"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <a href="{{ route('district.summery') }}" class="btn btn-outline-secondary btn-sm">Details</a>
                 </div>
-            </div>
-        </div>
-
-
-        <!-- Charts Section -->
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Case Distribution (Pie Chart)</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="pieChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Interventions Over Time (Bar Chart)</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="barChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Activities -->
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Recent Activities</h5>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
+                <div class="dash-panel-body table-responsive">
+                    @if ($topDistricts->count())
+                        <table class="table table-bordered table-striped table-sm dash-table">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Case ID</th>
-                                    <th>Activity</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
+                                    <th>District</th>
+                                    <th>Male</th>
+                                    <th>Female</th>
+                                    <th>Transgender</th>
+                                    <th>Under 18</th>
+                                    <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>CASE-101</td>
-                                    <td>Filed Application</td>
-                                    <td><span class="badge bg-success">Completed</span></td>
-                                    <td>2024-11-24</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>CASE-102</td>
-                                    <td>Follow-up Meeting</td>
-                                    <td><span class="badge bg-warning">Pending</span></td>
-                                    <td>2024-11-23</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>CASE-103</td>
-                                    <td>Family Counseling</td>
-                                    <td><span class="badge bg-info">Ongoing</span></td>
-                                    <td>2024-11-22</td>
-                                </tr>
+                                @foreach ($topDistricts as $row)
+                                    <tr>
+                                        <td><span class="dash-rank">{{ $loop->iteration }}</span> {{ $row['district_name'] }}</td>
+                                        <td>{{ $row['male'] }}</td>
+                                        <td>{{ $row['female'] }}</td>
+                                        <td>{{ $row['transgender'] }}</td>
+                                        <td>{{ $row['under_18'] }}</td>
+                                        <td><strong>{{ $row['total'] }}</strong></td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
-                    </div>
+                    @else
+                        <div class="dash-empty">No district data available yet.</div>
+                    @endif
                 </div>
             </div>
-        </div> --}}
+        </div>
+
+        <div class="col-lg-6">
+            <div class="dash-panel h-100">
+                <div class="dash-panel-header">
+                    <div>
+                        <h2>PNGO Summary</h2>
+                        <small>Top PNGOs by total cases</small>
+                    </div>
+                    <a href="{{ route('pngo.summery') }}" class="btn btn-outline-secondary btn-sm">Details</a>
+                </div>
+                <div class="dash-panel-body table-responsive">
+                    @if ($topPngos->count())
+                        <table class="table table-bordered table-striped table-sm dash-table">
+                            <thead>
+                                <tr>
+                                    <th>PNGO</th>
+                                    <th>Male</th>
+                                    <th>Female</th>
+                                    <th>Transgender</th>
+                                    <th>Under 18</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($topPngos as $row)
+                                    <tr>
+                                        <td><span class="dash-rank">{{ $loop->iteration }}</span> {{ $row['pngo_name'] }}</td>
+                                        <td>{{ $row['male'] }}</td>
+                                        <td>{{ $row['female'] }}</td>
+                                        <td>{{ $row['transgender'] }}</td>
+                                        <td>{{ $row['under_18'] }}</td>
+                                        <td><strong>{{ $row['total'] }}</strong></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @else
+                        <div class="dash-empty">No PNGO data available yet.</div>
+                    @endif
+                </div>
+            </div>
+        </div>
     </div>
 </section>
-
-@push('scripts')
-<script>
-    const districtData = @json($districtWise);  // Pass the data to JS
-
-    // Prepare labels and datasets from the district data
-    const districtNames = districtData.map(item => item.district_name);
-    const maleData = districtData.map(item => item.male);
-    const femaleData = districtData.map(item => item.female);
-    const transgenderData = districtData.map(item => item.transgender);
-    const under18Data = districtData.map(item => item.under_18);
-    const totalData = districtData.map(item => item.total); // Total cases per district
-
-    const districtBarCtx = document.getElementById('districtBarChart').getContext('2d');
-
-    new Chart(districtBarCtx, {
-        type: 'bar',
-        data: {
-            labels: districtNames, // District names (e.g., 'Khulna', 'Barishal')
-            datasets: [
-                {
-                    label: 'Male',
-                    data: maleData, // Male count per district
-                    backgroundColor: '#007bff', // Blue color
-                    borderRadius: 5, // Rounded corners
-                    borderWidth: 1,
-                    borderColor: '#0056b3', // Dark blue border for contrast
-                },
-                {
-                    label: 'Female',
-                    data: femaleData, // Female count per district
-                    backgroundColor: '#800080', // Pink color
-                    borderRadius: 5, // Rounded corners
-                    borderWidth: 1,
-                    borderColor: '#e60073', // Dark pink border for contrast
-                },
-                {
-                    label: 'Transgender',
-                    data: transgenderData, // Transgender count per district
-                    backgroundColor: '#ff9900', // Orange color
-                    borderRadius: 5, // Rounded corners
-                    borderWidth: 1,
-                    borderColor: '#cc7a00', // Dark orange border for contrast
-                },
-                {
-                    label: 'Under 18',
-                    data: under18Data, // Under 18 count per district
-                    backgroundColor: '#ffc107', // Yellow color
-                    borderRadius: 5, // Rounded corners
-                    borderWidth: 1,
-                    borderColor: '#b88f02', // Dark yellow border for contrast
-                },
-                {
-                    label: 'Total',
-                    data: totalData, // Total count per district
-                    backgroundColor: '#28a745', // Green color
-                    borderWidth: 2,
-                    borderColor: '#155724', // Dark green border for total
-                    borderRadius: 5, // Rounded corners
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top', // Position of the legend
-                    labels: {
-                        boxWidth: 20, // Size of legend boxes
-                        padding: 15, // Padding between legend items
-                    },
-                },
-            },
-            scales: {
-                x: {
-                    beginAtZero: true, // Ensure the x-axis starts at 0
-                    grid: {
-                        display: true, // Show gridlines on the x-axis
-                        color: 'rgba(0, 0, 0, 0.1)', // Light gray gridlines
-                    },
-                    ticks: {
-                        padding: 20, // Add padding between x-axis and bars
-                    },
-                },
-                y: {
-                    beginAtZero: true, // Ensure the y-axis starts at 0
-                    grid: {
-                        display: true, // Show gridlines for better visibility of values
-                        color: 'rgba(0, 0, 0, 0.1)', // Light gray gridlines for Y axis
-                        lineWidth: 1, // Grid lines thickness
-                    },
-                    ticks: {
-                        padding: 15, // Add padding between y-axis and bars
-                    },
-                },
-            },
-            // Adjusting the space between each district
-            categoryPercentage: 0.7,  // Keep space between categories (districts)
-            barPercentage: 1,        // Set bar width to fill the available space
-            responsiveAnimationDuration: 500,
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuart'
-            },
-            layout: {
-                padding: {
-                    left: 10,
-                    right: 10,
-                    top: 10,
-                    bottom: 10
-                }
-            },
-        },
-    });
-</script>
-
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const pngoData = @json($pngoWise); // Passing PHP array to JavaScript
-
-        if (!pngoData || pngoData.length === 0) {
-            console.warn("No data available for the chart.");
-            return;
-        }
-
-        // Extract labels and data
-        const pngoNames = pngoData.map(item => item.pngo_name);
-        const maleData = pngoData.map(item => item.male);
-        const femaleData = pngoData.map(item => item.female);
-        const transgenderData = pngoData.map(item => item.transgender);
-        const under18Data = pngoData.map(item => item.under_18);
-
-        const ctx = document.getElementById("pngoBarChart").getContext("2d");
-
-        new Chart(ctx, {
-            type: "bar",
-            data: {
-                labels: pngoNames,
-                datasets: [
-                    {
-                        label: "Male",
-                        data: maleData,
-                        backgroundColor: "#007bff",
-                        barThickness: 40,
-                    },
-                    {
-                        label: "Female",
-                        data: femaleData,
-                        backgroundColor: "#800080",
-                        barThickness: 40,
-                    },
-                    {
-                        label: "Transgender",
-                        data: transgenderData,
-                        backgroundColor: "#ff9900",
-                        barThickness: 40,
-                    },
-                    {
-                        label: "Under 18",
-                        data: under18Data,
-                        backgroundColor: "#ffc107",
-                        barThickness: 40,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: "top",
-                    },
-                    tooltip: {
-                        enabled: true
-                    }
-                },
-                scales: {
-                    x: {
-                        stacked: true,
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        grid: {
-                            color: "rgba(0, 0, 0, 0.1)"
-                        }
-                    }
-                }
-            }
-        });
-    });
-</script>
-
-
-
-
-
-
-
-@endpush
 @endsection
