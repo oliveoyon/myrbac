@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/CPANEL_USERNAME/mis.a2jbd.org/
+    - /bin/rsync -av --delete --exclude='.git' --exclude='.env' --exclude='storage/logs/*' --exclude='vendor' ./ $DEPLOYPATH
