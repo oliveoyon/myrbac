@@ -632,7 +632,7 @@
                                 </div>
 
                                 <div class="mb-3 col-md-6">
-                                    <label class="form-label required" for="district_id">District</label>
+                                    <label class="form-label scoped-location-label" for="district_id">District</label>
                                     <select class="form-control user-district-select" name="district_id" id="district_id">
                                         <option value="">Select District</option>
                                         @foreach ($districts as $district)
@@ -643,7 +643,7 @@
                                 </div>
 
                                 <div class="mb-3 col-md-6">
-                                    <label class="form-label required" for="pngo_id">PNGO</label>
+                                    <label class="form-label scoped-location-label" for="pngo_id">PNGO</label>
                                     <select class="form-control user-pngo-select" name="pngo_id" id="pngo_id">
                                         <option value="">Select District First</option>
                                         @foreach ($pngos as $pngo)
@@ -725,7 +725,7 @@
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label required" for="district_id">District</label>
+                                        <label class="form-label scoped-location-label" for="district_id">District</label>
                                         <select class="form-control user-district-select" name="district_id" id="district_id">
                                             <option value="">Select District</option>
                                             @foreach ($districts as $district)
@@ -751,7 +751,7 @@
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label required" for="pngo_id">PNGO</label>
+                                        <label class="form-label scoped-location-label" for="pngo_id">PNGO</label>
                                         <select class="form-control user-pngo-select" name="pngo_id" id="pngo_id">
                                             <option value="">Select District First</option>
                                             @foreach ($pngos as $pngo)
@@ -867,6 +867,20 @@
     });
 
     $(document).ready(function() {
+        const scopedLocationRoles = ['Paralegal', 'DPO'];
+
+        function selectedRolesRequireLocation(form) {
+            const selectedRoles = form.find('select[name="role_name[]"]').val() || [];
+            return selectedRoles.some(role => scopedLocationRoles.includes(role));
+        }
+
+        function syncLocationRequirement(form) {
+            const isRequired = selectedRolesRequireLocation(form);
+
+            form.find('.scoped-location-label').toggleClass('required', isRequired);
+            form.find('select[name="district_id"], select[name="pngo_id"]').prop('required', isRequired);
+        }
+
         function syncUserPngoOptions(form, selectedPngoId = null) {
             const districtId = String(form.find('select[name="district_id"]').val() || '');
             const pngoSelect = form.find('select[name="pngo_id"]');
@@ -924,14 +938,21 @@
             syncUserPngoOptions($(this).closest('form'));
         });
 
+        $('#role_name, #role_name1').on('change', function() {
+            const form = $(this).closest('form');
+            syncLocationRequirement(form);
+        });
+
         $('#addUserModal').on('shown.bs.modal', function() {
             syncUserPngoOptions($('#add-user-form'));
+            syncLocationRequirement($('#add-user-form'));
         });
 
         // Clear error messages on modal close
         $('#addUserModal').on('hidden.bs.modal', function() {
             $('#add-user-form').find('span.error-text').text('');
             syncUserPngoOptions($('#add-user-form'));
+            syncLocationRequirement($('#add-user-form'));
         });
 
         // When the 'View Permissions' button is clicked
@@ -1093,6 +1114,7 @@
                 // ✅ Set Select2 roles
                 let roleSelect = modal.find('select[name="role_name[]"]');
                 roleSelect.val(data.details.role_name).trigger('change');
+                syncLocationRequirement(modal.find('form'));
 
                 modal.modal('show');
             }, 'json');

@@ -66,16 +66,16 @@
             @endcan
 
             <li class="has-submenu">
-                <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">Manage Data Entry</span><i class="fas fa-chevron-down menu-chevron"></i></a>
+                <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">Manage Central ID</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
-                    <li><a class="nav-link nav-sublink" href="{{ route('form.index') }}"><i class="fas fa-database"></i><span class="nav-text">Data Entry Forms</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('form.index') }}"><i class="fas fa-database"></i><span class="nav-text">Central ID Form</span></a></li>
                     @can('View LSID Register')
                     <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.index') }}"><i class="fas fa-info-circle"></i><span class="nav-text">LSID Register</span></a></li>
                     @endcan
                     @can('View LSID Management')
                     <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.manage') }}"><i class="fas fa-table-list"></i><span class="nav-text">LSID Management</span></a></li>
                     @endcan
-                    <li><a class="nav-link nav-sublink" href="{{ route('import.view') }}"><i class="fas fa-database"></i><span class="nav-text">Bulk Data Entry</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('import.view') }}"><i class="fas fa-database"></i><span class="nav-text">Bulk Central ID</span></a></li>
                 </ul>
             </li>
             <li class="has-submenu">

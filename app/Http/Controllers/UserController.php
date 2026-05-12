@@ -18,6 +18,15 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
+    private array $districtPngoRequiredRoles = ['Paralegal', 'DPO'];
+
+    private function selectedRolesRequireDistrictPngo(Request $request): bool
+    {
+        return collect((array) $request->input('role_name', []))
+            ->intersect($this->districtPngoRequiredRoles)
+            ->isNotEmpty();
+    }
+
     // Display a listing of the users
     public function index(Request $request)
     {
@@ -68,8 +77,8 @@ class UserController extends Controller
             'name' => 'required|unique:users,name',
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'district_id' => 'required|exists:districts,id',
-            'pngo_id' => 'required|exists:pngos,id',
+            'district_id' => 'nullable|exists:districts,id',
+            'pngo_id' => 'nullable|exists:pngos,id',
             'status' => 'required',
             'password' => [
                 'nullable',
@@ -84,9 +93,23 @@ class UserController extends Controller
         ]);
 
         $validator->after(function ($validator) use ($request) {
+            if ($this->selectedRolesRequireDistrictPngo($request)) {
+                if (! $request->filled('district_id')) {
+                    $validator->errors()->add('district_id', 'District is required for Paralegal and DPO users.');
+                }
+
+                if (! $request->filled('pngo_id')) {
+                    $validator->errors()->add('pngo_id', 'PNGO is required for Paralegal and DPO users.');
+                }
+            }
+
             $pngo = Pngo::find($request->pngo_id);
 
-            if ($pngo && (int) $pngo->district_id !== (int) $request->district_id) {
+            if ($pngo && ! $request->filled('district_id')) {
+                $validator->errors()->add('district_id', 'Please select the district for the selected PNGO.');
+            }
+
+            if ($pngo && $request->filled('district_id') && (int) $pngo->district_id !== (int) $request->district_id) {
                 $validator->errors()->add('pngo_id', 'The selected PNGO does not belong to the selected district.');
             }
         });
@@ -103,8 +126,8 @@ class UserController extends Controller
             $user->name = $request->name;
             $user->email = $request->email;
             $user->password = Hash::make('12345678'); // Default password
-            $user->district_id = $request->district_id;
-            $user->pngo_id = $request->pngo_id;
+            $user->district_id = $request->filled('district_id') ? $request->district_id : null;
+            $user->pngo_id = $request->filled('pngo_id') ? $request->pngo_id : null;
             $user->status = $request->status == 1 ? 2 : 0;
 
             // Save user to the database
@@ -193,17 +216,31 @@ class UserController extends Controller
             'name' => 'required|string|max:255|unique:users,name,' . $user_id . ',id',
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user_id . ',id',
-            'district_id' => 'required|exists:districts,id',
-            'pngo_id' => 'required|exists:pngos,id',
+            'district_id' => 'nullable|exists:districts,id',
+            'pngo_id' => 'nullable|exists:pngos,id',
             'status' => 'required',
             'role_name' => 'required|array',
             'role_name.*' => 'exists:roles,name'
         ]);
 
         $validator->after(function ($validator) use ($request) {
+            if ($this->selectedRolesRequireDistrictPngo($request)) {
+                if (! $request->filled('district_id')) {
+                    $validator->errors()->add('district_id', 'District is required for Paralegal and DPO users.');
+                }
+
+                if (! $request->filled('pngo_id')) {
+                    $validator->errors()->add('pngo_id', 'PNGO is required for Paralegal and DPO users.');
+                }
+            }
+
             $pngo = Pngo::find($request->pngo_id);
 
-            if ($pngo && (int) $pngo->district_id !== (int) $request->district_id) {
+            if ($pngo && ! $request->filled('district_id')) {
+                $validator->errors()->add('district_id', 'Please select the district for the selected PNGO.');
+            }
+
+            if ($pngo && $request->filled('district_id') && (int) $pngo->district_id !== (int) $request->district_id) {
                 $validator->errors()->add('pngo_id', 'The selected PNGO does not belong to the selected district.');
             }
         });
@@ -217,8 +254,8 @@ class UserController extends Controller
         $user->full_name = $request->full_name;
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->district_id = $request->district_id;
-        $user->pngo_id = $request->pngo_id;
+        $user->district_id = $request->filled('district_id') ? $request->district_id : null;
+        $user->pngo_id = $request->filled('pngo_id') ? $request->pngo_id : null;
         $user->status = $request->status;
 
         // If password is provided, update it
