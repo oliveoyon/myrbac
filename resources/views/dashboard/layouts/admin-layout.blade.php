@@ -29,11 +29,13 @@
             <span class="brand-mark">A</span>
             <span class="brand-text">A2J4W</span>
         </div>
+        @can('Search Dashboard Reports')
         <form action="{{ route('dashboard.search') }}" method="POST" class="search-form">
             @csrf
             <input type="text" name="query" placeholder="Central ID..." required>
             <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
         </form>
+        @endcan
         <ul class="sidebar-nav">
             @can('Admin Dashboard')
             <li><a class="nav-link" href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i><span class="nav-text">Dashboard</span></a></li>
@@ -42,56 +44,89 @@
             <li><a class="nav-link" href="{{ route('todos.index') }}"><i class="fas fa-list-check"></i><span class="nav-text">ToDo List</span></a></li>
             @endcan
         
-            @can('View Districts')
+            @canany(['View Districts', 'View PNGOs'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">General Settings</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
+                    @can('View Districts')
                     <li><a class="nav-link nav-sublink" href="{{ route('dashboard.districts') }}"><i class="fas fa-map-marker-alt"></i><span class="nav-text">District Management</span></a></li>
+                    @endcan
+                    @can('View PNGOs')
                     <li><a class="nav-link nav-sublink" href="{{ route('dashboard.pngos') }}"><i class="fas fa-handshake"></i><span class="nav-text">PNGOs Management</span></a></li>
+                    @endcan
                 </ul>
             </li>
-            @endcan
+            @endcanany
         
-            @can('View Categories')
+            @canany(['View Categories', 'View Roles', 'View Permissions', 'Manage Role Permissions', 'View Users'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-user-shield"></i><span class="nav-text">Roles & Permissions</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
+                    @can('View Categories')
                     <li><a class="nav-link nav-sublink" href="{{ route('dashboard.categories') }}"><i class="fas fa-tags"></i><span class="nav-text">Manage Category</span></a></li>
+                    @endcan
+                    @can('View Roles')
                     <li><a class="nav-link nav-sublink" href="{{ route('dashboard.roles') }}"><i class="fas fa-user-tag"></i><span class="nav-text">Manage Roles</span></a></li>
+                    @endcan
+                    @can('View Permissions')
                     <li><a class="nav-link nav-sublink" href="{{ route('permissions.list') }}"><i class="fas fa-key"></i><span class="nav-text">Manage Permissions</span></a></li>
+                    @endcan
+                    @can('Manage Role Permissions')
                     <li><a class="nav-link nav-sublink" href="{{ route('roles.permissions') }}"><i class="fas fa-users-cog"></i><span class="nav-text">Assign Roles & Permissions</span></a></li>
+                    @endcan
+                    @can('View Users')
                     <li><a class="nav-link nav-sublink" href="{{ route('users.index') }}"><i class="fas fa-user"></i><span class="nav-text">Users</span></a></li>
+                    @endcan
                 </ul>
             </li>
-            @endcan
+            @endcanany
 
+            @canany(['View Formal Cases Form', 'View LSID Register', 'View LSID Management', 'View Formal Case Import Page'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">Manage Central ID</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
+                    @can('View Formal Cases Form')
                     <li><a class="nav-link nav-sublink" href="{{ route('form.index') }}"><i class="fas fa-database"></i><span class="nav-text">Central ID Form</span></a></li>
+                    @endcan
                     @can('View LSID Register')
                     <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.index') }}"><i class="fas fa-info-circle"></i><span class="nav-text">LSID Register</span></a></li>
                     @endcan
                     @can('View LSID Management')
                     <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.manage') }}"><i class="fas fa-table-list"></i><span class="nav-text">LSID Management</span></a></li>
                     @endcan
+                    @can('View Formal Case Import Page')
                     <li><a class="nav-link nav-sublink" href="{{ route('import.view') }}"><i class="fas fa-database"></i><span class="nav-text">Bulk Central ID</span></a></li>
+                    @endcan
                 </ul>
             </li>
+            @endcanany
+
+            @canany(['View Case List Report', 'View Intervention Report Page', 'View LSID Report', 'View District Summary Report', 'View PNGO Summary Report', 'Export Formal Cases'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-file-alt"></i><span class="nav-text">Reports & Analytics</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
+                    @can('View Case List Report')
                     <li><a class="nav-link nav-sublink" href="{{ route('case_list') }}"><i class="fas fa-chart-bar"></i><span class="nav-text">Case List</span></a></li>
+                    @endcan
+                    @can('View Intervention Report Page')
                     <li><a class="nav-link nav-sublink" href="{{ route('customReport') }}"><i class="fas fa-chart-bar"></i><span class="nav-text">Intervention Report</span></a></li>
+                    @endcan
                     @can('View LSID Report')
                     <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.report') }}"><i class="fas fa-clipboard-list"></i><span class="nav-text">LSID Report</span></a></li>
                     @endcan
+                    @can('View District Summary Report')
                     <li><a class="nav-link nav-sublink" href="{{ route('district.summery') }}"><i class="fas fa-user-clock"></i><span class="nav-text">District Summery</span></a></li>
+                    @endcan
+                    @can('View PNGO Summary Report')
                     <li><a class="nav-link nav-sublink" href="{{ route('pngo.summery') }}"><i class="fas fa-lock"></i><span class="nav-text">PNGO Summery</span></a></li>
+                    @endcan
+                    @can('Export Formal Cases')
                     <li><a class="nav-link nav-sublink" href="{{ route('formal.cases.export') }}"><i class="fa fa-download"></i><span class="nav-text">Download Excel</span></a></li>
+                    @endcan
 
                 </ul>
             </li>
+            @endcanany
         
             <!-- <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
         
