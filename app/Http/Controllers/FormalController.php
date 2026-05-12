@@ -595,6 +595,9 @@ class FormalController extends Controller
 
     public function fileCase(Request $request)
     {
+        $case = FormalCase::findOrFail($request->file_id);
+        $this->authorizeFormalCaseScope($case);
+
         Session::put('file_id', $request->file_id);
         return response()->json(['success' => true, 'redirect_url' => route('edit-file.get')]);
     }
@@ -606,6 +609,10 @@ class FormalController extends Controller
         if (!$caseId) {
             return redirect()->route('case_list');
         }
+
+        $case = FormalCase::findOrFail($caseId);
+        $this->authorizeFormalCaseScope($case);
+
         $caseFiles = FileUpload::where('case_id', $caseId)->orderBy('id', 'asc')->get();
 
         return view('dashboard.admin.get-file', compact('caseFiles'));
@@ -727,6 +734,10 @@ class FormalController extends Controller
 
             if (!empty($row['reference_no'])) {
                 $row['received_application'] = 'Yes';
+            }
+
+            if (! Auth::user()->canAccessDistrictPngo($row['district_id'], $row['pngo_id'])) {
+                return redirect()->back()->with('error', 'The import contains a district-PNGO pair outside your assigned access scope.');
             }
 
             
@@ -1001,8 +1012,7 @@ private function prepareMultiSelectValue($value): ?string
     {
         $user = Auth::user();
 
-        abort_if($user->district_id && (int) $case->district_id !== (int) $user->district_id, 403);
-        abort_if($user->pngo_id && (int) $case->pngo_id !== (int) $user->pngo_id, 403);
+        abort_if(! $user->canAccessDistrictPngo($case->district_id, $case->pngo_id), 403);
     }
     
 

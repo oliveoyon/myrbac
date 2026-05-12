@@ -48,13 +48,7 @@ class DashboardController extends Controller
             ->whereNotNull('follow_up_interventions.intervention_to_be_taken')
             ->where('follow_up_interventions.task_status', '!=', Todo::STATUS_DONE);
 
-        if ($user->district_id) {
-            $followUpQuery->where('formal_cases.district_id', $user->district_id);
-        }
-
-        if ($user->pngo_id) {
-            $followUpQuery->where('formal_cases.pngo_id', $user->pngo_id);
-        }
+        $user->applyDistrictPngoScope($followUpQuery, 'formal_cases.district_id', 'formal_cases.pngo_id');
 
         $todayFollowUpCount = (clone $followUpQuery)
             ->whereDate('follow_up_interventions.to_be_taken_date', $today)

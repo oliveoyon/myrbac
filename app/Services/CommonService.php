@@ -27,7 +27,7 @@ class CommonService
         $pngoName = Pngo::where('id', $pngoId)->value('name');
 
         
-        $data = FormalCase::select(
+        $query = FormalCase::select(
             'institute',
             DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
             DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
@@ -39,8 +39,9 @@ class CommonService
         // ->where('pngo_id', $pngoId)
         // ->where('status', $status)
         ->where($whr)
-        ->groupBy('institute')
-        ->get();
+        ->groupBy('institute');
+
+        $data = Auth::user()->applyDistrictPngoScope($query)->get();
         
         return $data;
     }
@@ -90,13 +91,8 @@ class CommonService
 
     public function showCaseAssistanceDistrictWise()
     {
-        $districtId = Auth::user()->district_id;
-        $pngoId = Auth::user()->pngo_id;
-        $whr = ['district_id' => $districtId,'pngo_id' => $pngoId];
-        $whr = array_filter($whr);
-
         // Fetch the district data grouped by district_id
-        $data = FormalCase::select(
+        $query = FormalCase::select(
             'district_id',
             DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
             DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
@@ -106,9 +102,9 @@ class CommonService
         )
         // Add condition to filter by status (if required)
         ->where('status', '>', 1) 
-        ->where($whr)
-        ->groupBy('district_id') // Group by district only, not by institute
-        ->get();
+        ->groupBy('district_id'); // Group by district only, not by institute
+
+        $data = Auth::user()->applyDistrictPngoScope($query)->get();
 
         // Fetch district names based on district_id
         $districts = District::all();
@@ -133,13 +129,8 @@ class CommonService
 
     public function showCaseAssistancePngoWise()
     {
-        $districtId = Auth::user()->district_id;
-        $pngoId = Auth::user()->pngo_id;
-        $whr = ['district_id' => $districtId,'pngo_id' => $pngoId];
-        $whr = array_filter($whr);
-
         // Fetch the case data grouped by pngo_id
-        $data = FormalCase::select(
+        $query = FormalCase::select(
             'pngo_id',
             DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
             DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
@@ -148,9 +139,9 @@ class CommonService
             DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
         )
         ->where('status', '>', 1) 
-        ->where($whr)
-        ->groupBy('pngo_id') // Group by pngo_id instead of district_id
-        ->get();
+        ->groupBy('pngo_id'); // Group by pngo_id instead of district_id
+
+        $data = Auth::user()->applyDistrictPngoScope($query)->get();
 
         // Fetch PNGO names based on pngo_id
         $pngos = Pngo::all(); 

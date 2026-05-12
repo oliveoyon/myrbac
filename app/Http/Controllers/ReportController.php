@@ -138,8 +138,7 @@ class ReportController extends Controller
 
     public function districtWiseCaselist()
     {
-        $districts = District::orderBy('name')->get();
-        $pngos = Pngo::orderBy('name')->get();
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
         return view('dashboard.report.case_list', compact('districts', 'pngos'));
     }
 
@@ -147,7 +146,9 @@ class ReportController extends Controller
     {
         $whr = ['district_id' => $request->district_id, 'pngo_id' => $request->pngo_id,];
         $whr = array_filter($whr);
-        $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])->where($whr)->get();
+        $cases = Auth::user()
+            ->applyDistrictPngoScope(FormalCase::with(['district:id,name', 'pngo:id,name'])->where($whr))
+            ->get();
         return response()->json(['cases' => $cases]);
     }
 
@@ -162,6 +163,7 @@ class ReportController extends Controller
 
         $whr = array_filter($whr);
         $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])->where($whr);
+        Auth::user()->applyDistrictPngoScope($cases);
 
         if ($request->filled('from_date') && $request->filled('to_date')) {
             $fromDate = \Carbon\Carbon::createFromFormat('Y-m-d', $request->from_date)->startOfDay();
@@ -178,6 +180,7 @@ class ReportController extends Controller
     public function generateForm(Request $request)
     {
         $send['details'] = FormalCase::find($request->id);
+        abort_if(! $send['details'] || ! Auth::user()->canAccessDistrictPngo($send['details']->district_id, $send['details']->pngo_id), 403);
         $send['followups'] = FollowUpIntervention::where('central_id', $request->id)->get();
         // dd($send['followups']);
         $send['data'] = $request->input('pdf_data');
@@ -275,8 +278,7 @@ class ReportController extends Controller
 
     public function customReport()
     {
-        $districts = District::all();
-        $pngos = Pngo::all();
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
         $fields = include(app_path('Services/DbFields.php'));
         return view('dashboard.report.custom-report', compact('fields', 'districts', 'pngos'));
     }
@@ -321,8 +323,9 @@ class ReportController extends Controller
         }
 
         // Fix: Pass $whr inside the closure
-        $results = collect($flatFields)->map(function ($field) use ($whr) {
-            return FormalCase::selectRaw("
+        $user = Auth::user();
+        $results = collect($flatFields)->map(function ($field) use ($whr, $user) {
+            $query = FormalCase::selectRaw("
                 '$field' AS field,
                 SUM(CASE WHEN sex = 'Male' AND age >= 18 THEN 1 ELSE 0 END) AS adult_males,
                 SUM(CASE WHEN sex = 'Female' AND age >= 18 THEN 1 ELSE 0 END) AS adult_females,
@@ -331,8 +334,9 @@ class ReportController extends Controller
                 COUNT(*) AS total
             ")
                 ->whereNotNull($field)
-                ->where($whr)  // Correctly passing $whr
-                ->first();
+                ->where($whr);
+
+            return $user->applyDistrictPngoScope($query)->first();
         });
 
         // Load field names
@@ -362,20 +366,15 @@ class ReportController extends Controller
 
     public function search(Request $request)
     {
-        $districtId = Auth::user()->district_id;
-        $pngoId = Auth::user()->pngo_id;
-        $whr = ['district_id' => $districtId, 'pngo_id' => $pngoId];
-        $whr = array_filter($whr);
-
         $query = $request->input('query');
         $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])
             ->where(function ($q) use ($query) {
                 $q->where('central_id', 'like', "%{$query}%")
                     ->orWhere('full_name', 'like', "%{$query}%")
                     ->orWhere('phone_number', 'like', "%{$query}%");
-            })
-            ->where($whr)
-            ->get();
+            });
+
+        $cases = Auth::user()->applyDistrictPngoScope($cases)->get();
         return view('dashboard.report.search-list', compact('cases'));
         // return response()->json(['cases' => $cases1]);
     }
@@ -390,6 +389,25 @@ class ReportController extends Controller
 
         // Proceed with the Excel download
         return Excel::download(new FormalCaseExport, 'formal_cases.xlsx');
+    }
+
+    private function allowedDistrictsAndPngos(): array
+    {
+        $user = Auth::user();
+        $districtIds = $user->accessibleDistrictIds();
+        $pngoIds = $user->accessiblePngoIds();
+
+        $districts = District::query()
+            ->when(is_array($districtIds), fn ($query) => $query->whereIn('id', $districtIds))
+            ->orderBy('name')
+            ->get();
+
+        $pngos = Pngo::with('district:id,name')
+            ->when(is_array($pngoIds), fn ($query) => $query->whereIn('id', $pngoIds))
+            ->orderBy('name')
+            ->get();
+
+        return [$districts, $pngos];
     }
 }
 

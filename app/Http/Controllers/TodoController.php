@@ -118,13 +118,7 @@ class TodoController extends Controller
 
         $user = Auth::user();
 
-        if ($user->district_id) {
-            $query->where('formal_cases.district_id', $user->district_id);
-        }
-
-        if ($user->pngo_id) {
-            $query->where('formal_cases.pngo_id', $user->pngo_id);
-        }
+        $user->applyDistrictPngoScope($query, 'formal_cases.district_id', 'formal_cases.pngo_id');
 
         return $query;
     }
@@ -140,8 +134,7 @@ class TodoController extends Controller
 
         $user = Auth::user();
 
-        abort_if($user->district_id && (int) $case->district_id !== (int) $user->district_id, 403);
-        abort_if($user->pngo_id && (int) $case->pngo_id !== (int) $user->pngo_id, 403);
+        abort_if(! $user->canAccessDistrictPngo($case->district_id, $case->pngo_id), 403);
     }
 
     private function calendarDays(): array

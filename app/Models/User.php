@@ -62,6 +62,112 @@ class User extends Authenticatable
         return $this->belongsTo(Pngo::class);
     }
 
+    public function pngoScopes()
+    {
+        return $this->hasMany(UserPngoScope::class);
+    }
+
+    public function hasPngoScopes(): bool
+    {
+        return $this->relationLoaded('pngoScopes')
+            ? $this->pngoScopes->isNotEmpty()
+            : $this->pngoScopes()->exists();
+    }
+
+    public function requiresMultiPngoScopes(): bool
+    {
+        if ($this->hasAnyRole(['Super Admin', 'Admin'])) {
+            return false;
+        }
+
+        return $this->hasAnyRole(['M&EO', 'PNGO Focal']);
+    }
+
+    public function canAccessDistrictPngo($districtId, $pngoId): bool
+    {
+        if ($this->hasPngoScopes()) {
+            return $this->pngoScopes()
+                ->where('district_id', $districtId)
+                ->where('pngo_id', $pngoId)
+                ->exists();
+        }
+
+        if ($this->requiresMultiPngoScopes() && ! $this->district_id && ! $this->pngo_id) {
+            return false;
+        }
+
+        if ($this->district_id && (int) $this->district_id !== (int) $districtId) {
+            return false;
+        }
+
+        if ($this->pngo_id && (int) $this->pngo_id !== (int) $pngoId) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function applyDistrictPngoScope($query, string $districtColumn = 'district_id', string $pngoColumn = 'pngo_id')
+    {
+        $scopes = $this->pngoScopes()->get(['district_id', 'pngo_id']);
+
+        if ($scopes->isNotEmpty()) {
+            return $query->where(function ($scopeQuery) use ($scopes, $districtColumn, $pngoColumn) {
+                foreach ($scopes as $scope) {
+                    $scopeQuery->orWhere(function ($pairQuery) use ($scope, $districtColumn, $pngoColumn) {
+                        $pairQuery
+                            ->where($districtColumn, $scope->district_id)
+                            ->where($pngoColumn, $scope->pngo_id);
+                    });
+                }
+            });
+        }
+
+        if ($this->requiresMultiPngoScopes() && ! $this->district_id && ! $this->pngo_id) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if ($this->district_id) {
+            $query->where($districtColumn, $this->district_id);
+        }
+
+        if ($this->pngo_id) {
+            $query->where($pngoColumn, $this->pngo_id);
+        }
+
+        return $query;
+    }
+
+    public function accessibleDistrictIds(): ?array
+    {
+        $scopes = $this->pngoScopes()->get(['district_id']);
+
+        if ($scopes->isNotEmpty()) {
+            return $scopes->pluck('district_id')->unique()->values()->all();
+        }
+
+        if ($this->district_id) {
+            return [(int) $this->district_id];
+        }
+
+        return $this->requiresMultiPngoScopes() ? [] : null;
+    }
+
+    public function accessiblePngoIds(): ?array
+    {
+        $scopes = $this->pngoScopes()->get(['pngo_id']);
+
+        if ($scopes->isNotEmpty()) {
+            return $scopes->pluck('pngo_id')->unique()->values()->all();
+        }
+
+        if ($this->pngo_id) {
+            return [(int) $this->pngo_id];
+        }
+
+        return $this->requiresMultiPngoScopes() ? [] : null;
+    }
+
     public function getAllPermissionsList()
     {
         return [

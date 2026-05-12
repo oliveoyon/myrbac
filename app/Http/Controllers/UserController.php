@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\District;
 use App\Models\Pngo;
+use App\Models\UserPngoScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -19,12 +20,36 @@ use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
     private array $districtPngoRequiredRoles = ['Paralegal', 'DPO'];
+    private array $multiScopeRequiredRoles = ['M&EO', 'PNGO Focal'];
 
     private function selectedRolesRequireDistrictPngo(Request $request): bool
     {
         return collect((array) $request->input('role_name', []))
             ->intersect($this->districtPngoRequiredRoles)
             ->isNotEmpty();
+    }
+
+    private function selectedRolesRequireMultiScope(Request $request): bool
+    {
+        return collect((array) $request->input('role_name', []))
+            ->intersect($this->multiScopeRequiredRoles)
+            ->isNotEmpty();
+    }
+
+    private function syncPngoScopes(User $user, array $pngoIds): void
+    {
+        $pngos = Pngo::whereIn('id', array_filter($pngoIds))
+            ->get(['id', 'district_id']);
+
+        $user->pngoScopes()->delete();
+
+        foreach ($pngos as $pngo) {
+            UserPngoScope::create([
+                'user_id' => $user->id,
+                'district_id' => $pngo->district_id,
+                'pngo_id' => $pngo->id,
+            ]);
+        }
     }
 
     // Display a listing of the users
@@ -35,7 +60,7 @@ class UserController extends Controller
             return $value !== null && $value !== '';
         })->isNotEmpty();
 
-        $usersQuery = User::with(['roles', 'district:id,name', 'pngo:id,name'])
+        $usersQuery = User::with(['roles', 'district:id,name', 'pngo:id,name', 'pngoScopes.pngo:id,name', 'pngoScopes.district:id,name'])
             ->latest('id');
 
         if ($filterRequested) {
@@ -87,7 +112,9 @@ class UserController extends Controller
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^])[A-Za-z\d@$!%*#?&^]{8,}$/'
             ],
             'role_name' => 'required|array',
-            'role_name.*' => 'exists:roles,name'
+            'role_name.*' => 'exists:roles,name',
+            'scoped_pngos' => 'nullable|array',
+            'scoped_pngos.*' => 'exists:pngos,id',
         ], [
             'password.regex' => 'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.',
         ]);
@@ -101,6 +128,10 @@ class UserController extends Controller
                 if (! $request->filled('pngo_id')) {
                     $validator->errors()->add('pngo_id', 'PNGO is required for Paralegal and DPO users.');
                 }
+            }
+
+            if ($this->selectedRolesRequireMultiScope($request) && empty(array_filter((array) $request->input('scoped_pngos', [])))) {
+                $validator->errors()->add('scoped_pngos', 'Please select at least one district-PNGO scope for M&EO and PNGO Focal users.');
             }
 
             $pngo = Pngo::find($request->pngo_id);
@@ -126,14 +157,16 @@ class UserController extends Controller
             $user->name = $request->name;
             $user->email = $request->email;
             $user->password = Hash::make('12345678'); // Default password
-            $user->district_id = $request->filled('district_id') ? $request->district_id : null;
-            $user->pngo_id = $request->filled('pngo_id') ? $request->pngo_id : null;
+            $useSingleScope = ! $this->selectedRolesRequireMultiScope($request) || $this->selectedRolesRequireDistrictPngo($request);
+            $user->district_id = $useSingleScope && $request->filled('district_id') ? $request->district_id : null;
+            $user->pngo_id = $useSingleScope && $request->filled('pngo_id') ? $request->pngo_id : null;
             $user->status = $request->status == 1 ? 2 : 0;
 
             // Save user to the database
             if ($user->save()) {
                 // Assign roles to the user
                 $user->syncRoles($request->role_name);
+                $this->syncPngoScopes($user, $this->selectedRolesRequireMultiScope($request) ? (array) $request->input('scoped_pngos', []) : []);
                 app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
                 // Log the user creation action
@@ -175,6 +208,7 @@ class UserController extends Controller
     {
         $user_id = $request->user_id;
         $userDetails = User::with('roles')->find($user_id);
+        $userDetails?->load('pngoScopes');
 
         if ($userDetails) {
             return response()->json([
@@ -187,6 +221,7 @@ class UserController extends Controller
                     'pngo_id' => $userDetails->pngo_id,
                     'status' => $userDetails->status,
                     'role_name' => $userDetails->roles->pluck('name')->toArray(), // for multiple roles
+                    'scoped_pngo_ids' => $userDetails->pngoScopes->pluck('pngo_id')->map(fn ($id) => (string) $id)->toArray(),
                 ]
             ]);
         } else {
@@ -220,7 +255,9 @@ class UserController extends Controller
             'pngo_id' => 'nullable|exists:pngos,id',
             'status' => 'required',
             'role_name' => 'required|array',
-            'role_name.*' => 'exists:roles,name'
+            'role_name.*' => 'exists:roles,name',
+            'scoped_pngos' => 'nullable|array',
+            'scoped_pngos.*' => 'exists:pngos,id',
         ]);
 
         $validator->after(function ($validator) use ($request) {
@@ -232,6 +269,10 @@ class UserController extends Controller
                 if (! $request->filled('pngo_id')) {
                     $validator->errors()->add('pngo_id', 'PNGO is required for Paralegal and DPO users.');
                 }
+            }
+
+            if ($this->selectedRolesRequireMultiScope($request) && empty(array_filter((array) $request->input('scoped_pngos', [])))) {
+                $validator->errors()->add('scoped_pngos', 'Please select at least one district-PNGO scope for M&EO and PNGO Focal users.');
             }
 
             $pngo = Pngo::find($request->pngo_id);
@@ -254,8 +295,9 @@ class UserController extends Controller
         $user->full_name = $request->full_name;
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->district_id = $request->filled('district_id') ? $request->district_id : null;
-        $user->pngo_id = $request->filled('pngo_id') ? $request->pngo_id : null;
+        $useSingleScope = ! $this->selectedRolesRequireMultiScope($request) || $this->selectedRolesRequireDistrictPngo($request);
+        $user->district_id = $useSingleScope && $request->filled('district_id') ? $request->district_id : null;
+        $user->pngo_id = $useSingleScope && $request->filled('pngo_id') ? $request->pngo_id : null;
         $user->status = $request->status;
 
         // If password is provided, update it
@@ -275,6 +317,7 @@ class UserController extends Controller
             // Save the user and sync roles
             if ($user->save()) {
                 $user->syncRoles($request->role_name);  // Update roles
+                $this->syncPngoScopes($user, $this->selectedRolesRequireMultiScope($request) ? (array) $request->input('scoped_pngos', []) : []);
                 app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
                 // Log the successful update

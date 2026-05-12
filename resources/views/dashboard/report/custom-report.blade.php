@@ -448,7 +448,7 @@
 
                     <div class="filter-item">
                         <label for="pngo_id">PNGO</label>
-                        <select class="form-control form-control-sm pngo_id" name="pngo_id" id="pngo_id">
+                        <select class="form-control form-control-sm pngo_id" name="pngo_id" id="pngo_id" data-selected-pngo="{{ auth()->user()->pngo_id }}" data-fixed-district="{{ auth()->user()->district_id }}">
                             @php
                             $userPngoId = auth()->user()->pngo_id;
                             @endphp
@@ -460,10 +460,7 @@
                             @endif
                             @endforeach
                             @else
-                            <option value="">All PNGO</option>
-                            @foreach ($pngos as $pngo)
-                            <option value="{{ $pngo->id }}">{{ $pngo->name }}</option>
-                            @endforeach
+                            <option value="">Select District First</option>
                             @endif
                         </select>
                     </div>
@@ -544,6 +541,39 @@
 
 @push('scripts')
 <script>
+    const interventionReportPngos = @json($pngos->map(fn ($pngo) => ['id' => $pngo->id, 'name' => $pngo->name, 'district_id' => $pngo->district_id])->values());
+
+    function syncInterventionReportPngoDropdown() {
+        const districtSelect = document.getElementById('district_id');
+        const pngoSelect = document.getElementById('pngo_id');
+
+        if (!districtSelect || !pngoSelect) {
+            return;
+        }
+
+        const selectedPngo = pngoSelect.getAttribute('data-selected-pngo') || pngoSelect.value;
+        const districtId = districtSelect.value || pngoSelect.getAttribute('data-fixed-district') || '';
+        const availablePngos = interventionReportPngos.filter(function(pngo) {
+            return districtId && String(pngo.district_id) === String(districtId);
+        });
+
+        pngoSelect.innerHTML = '<option value="">' + (districtId ? 'All PNGO' : 'Select District First') + '</option>';
+        availablePngos.forEach(function(pngo) {
+            const option = document.createElement('option');
+            option.value = pngo.id;
+            option.textContent = pngo.name;
+            option.selected = String(selectedPngo) === String(pngo.id);
+            pngoSelect.appendChild(option);
+        });
+    }
+
+    document.getElementById('district_id')?.addEventListener('change', function() {
+        document.getElementById('pngo_id')?.setAttribute('data-selected-pngo', '');
+        syncInterventionReportPngoDropdown();
+    });
+
+    syncInterventionReportPngoDropdown();
+
     document.querySelectorAll('.select-all').forEach(function(selectAllCheckbox) {
         selectAllCheckbox.addEventListener('change', function() {
             const category = selectAllCheckbox.getAttribute('data-category');

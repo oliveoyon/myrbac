@@ -49,9 +49,11 @@ class LsidRegisterController extends Controller
 
     public function index()
     {
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
+
         return view('dashboard.admin.lsid-register', [
-            'districts' => District::orderBy('name')->get(),
-            'pngos' => Pngo::orderBy('name')->get(),
+            'districts' => $districts,
+            'pngos' => $pngos,
             'sexOptions' => self::SEX_OPTIONS,
             'otherInformationOptions' => self::OTHER_INFORMATION_OPTIONS,
             'receiverTypeOptions' => self::RECEIVER_TYPE_OPTIONS,
@@ -107,10 +109,10 @@ class LsidRegisterController extends Controller
 
         if ($managementRequested) {
             $query
-                ->when($request->filled('district_id') && ! Auth::user()->district_id, function ($query) use ($request) {
+                ->when($request->filled('district_id'), function ($query) use ($request) {
                     $query->where('district_id', $request->district_id);
                 })
-                ->when($request->filled('pngo_id') && ! Auth::user()->pngo_id, function ($query) use ($request) {
+                ->when($request->filled('pngo_id'), function ($query) use ($request) {
                     $query->where('pngo_id', $request->pngo_id);
                 })
                 ->when($request->filled('sex'), function ($query) use ($request) {
@@ -134,10 +136,12 @@ class LsidRegisterController extends Controller
             ->paginate(25)
             ->withQueryString();
 
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
+
         return view('dashboard.admin.lsid-management', $this->viewData([
             'registers' => $registers,
-            'districts' => District::orderBy('name')->get(),
-            'pngos' => Pngo::orderBy('name')->get(),
+            'districts' => $districts,
+            'pngos' => $pngos,
             'filters' => $request->only(['district_id', 'pngo_id', 'sex', 'from_date', 'to_date', 'intervention']),
             'managementRequested' => $managementRequested,
         ]));
@@ -177,10 +181,12 @@ class LsidRegisterController extends Controller
     {
         $this->authorizeScope($lsidRegister);
 
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
+
         return view('dashboard.admin.lsid-register', $this->viewData([
             'register' => $lsidRegister,
-            'districts' => District::orderBy('name')->get(),
-            'pngos' => Pngo::orderBy('name')->get(),
+            'districts' => $districts,
+            'pngos' => $pngos,
         ]));
     }
 
@@ -201,10 +207,10 @@ class LsidRegisterController extends Controller
 
         $query = $this->scopedQuery()
             ->with(['district:id,name', 'pngo:id,name', 'creator:id,name'])
-            ->when($request->filled('district_id') && ! Auth::user()->district_id, function ($query) use ($request) {
+            ->when($request->filled('district_id'), function ($query) use ($request) {
                 $query->where('district_id', $request->district_id);
             })
-            ->when($request->filled('pngo_id') && ! Auth::user()->pngo_id, function ($query) use ($request) {
+            ->when($request->filled('pngo_id'), function ($query) use ($request) {
                 $query->where('pngo_id', $request->pngo_id);
             })
             ->when($request->filled('sex'), function ($query) use ($request) {
@@ -231,10 +237,12 @@ class LsidRegisterController extends Controller
             ? Pngo::whereKey(Auth::user()->pngo_id)->value('name')
             : ($request->filled('pngo_id') ? Pngo::whereKey($request->pngo_id)->value('name') : 'All PNGO');
 
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
+
         return view('dashboard.report.lsid-report', $this->viewData([
             'registers' => $registers,
-            'districts' => District::orderBy('name')->get(),
-            'pngos' => Pngo::orderBy('name')->get(),
+            'districts' => $districts,
+            'pngos' => $pngos,
             'filters' => $request->only(['district_id', 'pngo_id', 'sex', 'from_date', 'to_date', 'intervention']),
             'appliedFilters' => $appliedFilters,
             'reportRequested' => $reportRequested,
@@ -257,6 +265,10 @@ class LsidRegisterController extends Controller
             $query->where('pngo_id', $user->pngo_id);
         }
 
+        if ($user->hasPngoScopes()) {
+            $user->applyDistrictPngoScope($query);
+        }
+
         return $query;
     }
 
@@ -264,8 +276,7 @@ class LsidRegisterController extends Controller
     {
         $user = Auth::user();
 
-        abort_if($user->district_id && (int) $lsidRegister->district_id !== (int) $user->district_id, 403);
-        abort_if($user->pngo_id && (int) $lsidRegister->pngo_id !== (int) $user->pngo_id, 403);
+        abort_if(! $user->canAccessDistrictPngo($lsidRegister->district_id, $lsidRegister->pngo_id), 403);
     }
 
     private function applyUserScopeToData(array $data): array
@@ -278,6 +289,11 @@ class LsidRegisterController extends Controller
 
         if ($user->pngo_id) {
             $data['pngo_id'] = $user->pngo_id;
+        }
+
+        if ($user->hasPngoScopes()) {
+            abort_if(empty($data['district_id']) || empty($data['pngo_id']), 403);
+            abort_if(! $user->canAccessDistrictPngo($data['district_id'], $data['pngo_id']), 403);
         }
 
         return $data;
@@ -328,5 +344,24 @@ class LsidRegisterController extends Controller
             'interventionOptions' => self::INTERVENTION_OPTIONS,
             'serviceTypeOptions' => self::SERVICE_TYPE_OPTIONS,
         ], $data);
+    }
+
+    private function allowedDistrictsAndPngos(): array
+    {
+        $user = Auth::user();
+        $districtIds = $user->accessibleDistrictIds();
+        $pngoIds = $user->accessiblePngoIds();
+
+        $districts = District::query()
+            ->when(is_array($districtIds), fn ($query) => $query->whereIn('id', $districtIds))
+            ->orderBy('name')
+            ->get();
+
+        $pngos = Pngo::with('district:id,name')
+            ->when(is_array($pngoIds), fn ($query) => $query->whereIn('id', $pngoIds))
+            ->orderBy('name')
+            ->get();
+
+        return [$districts, $pngos];
     }
 }

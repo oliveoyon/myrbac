@@ -329,6 +329,51 @@
         padding: 12px 0 0;
     }
 
+    .multi-scope-panel {
+        display: none;
+        padding: 12px;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
+        background: #fbfcfd;
+    }
+
+    .multi-scope-panel.is-visible {
+        display: block;
+    }
+
+    .multi-scope-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 8px;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+
+    .multi-scope-item {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        padding: 8px 10px;
+        border: 1px solid #d8dee6;
+        border-radius: 6px;
+        background: #fff;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .multi-scope-item input {
+        margin-top: 2px;
+        accent-color: #c30f08;
+    }
+
+    .multi-scope-note {
+        margin: 0 0 10px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
     /* Custom Styling for the Edit Permissions Form */
     .edit-permission-header {
         font-size: 22px;
@@ -551,6 +596,7 @@
                         <th>Email</th>
                         <th>District</th>
                         <th>PNGO</th>
+                        <th>Assigned Scopes</th>
                         <th>Status</th>
                         <th style="width: 260px;">Action</th>
                     </tr>
@@ -564,6 +610,13 @@
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->district ? $user->district->name : 'No District' }}</td>
                         <td>{{ $user->pngo ? $user->pngo->name : 'No PNGO' }}</td>
+                        <td>
+                            @if ($user->pngoScopes->isNotEmpty())
+                                {{ $user->pngoScopes->map(fn ($scope) => optional($scope->pngo)->name . ' - ' . optional($scope->district)->name)->implode(', ') }}
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td>
                             <span class="badge {{ $user->status == 1 ? 'bg-success' : 'bg-secondary' }}">
                                 {{ $user->status == 1 ? 'Active' : 'Inactive' }}
@@ -664,6 +717,20 @@
                                     <span class="text-danger error-text role_name_error"></span>
                                 </div>
 
+                                <div class="mb-3 col-12 multi-scope-panel">
+                                    <label class="form-label required">District-PNGO Scopes</label>
+                                    <p class="multi-scope-note">Required only for M&EO and PNGO Focal users. Select every district-PNGO pair this user can monitor.</p>
+                                    <div class="multi-scope-grid">
+                                        @foreach ($pngos as $pngo)
+                                        <label class="multi-scope-item">
+                                            <input type="checkbox" name="scoped_pngos[]" value="{{ $pngo->id }}">
+                                            <span>{{ $pngo->name }}{{ $pngo->district ? ' - ' . $pngo->district->name : '' }}</span>
+                                        </label>
+                                        @endforeach
+                                    </div>
+                                    <span class="text-danger error-text scoped_pngos_error"></span>
+                                </div>
+
                                 <div class="mb-3 col-md-6">
                                     <label class="form-label required" for="status">Status</label>
                                     <select class="form-control" name="status" id="status">
@@ -747,6 +814,20 @@
                                         </select>
                                         <span class="text-danger error-text role_name_error"></span>
                                     </div>
+                                </div>
+
+                                <div class="col-12 multi-scope-panel">
+                                    <label class="form-label required">District-PNGO Scopes</label>
+                                    <p class="multi-scope-note">Required only for M&EO and PNGO Focal users. Select every district-PNGO pair this user can monitor.</p>
+                                    <div class="multi-scope-grid">
+                                        @foreach ($pngos as $pngo)
+                                        <label class="multi-scope-item">
+                                            <input type="checkbox" name="scoped_pngos[]" value="{{ $pngo->id }}">
+                                            <span>{{ $pngo->name }}{{ $pngo->district ? ' - ' . $pngo->district->name : '' }}</span>
+                                        </label>
+                                        @endforeach
+                                    </div>
+                                    <span class="text-danger error-text scoped_pngos_error"></span>
                                 </div>
 
                                 <div class="col-md-6">
@@ -868,17 +949,38 @@
 
     $(document).ready(function() {
         const scopedLocationRoles = ['Paralegal', 'DPO'];
+        const multiScopeRoles = ['M&EO', 'PNGO Focal'];
 
         function selectedRolesRequireLocation(form) {
             const selectedRoles = form.find('select[name="role_name[]"]').val() || [];
             return selectedRoles.some(role => scopedLocationRoles.includes(role));
         }
 
+        function selectedRolesRequireMultiScope(form) {
+            const selectedRoles = form.find('select[name="role_name[]"]').val() || [];
+            return selectedRoles.some(role => multiScopeRoles.includes(role));
+        }
+
         function syncLocationRequirement(form) {
             const isRequired = selectedRolesRequireLocation(form);
+            const multiScopeRequired = selectedRolesRequireMultiScope(form);
+            const singleScopeDisabled = multiScopeRequired && !isRequired;
 
             form.find('.scoped-location-label').toggleClass('required', isRequired);
-            form.find('select[name="district_id"], select[name="pngo_id"]').prop('required', isRequired);
+            form.find('select[name="district_id"], select[name="pngo_id"]')
+                .prop('required', isRequired)
+                .prop('disabled', singleScopeDisabled);
+            form.find('.multi-scope-panel').toggleClass('is-visible', multiScopeRequired);
+            form.find('input[name="scoped_pngos[]"]').prop('required', false);
+
+            if (singleScopeDisabled) {
+                form.find('select[name="district_id"], select[name="pngo_id"]').val('');
+                syncUserPngoOptions(form);
+            }
+
+            if (!multiScopeRequired) {
+                form.find('input[name="scoped_pngos[]"]').prop('checked', false);
+            }
         }
 
         function syncUserPngoOptions(form, selectedPngoId = null) {
@@ -951,6 +1053,7 @@
         // Clear error messages on modal close
         $('#addUserModal').on('hidden.bs.modal', function() {
             $('#add-user-form').find('span.error-text').text('');
+            $('#add-user-form').find('input[name="scoped_pngos[]"]').prop('checked', false);
             syncUserPngoOptions($('#add-user-form'));
             syncLocationRequirement($('#add-user-form'));
         });
@@ -1114,6 +1217,10 @@
                 // ✅ Set Select2 roles
                 let roleSelect = modal.find('select[name="role_name[]"]');
                 roleSelect.val(data.details.role_name).trigger('change');
+                modal.find('input[name="scoped_pngos[]"]').prop('checked', false);
+                (data.details.scoped_pngo_ids || []).forEach(function(pngoId) {
+                    modal.find('input[name="scoped_pngos[]"][value="' + pngoId + '"]').prop('checked', true);
+                });
                 syncLocationRequirement(modal.find('form'));
 
                 modal.modal('show');

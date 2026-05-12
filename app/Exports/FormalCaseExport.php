@@ -11,7 +11,9 @@ class FormalCaseExport implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return FormalCase::with(['district:id,name', 'pngo:id,name'])->get();
+        return auth()->user()
+            ->applyDistrictPngoScope(FormalCase::with(['district:id,name', 'pngo:id,name']))
+            ->get();
     }
 
     public function map($case): array
