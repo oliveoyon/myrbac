@@ -26,8 +26,7 @@
     <!-- Sidebar -->
     <aside class="sidebar app-sidebar" id="sidebar" aria-label="Main navigation">
         <div class="logo">
-            <span class="brand-mark">A</span>
-            <span class="brand-text">A2J4W</span>
+            <img class="sidebar-brand-logo" src="{{ asset('logo/giz-logo.png') }}" alt="GIZ">
         </div>
         @can('Search Dashboard Reports')
         <form action="{{ route('dashboard.search') }}" method="POST" class="search-form">

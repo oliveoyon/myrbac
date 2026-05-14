@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A2J4W | Project Monitoring</title>
-    <link rel="icon" href="{{ asset('logo/giz-logo.gif') }}" type="image/x-icon" />
+    <link rel="icon" href="{{ asset('logo/giz-logo.png') }}" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
@@ -47,7 +47,9 @@
 
         .brand-mark img {
             width: auto;
-            height: 42px;
+            height: 52px;
+            max-width: 230px;
+            object-fit: contain;
         }
 
         .brand-mark span {
@@ -214,13 +216,19 @@
         .landing-card-icon {
             display: grid;
             place-items: center;
-            width: 48px;
-            height: 48px;
+            width: 68px;
+            height: 52px;
             margin-bottom: 18px;
             border-radius: 12px;
-            background: var(--soft);
-            color: var(--giz-red);
-            font-size: 20px;
+            background: #fff;
+            border: 1px solid var(--line);
+        }
+
+        .landing-card-icon img {
+            width: auto;
+            max-width: 50px;
+            max-height: 36px;
+            object-fit: contain;
         }
 
         .landing-card h2 {
@@ -309,8 +317,8 @@
         <nav class="landing-nav">
             <div class="container d-flex justify-content-between align-items-center">
                 <div class="brand-mark">
-                    <img src="{{ asset('logo/giz-logo.gif') }}" alt="GIZ">
-                    <span>A2J4W Monitoring</span>
+                    <img src="{{ asset('logo/giz-logo.png') }}" alt="GIZ">
+                    {{-- <span>A2J4W</span> --}}
                 </div>
             </div>
         </nav>
@@ -326,7 +334,7 @@
                             </div>
                             <h1>Access to Justice for Women</h1>
                             <p>
-                                Project monitoring, case tracking, and reporting platform.
+                                Project insights, case tracking, and reporting platform.
                             </p>
                             <div class="hero-actions">
                                 @auth
@@ -343,7 +351,7 @@
                     <div class="col-lg-5">
                         <div class="landing-card">
                             <div class="landing-card-icon">
-                                <i class="fas fa-balance-scale"></i>
+                                <img src="{{ asset('logo/giz-logo-short.png') }}" alt="GIZ">
                             </div>
                             <h2>Project workspace</h2>
                             <p>For authorized project staff and partner organizations.</p>
@@ -356,7 +364,8 @@
                                     <div class="alert alert-danger">{{ session('fail') }}</div>
                                 @endif
 
-                                <form method="POST" action="{{ route('login') }}" class="login-form" onsubmit="handleLoginSubmit(event)">
+                                <form method="POST" action="{{ route('login') }}" class="login-form"
+                                    onsubmit="handleLoginSubmit(event)">
                                     @csrf
 
                                     <div>
@@ -365,7 +374,8 @@
                                             <i class="fas fa-user"></i>
                                             <input type="text" id="email" name="email"
                                                 class="form-control @error('email') is-invalid @enderror"
-                                                value="{{ old('email') }}" placeholder="Enter username or email" required autofocus>
+                                                value="{{ old('email') }}" placeholder="Enter username or email" required
+                                                autofocus>
                                         </div>
                                         @error('email')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -387,15 +397,18 @@
 
                                     <div class="login-options">
                                         <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                                            <input type="checkbox" class="form-check-input" id="remember" name="remember"
+                                                {{ old('remember') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="remember">Remember me</label>
                                         </div>
-                                        <a href="{{ route('password.request') }}" class="forgot-password">Forgot password?</a>
+                                        <a href="{{ route('password.request') }}" class="forgot-password">Forgot
+                                            password?</a>
                                     </div>
 
                                     <button type="submit" class="btn btn-login w-100" id="loginButton">
                                         <span id="btnText">Login</span>
-                                        <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"
+                                            aria-hidden="true"></span>
                                     </button>
                                 </form>
                             @else

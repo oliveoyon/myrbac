@@ -688,12 +688,23 @@ body {
     position: static;
     display: flex;
     align-items: center;
-    gap: 10px;
-    min-height: 42px;
-    margin: 0 2px 14px;
+    justify-content: center;
+    min-height: 52px;
+    margin: 0 2px 16px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.96);
     color: #fff;
     font-size: 19px;
     letter-spacing: 0;
+}
+
+.sidebar-brand-logo {
+    display: block;
+    width: auto;
+    max-width: 170px;
+    max-height: 42px;
+    object-fit: contain;
 }
 
 .brand-mark {

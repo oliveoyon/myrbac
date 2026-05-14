@@ -140,6 +140,41 @@
         color: #c30f08;
     }
 
+    .support-selector-card {
+        margin-bottom: 16px;
+        padding: 16px 18px;
+        border: 1px solid #e1e5ea;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    }
+
+    .support-selector-card h3 {
+        margin: 0 0 4px;
+        color: #111827;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .support-selector-card p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .case-section-placeholder {
+        display: none;
+        padding: 18px;
+        border: 1px dashed #d8dee6;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #6b7280;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
     .accordion {
         display: grid;
         gap: 12px;
@@ -418,19 +453,55 @@
                 <div class="case-status-pill">Draft entry</div>
             </div>
 
+            <div class="support-selector-card">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="institute" class="form-label">সহায়তার স্থান <span class="text-muted">Support in</span></label>
+                        <select class="form-select @error('institute') is-invalid @enderror" id="institute" name="institute">
+                            <option value="">Select</option>
+                            <option value="Court">Court</option>
+                            <option value="Prison">Prison</option>
+                            <option value="Police Station">Police Station</option>
+                        </select>
+                        @error('institute')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                    <div class="col-md-8">
+                        <h3>প্রথমে সহায়তার স্থান নির্বাচন করুন</h3>
+                        <p class="text-muted mb-1">Select support location first</p>
+                        <p class="mb-1">আদালত, থানা অথবা কারাগার নির্বাচন করলে নিচের ফর্ম সেকশনগুলো সেই অনুযায়ী দেখাবে।</p>
+                        <p class="text-muted mb-0">The form sections below will adjust automatically based on Court, Police Station, or Prison.</p>
+                    </div>
+                </div>
+            </div>
+
             <nav class="case-section-nav" aria-label="Case form sections">
                 <a href="#collapseOne" data-bs-toggle="collapse" data-bs-target="#collapseOne">1. Profile</a>
+                <a href="#collapseTwo" data-bs-toggle="collapse" data-bs-target="#collapseTwo">2. Session</a>
                 <a href="#collapseThree" data-bs-toggle="collapse" data-bs-target="#collapseThree">3. Personal</a>
+                <a href="#collapseFour" data-bs-toggle="collapse" data-bs-target="#collapseFour">4. Guardian</a>
+                <a href="#collapseFive" data-bs-toggle="collapse" data-bs-target="#collapseFive">5. Lawyer</a>
+                <a href="#collapseSix" data-bs-toggle="collapse" data-bs-target="#collapseSix">6. Incident</a>
                 <a href="#collapseSeven" data-bs-toggle="collapse" data-bs-target="#collapseSeven">7. Case</a>
                 <a href="#collapseEight" data-bs-toggle="collapse" data-bs-target="#collapseEight">8. Assistance</a>
                 <a href="#collapseNine" data-bs-toggle="collapse" data-bs-target="#collapseNine">9. Result</a>
                 <a href="#collapseTwelve" data-bs-toggle="collapse" data-bs-target="#collapseTwelve">10. Prison Case</a>
+                <a href="#collapseThirteen" data-bs-toggle="collapse" data-bs-target="#collapseThirteen">11. Prison Status</a>
                 <a href="#collapseFourteen" data-bs-toggle="collapse" data-bs-target="#collapseFourteen">12. Prison Assistance</a>
+                <a href="#collapseFifteen" data-bs-toggle="collapse" data-bs-target="#collapseFifteen">13. Prison Result</a>
                 <a href="#collapseSixteen" data-bs-toggle="collapse" data-bs-target="#collapseSixteen">15. Service</a>
                 <a href="#collapseFileClosure" data-bs-toggle="collapse" data-bs-target="#collapseFileClosure">16. Closure</a>
                 <a href="#collapseSeventeen" data-bs-toggle="collapse" data-bs-target="#collapseSeventeen">17. Follow-Up</a>
                 <a href="#collapseEighteen" data-bs-toggle="collapse" data-bs-target="#collapseEighteen">18. Uploads</a>
             </nav>
+
+            <div class="case-section-placeholder" id="caseSectionPlaceholder">
+                <div>চালিয়ে যেতে আদালত, থানা অথবা কারাগার নির্বাচন করুন।</div>
+                <small class="text-muted">Please select Court, Police Station, or Prison to continue.</small>
+            </div>
 
             <div class="accordion" id="caseFormAccordion">
                 <!-- Profile Information (Section 1) -->
@@ -445,16 +516,6 @@
                         data-bs-parent="#caseFormAccordion">
                         <div class="accordion-body">
                             <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label for="Institute" class="form-label">Institute</label>
-                                    <select class="form-select" id="sex" name="institute">
-                                        <option value="">Select</option>
-                                        <option value="Court">Court</option>
-                                        <option value="Prison">Prison</option>
-                                        <option value="Police Station">Police Station</option>
-                                    </select>
-                                </div>
-
                                 <div class="col-md-4">
                                     <label for="full_name" class="form-label">Full Name</label>
                                     <input type="text" id="full_name" name="full_name"
@@ -1651,6 +1712,132 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const instituteSelect = document.getElementById('institute');
+        const sectionNav = document.querySelector('.case-section-nav');
+        const sectionPlaceholder = document.getElementById('caseSectionPlaceholder');
+
+        const commonSections = [
+            'collapseOne',
+            'collapseTwo',
+            'collapseThree',
+            'collapseFour',
+            'collapseFive',
+            'collapseSix',
+            'collapseSixteen',
+            'collapseFileClosure',
+            'collapseSeventeen',
+            'collapseEighteen'
+        ];
+
+        const sectionSets = {
+            Court: [
+                ...commonSections.slice(0, 6),
+                'collapseSeven',
+                'collapseEight',
+                'collapseNine',
+                ...commonSections.slice(6)
+            ],
+            'Police Station': [
+                ...commonSections.slice(0, 6),
+                'collapseSeven',
+                'collapseEight',
+                'collapseNine',
+                ...commonSections.slice(6)
+            ],
+            Prison: [
+                ...commonSections.slice(0, 6),
+                'collapseTwelve',
+                'collapseThirteen',
+                'collapseFourteen',
+                'collapseFifteen',
+                ...commonSections.slice(6)
+            ]
+        };
+
+        function collapsePane(pane) {
+            if (!pane) {
+                return;
+            }
+
+            if (window.bootstrap) {
+                window.bootstrap.Collapse.getOrCreateInstance(pane, {
+                    toggle: false
+                }).hide();
+            } else {
+                pane.classList.remove('show');
+            }
+        }
+
+        function showPane(pane) {
+            if (!pane) {
+                return;
+            }
+
+            if (window.bootstrap) {
+                window.bootstrap.Collapse.getOrCreateInstance(pane, {
+                    toggle: false
+                }).show();
+            } else {
+                pane.classList.add('show');
+            }
+        }
+
+        function syncSupportSections() {
+            const selectedValue = instituteSelect ? instituteSelect.value : '';
+            const allowedSections = sectionSets[selectedValue] || [];
+            const allowedSet = new Set(allowedSections);
+            const hasSelection = allowedSections.length > 0;
+
+            document.querySelectorAll('#caseFormAccordion .accordion-collapse').forEach(function(pane) {
+                const sectionItem = pane.closest('.accordion-item');
+                const isAllowed = allowedSet.has(pane.id);
+
+                if (sectionItem) {
+                    sectionItem.style.display = isAllowed ? '' : 'none';
+                }
+
+                if (!isAllowed) {
+                    collapsePane(pane);
+                }
+            });
+
+            document.querySelectorAll('.case-section-nav a[data-bs-target]').forEach(function(link) {
+                const targetId = (link.getAttribute('data-bs-target') || '').replace('#', '');
+                link.style.display = allowedSet.has(targetId) ? '' : 'none';
+            });
+
+            if (sectionNav) {
+                sectionNav.style.display = hasSelection ? '' : 'none';
+            }
+
+            if (sectionPlaceholder) {
+                sectionPlaceholder.style.display = hasSelection ? 'none' : 'block';
+            }
+
+            const visibleOpenPane = Array.from(document.querySelectorAll('#caseFormAccordion .accordion-collapse.show'))
+                .some(function(pane) {
+                    return allowedSet.has(pane.id);
+                });
+
+            if (hasSelection && !visibleOpenPane) {
+                showPane(document.getElementById(allowedSections[0]));
+            }
+
+            if (typeof checkNatureOfAssistanceInputs === 'function') {
+                checkNatureOfAssistanceInputs();
+            }
+        }
+
+        if (instituteSelect) {
+            instituteSelect.addEventListener('change', syncSupportSections);
+        }
+
+        window.syncCourtPolicePrisonSupportSections = syncSupportSections;
+        syncSupportSections();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
         const oldInput = @json(session()->getOldInput());
         const validationErrorFields = @json($errors->keys());
 
@@ -1731,6 +1918,10 @@
                 control.dispatchEvent(new Event('change', { bubbles: true }));
             });
         });
+
+        if (window.syncCourtPolicePrisonSupportSections) {
+            window.syncCourtPolicePrisonSupportSections();
+        }
 
         if (window.applyCourtPolicePrisonManualLabels) {
             window.applyCourtPolicePrisonManualLabels();
