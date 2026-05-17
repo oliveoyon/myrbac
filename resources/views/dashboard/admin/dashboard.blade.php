@@ -202,7 +202,7 @@
 
     .dash-calendar-row {
         display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(124px, 1fr));
         gap: 8px;
         min-width: 0;
     }
@@ -292,7 +292,7 @@
         }
 
         .dash-calendar-row {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(124px, 1fr));
         }
     }
 
@@ -310,7 +310,7 @@
         }
 
         .dash-calendar-row {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
         }
 
         .dash-day {
@@ -390,7 +390,7 @@
         }
 
         .dash-calendar-row {
-            grid-template-columns: repeat(2, minmax(132px, 1fr));
+            grid-template-columns: repeat(2, minmax(118px, 1fr));
             overflow-x: auto;
             padding-bottom: 4px;
             scroll-snap-type: x proximity;
