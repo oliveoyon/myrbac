@@ -202,12 +202,9 @@
 
     .dash-calendar-row {
         display: grid;
-        grid-template-columns: repeat(7, minmax(118px, 1fr));
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 8px;
         min-width: 0;
-        overflow-x: auto;
-        padding-bottom: 2px;
-        -webkit-overflow-scrolling: touch;
     }
 
     .dash-day {
@@ -295,7 +292,8 @@
         }
 
         .dash-calendar-row {
-            grid-template-columns: repeat(4, minmax(118px, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            overflow-x: visible;
         }
     }
 
@@ -313,7 +311,8 @@
         }
 
         .dash-calendar-row {
-            grid-template-columns: repeat(3, minmax(118px, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            overflow-x: visible;
         }
 
         .dash-day {
@@ -357,6 +356,7 @@
         .dash-calendar-row {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 7px;
+            overflow-x: visible;
         }
 
         .dash-stat-card {
@@ -393,27 +393,14 @@
         }
 
         .dash-calendar-row {
-            grid-template-columns: repeat(2, minmax(118px, 1fr));
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scroll-snap-type: x proximity;
-        }
-
-        .dash-day {
-            scroll-snap-align: start;
-        }
-    }
-
-    @media (hover: none) and (pointer: coarse) {
-        .dash-calendar-row {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             overflow-x: visible;
             padding-bottom: 0;
         }
 
         .dash-day {
-            min-height: 74px;
-            padding: 10px;
+            min-height: 72px;
+            padding: 9px;
         }
     }
 </style>
