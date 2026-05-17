@@ -8,6 +8,7 @@
         display: grid;
         gap: 16px;
         color: #17202a;
+        min-width: 0;
     }
 
     .dash-hero {
@@ -196,12 +197,14 @@
 
     .dash-panel-body {
         padding: 14px 16px;
+        min-width: 0;
     }
 
     .dash-calendar-row {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 8px;
+        min-width: 0;
     }
 
     .dash-day {
@@ -214,6 +217,7 @@
         text-decoration: none;
         background: #fff;
         transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+        min-width: 0;
     }
 
     .dash-day:hover {
@@ -241,6 +245,8 @@
         color: #17643a;
         font-size: 12px;
         font-weight: 800;
+        max-width: 100%;
+        white-space: nowrap;
     }
 
     .dash-table {
@@ -290,15 +296,108 @@
         }
     }
 
+    @media (max-width: 768px) {
+        .smart-dashboard {
+            gap: 12px;
+        }
+
+        .dash-hero {
+            padding: 17px 16px;
+        }
+
+        .dash-panel-header {
+            align-items: flex-start;
+        }
+
+        .dash-calendar-row {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .dash-day {
+            min-height: 68px;
+            padding: 8px;
+        }
+    }
+
     @media (max-width: 576px) {
         .dash-hero {
             align-items: flex-start;
             flex-direction: column;
+            gap: 12px;
+            padding: 16px 14px;
         }
 
-        .dash-stat-grid,
+        .dash-hero h1 {
+            font-size: 22px;
+        }
+
+        .dash-date-pill {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .dash-quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            width: 100%;
+        }
+
+        .dash-quick-actions .btn {
+            width: 100%;
+        }
+
+        .dash-stat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
         .dash-calendar-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .dash-stat-card {
+            min-height: 92px;
+            padding: 13px;
+        }
+
+        .dash-stat-card strong {
+            font-size: 25px;
+        }
+
+        .dash-stat-icon {
+            width: 34px;
+            height: 34px;
+        }
+
+        .dash-panel-header {
+            flex-direction: column;
+        }
+
+        .dash-panel-header .btn {
+            width: 100%;
+        }
+
+        .dash-panel-body {
+            padding: 12px;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .dash-quick-actions,
+        .dash-stat-grid {
             grid-template-columns: 1fr;
+        }
+
+        .dash-calendar-row {
+            grid-template-columns: repeat(2, minmax(132px, 1fr));
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scroll-snap-type: x proximity;
+        }
+
+        .dash-day {
+            scroll-snap-align: start;
         }
     }
 </style>

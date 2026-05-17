@@ -75,10 +75,12 @@
 
         .district-table-wrap {
             padding: 14px;
+            overflow-x: auto;
         }
 
         #districtsTable {
             margin: 0;
+            min-width: 0;
         }
 
         #districtsTable thead th {
@@ -141,7 +143,100 @@
             }
 
             #districtsTable {
-                min-width: 520px;
+                min-width: 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .district-card {
+                overflow: visible;
+            }
+
+            .district-table-wrap {
+                padding: 10px;
+                overflow: visible;
+            }
+
+            #districtsTable {
+                min-width: 0;
+                border-collapse: separate;
+                border-spacing: 0 7px;
+                font-size: 13px;
+            }
+
+            #districtsTable thead {
+                display: none;
+            }
+
+            #districtsTable,
+            #districtsTable tbody,
+            #districtsTable tr,
+            #districtsTable td {
+                display: block;
+                width: 100%;
+            }
+
+            #districtsTable tr {
+                padding: 8px 10px;
+                border: 1px solid #e5e7eb;
+                border-left: 3px solid #c30f08;
+                border-radius: 7px;
+                background: #fff;
+                box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+            }
+
+            #districtsTable tbody td {
+                display: grid;
+                grid-template-columns: 64px minmax(0, 1fr);
+                align-items: center;
+                gap: 8px;
+                padding: 4px 0;
+                border: 0;
+                text-align: left;
+            }
+
+            #districtsTable tbody td::before {
+                content: attr(data-label);
+                color: #6b7280;
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+            }
+
+            #districtsTable tbody td.district-name-cell {
+                color: #111827;
+            }
+
+            .district-actions {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                gap: 5px;
+                width: auto;
+            }
+
+            .district-actions .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                width: auto;
+                min-width: 0;
+                padding: 5px 8px;
+                font-size: 12px;
+                line-height: 1.2;
+                white-space: nowrap;
+            }
+
+            #districtsTable tbody td[data-label="Actions"] {
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .district-actions .btn {
+                padding: 5px 7px;
+                font-size: 11px;
             }
         }
     </style>
@@ -179,9 +274,9 @@
                     <tbody>
                         @foreach ($districts as $district)
                             <tr id="district-{{ $district->id }}">
-                                <td>{{ $loop->iteration }}</td>
-                                <td class="district-name district-name-cell">{{ $district->name }}</td>
-                                <td>
+                                <td data-label="#">{{ $loop->iteration }}</td>
+                                <td data-label="Name" class="district-name district-name-cell">{{ $district->name }}</td>
+                                <td data-label="Actions">
                                     <div class="district-actions">
                                         <button class="btn btn-warning btn-sm editDistrictBtn" data-id="{{ $district->id }}"
                                             data-name="{{ $district->name }}">

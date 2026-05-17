@@ -2,9 +2,125 @@
 
 @section('title', 'Category Management')
 
+@push('styles')
+    <style>
+        @media (max-width: 576px) {
+            .category-management-page .management-card {
+                overflow: visible;
+            }
+
+            .category-management-page .management-table-wrap {
+                overflow: visible;
+            }
+
+            #categoriesTable {
+                min-width: 0;
+                border-collapse: separate;
+                border-spacing: 0 7px;
+                font-size: 13px;
+            }
+
+            #categoriesTable thead {
+                display: none;
+            }
+
+            #categoriesTable,
+            #categoriesTable tbody,
+            #categoriesTable tr,
+            #categoriesTable td {
+                display: block;
+                width: 100%;
+            }
+
+            #categoriesTable tr {
+                padding: 8px 10px;
+                border: 1px solid #e5e7eb;
+                border-left: 3px solid #c30f08;
+                border-radius: 7px;
+                background: #fff;
+                box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+            }
+
+            #categoriesTable tbody td {
+                display: grid;
+                grid-template-columns: 64px minmax(0, 1fr);
+                align-items: center;
+                gap: 8px;
+                padding: 4px 0;
+                border: 0;
+                text-align: left;
+            }
+
+            #categoriesTable tbody td::before {
+                content: attr(data-label);
+                color: #6b7280;
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+            }
+
+            #categoriesTable .management-name-cell {
+                color: #111827;
+                font-weight: 700;
+            }
+
+            #categoriesTable .management-actions {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                gap: 5px;
+                width: auto;
+            }
+
+            #categoriesTable .management-actions .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                width: auto;
+                min-width: 0;
+                padding: 5px 8px;
+                font-size: 12px;
+                line-height: 1.2;
+                white-space: nowrap;
+            }
+
+            .category-management-page .modal-dialog {
+                margin: 10px;
+            }
+
+            .category-management-page .modal-body {
+                padding: 14px;
+            }
+
+            .category-management-page .custombtn {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                text-align: initial !important;
+            }
+
+            .category-management-page .custombtn .btn {
+                width: 100%;
+                margin: 0;
+            }
+        }
+
+        @media (max-width: 380px) {
+            #categoriesTable tbody td {
+                grid-template-columns: 58px minmax(0, 1fr);
+            }
+
+            #categoriesTable .management-actions .btn {
+                padding: 5px 7px;
+                font-size: 11px;
+            }
+        }
+    </style>
+@endpush
 
 @section('content')
-    <section class="management-page">
+    <section class="management-page category-management-page">
         <div class="management-header">
             <div>
                 <h1>Category Management</h1>
@@ -23,7 +139,7 @@
             </div>
 
             <div class="management-table-wrap table-responsive">
-                <table class="table table-striped table-hover table-sm management-table" id="districtsTable">
+                <table class="table table-striped table-hover table-sm management-table" id="categoriesTable">
                     <thead>
                         <tr>
                             <th style="width: 70px;">#</th>
@@ -34,9 +150,9 @@
                     <tbody>
                         @foreach ($categories as $category)
                             <tr id="category-{{ $category->id }}">
-                                <td>{{ $loop->iteration }}</td>
-                                <td class="category-name management-name-cell">{{ $category->name }}</td>
-                                <td>
+                                <td data-label="#">{{ $loop->iteration }}</td>
+                                <td data-label="Name" class="category-name management-name-cell">{{ $category->name }}</td>
+                                <td data-label="Actions">
                                     <div class="management-actions">
                                         <button class="btn btn-warning btn-sm editDistrictBtn" data-id="{{ $category->id }}"
                                             data-name="{{ $category->name }}">

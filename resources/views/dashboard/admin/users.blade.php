@@ -486,6 +486,115 @@
         flex: 1 1 auto;
         padding: 5px;
     }
+
+    @media (max-width: 576px) {
+        #addUserModal .modal-dialog,
+        #editUserModal .modal-dialog {
+            align-items: flex-start;
+            margin: 10px;
+        }
+
+        #addUserModal .modal-content,
+        #editUserModal .modal-content {
+            max-height: calc(100dvh - 20px);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #addUserModal .modal-header,
+        #editUserModal .modal-header {
+            padding: 12px 14px;
+        }
+
+        #addUserModal .modal-title,
+        #editUserModal .modal-title {
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        #addUserModal .modal-body,
+        #editUserModal .modal-body {
+            max-height: calc(100dvh - 108px);
+            padding: 14px;
+        }
+
+        #addUserModal .row,
+        #editUserModal .row {
+            row-gap: 0;
+        }
+
+        #addUserModal .mb-3,
+        #editUserModal .mb-3 {
+            margin-bottom: 12px !important;
+        }
+
+        #addUserModal .form-label,
+        #editUserModal .form-label {
+            margin-bottom: 5px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        #addUserModal .form-control,
+        #editUserModal .form-control,
+        #addUserModal .select2-container .select2-selection--multiple,
+        #editUserModal .select2-container .select2-selection--multiple {
+            min-height: 38px;
+            font-size: 13px;
+        }
+
+        #addUserModal .modal-footer,
+        #editUserModal .modal-footer,
+        #permissionsViewModal .modal-footer,
+        #userPermissionsModal .modal-footer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 10px 14px 14px;
+        }
+
+        #permissionsViewModal .modal-footer {
+            grid-template-columns: 1fr;
+        }
+
+        #addUserModal .modal-footer .btn,
+        #editUserModal .modal-footer .btn,
+        #permissionsViewModal .modal-footer .btn,
+        #userPermissionsModal .modal-footer .btn {
+            width: 100%;
+            margin: 0;
+            min-height: 38px;
+        }
+
+        .multi-scope-panel {
+            padding: 10px;
+        }
+
+        .multi-scope-grid {
+            grid-template-columns: 1fr;
+            max-height: 180px;
+        }
+
+        .multi-scope-item {
+            padding: 7px 9px;
+            font-size: 12px;
+        }
+
+        #permissionsViewModal .modal-body,
+        #userPermissionsModal .modal-body {
+            padding: 12px;
+        }
+
+        #permissionsViewModal .permission-view-summary,
+        #userPermissionsModal .permission-view-summary {
+            padding: 12px;
+        }
+
+        #permissionsViewModal .permission-view-count,
+        #userPermissionsModal .permission-view-count {
+            align-self: flex-start;
+        }
+    }
 </style>
 @endpush
 

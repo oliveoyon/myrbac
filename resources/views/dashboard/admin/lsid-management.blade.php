@@ -129,9 +129,154 @@
     }
 
     @media (max-width: 576px) {
+        .lsid-manage-page {
+            gap: 12px;
+        }
+
+        .lsid-panel {
+            border-radius: 7px;
+        }
+
+        .lsid-panel-header {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 12px 14px;
+        }
+
+        .lsid-panel-header h1,
+        .lsid-panel-header h2 {
+            font-size: 16px;
+            line-height: 1.3;
+        }
+
+        .lsid-panel-header p {
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .lsid-panel-header .btn {
+            width: 100%;
+        }
+
+        .lsid-panel-body {
+            padding: 12px;
+        }
+
         .lsid-filter-grid,
         .lsid-check-grid {
             grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .lsid-filter-grid .form-label {
+            margin-bottom: 5px;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .lsid-filter-grid .form-control {
+            min-height: 38px;
+            font-size: 13px;
+        }
+
+        .lsid-filter-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .lsid-filter-actions .btn {
+            width: 100%;
+            min-height: 38px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .lsid-empty-state {
+            padding: 16px 12px;
+            font-size: 13px;
+        }
+
+        .lsid-panel-body.table-responsive {
+            overflow: visible;
+        }
+
+        #lsidManagementTable {
+            min-width: 0;
+            border-collapse: separate;
+            border-spacing: 0 7px;
+            font-size: 13px;
+        }
+
+        #lsidManagementTable thead {
+            display: none;
+        }
+
+        #lsidManagementTable,
+        #lsidManagementTable tbody,
+        #lsidManagementTable tr,
+        #lsidManagementTable td {
+            display: block;
+            width: 100%;
+        }
+
+        #lsidManagementTable tr {
+            padding: 8px 10px;
+            border: 1px solid #e5e7eb;
+            border-left: 3px solid #78a891;
+            border-radius: 7px;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+        }
+
+        #lsidManagementTable tbody td {
+            display: grid;
+            grid-template-columns: 82px minmax(0, 1fr);
+            align-items: start;
+            gap: 8px;
+            padding: 4px 0;
+            border: 0;
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        #lsidManagementTable tbody td::before {
+            content: attr(data-label);
+            color: #6b7280;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .lsid-tag {
+            margin-bottom: 3px;
+            font-size: 11px;
+        }
+
+        .lsid-action-buttons {
+            gap: 5px;
+        }
+
+        .lsid-action-buttons .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 30px;
+            padding: 0;
+        }
+
+        .pagination {
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+    }
+
+    @media (max-width: 380px) {
+        #lsidManagementTable tbody td {
+            grid-template-columns: 74px minmax(0, 1fr);
         }
     }
 </style>
@@ -235,7 +380,7 @@
             @if (!$managementRequested)
                 <div class="lsid-empty-state">Please apply a filter to load LSID register entries.</div>
             @else
-            <table class="table table-striped table-hover table-sm align-middle">
+            <table class="table table-striped table-hover table-sm align-middle" id="lsidManagementTable">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -252,18 +397,18 @@
                 <tbody>
                     @forelse ($registers as $register)
                         <tr>
-                            <td>{{ optional($register->service_date)->format('j M, Y') }}</td>
-                            <td>{{ $register->district->name ?? '-' }}</td>
-                            <td>{{ $register->pngo->name ?? '-' }}</td>
-                            <td>{{ $register->receiver_name }}</td>
-                            <td>{{ $register->mobile_number ?: '-' }}</td>
-                            <td>{{ $sexOptions[$register->sex] ?? $register->sex }}</td>
-                            <td>
+                            <td data-label="Date">{{ optional($register->service_date)->format('j M, Y') }}</td>
+                            <td data-label="District">{{ $register->district->name ?? '-' }}</td>
+                            <td data-label="PNGO">{{ $register->pngo->name ?? '-' }}</td>
+                            <td data-label="Name">{{ $register->receiver_name }}</td>
+                            <td data-label="Mobile">{{ $register->mobile_number ?: '-' }}</td>
+                            <td data-label="Sex">{{ $sexOptions[$register->sex] ?? $register->sex }}</td>
+                            <td data-label="Intervention">
                                 @foreach (($register->interventions_taken ?? []) as $intervention)
                                     <span class="lsid-tag">{{ $interventionOptions[$intervention] ?? $intervention }}</span>
                                 @endforeach
                             </td>
-                            <td>
+                            <td data-label="Service">
                                 @foreach (($register->service_types ?? []) as $type)
                                     <span class="lsid-tag">{{ $serviceTypeOptions[$type] ?? $type }}</span>
                                 @endforeach
@@ -271,7 +416,7 @@
                                     <span class="lsid-tag">{{ $register->service_type_other }}</span>
                                 @endif
                             </td>
-                            <td>
+                            <td data-label="Action">
                                 <div class="lsid-action-buttons">
                                     @can('Edit LSID Register')
                                         <a href="{{ route('lsid-register.edit', $register) }}" class="btn btn-warning btn-sm" title="Edit">

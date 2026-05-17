@@ -94,6 +94,15 @@
         vertical-align: top;
     }
 
+    .lsid-result-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .lsid-screen-table {
+        min-width: 980px;
+    }
+
     @media (max-width: 992px) {
         .lsid-filter-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -101,8 +110,98 @@
     }
 
     @media (max-width: 576px) {
+        .lsid-report-page {
+            gap: 12px;
+        }
+
+        .lsid-report-panel {
+            border-radius: 7px;
+        }
+
+        .lsid-report-header {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 12px 14px;
+        }
+
+        .lsid-report-header h1,
+        .lsid-report-header h2 {
+            font-size: 16px;
+            line-height: 1.3;
+        }
+
+        .lsid-report-header small {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .lsid-report-header .btn {
+            width: 100%;
+            min-height: 38px;
+        }
+
+        .lsid-report-body {
+            padding: 12px;
+        }
+
         .lsid-filter-grid {
             grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .lsid-filter-grid .form-label {
+            margin-bottom: 5px;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .lsid-filter-grid .form-control {
+            min-height: 38px;
+            font-size: 13px;
+        }
+
+        .lsid-filter-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .lsid-filter-actions .btn {
+            width: 100%;
+            min-height: 38px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .lsid-report-note {
+            padding: 16px 12px;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .lsid-result-table-wrap {
+            margin: 0 -2px;
+        }
+
+        .lsid-screen-table {
+            min-width: 900px;
+        }
+
+        .lsid-print-table th,
+        .lsid-print-table td {
+            font-size: 12px;
+            padding: 7px 8px;
+        }
+
+        .lsid-official-scope {
+            min-width: 640px;
+        }
+    }
+
+    @media (max-width: 390px) {
+        .lsid-screen-table {
+            min-width: 840px;
         }
     }
 </style>
@@ -215,7 +314,8 @@
                         </tr>
                     </table>
 
-                <table class="table table-bordered table-striped table-hover table-sm lsid-print-table lsid-pdf-table">
+                <div class="lsid-result-table-wrap">
+                <table class="table table-bordered table-striped table-hover table-sm lsid-print-table lsid-pdf-table lsid-screen-table">
                     <thead>
                         <tr>
                             <th style="width: 36px;">SL</th>
@@ -281,6 +381,7 @@
                         @endforelse
                     </tbody>
                 </table>
+                </div>
                 </div>
             @endif
         </div>

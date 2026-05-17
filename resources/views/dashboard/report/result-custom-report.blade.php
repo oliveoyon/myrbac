@@ -45,6 +45,64 @@
   .modal.modal-fullscreen .modal-body {
     overflow-y: auto;
   }
+
+  .intervention-result-card .card-header {
+    gap: 10px;
+  }
+
+  .intervention-result-table {
+    min-width: 720px;
+  }
+
+  .intervention-filter-chip {
+    display: inline-block;
+    margin: 4px 6px 0 0;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #e8f5ee;
+    color: #17643a;
+    font-size: 12px;
+  }
+
+  @media (max-width: 576px) {
+    .intervention-result-card .card-header {
+        align-items: flex-start !important;
+        flex-direction: column;
+        padding: 12px 14px;
+    }
+
+    .intervention-result-card .card-title {
+        font-size: 15px;
+        line-height: 1.35;
+    }
+
+    #printButton {
+        width: 100%;
+        min-height: 38px;
+    }
+
+    .intervention-result-card .card-body {
+        padding: 10px;
+    }
+
+    .intervention-filter-box {
+        padding: 9px 10px !important;
+        font-size: 12px;
+    }
+
+    .intervention-filter-chip {
+        font-size: 11px;
+    }
+
+    .intervention-result-table {
+        min-width: 650px;
+        font-size: 12px;
+    }
+
+    #pdfIframe {
+        height: 76vh !important;
+    }
+  }
     </style>
 @endpush
 
@@ -56,7 +114,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-outline">
+                <div class="card card-outline intervention-result-card">
                     <header class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                         <h5 class="card-title d-flex align-items-center mb-0">
                             <i class="fas fa-chalkboard-teacher me-2"></i>
@@ -72,16 +130,16 @@
                         </div>
                         <div id="reportDiv">
                             @if(!empty($appliedFilters))
-                                <div style="margin-bottom: 12px; padding: 10px 12px; border: 1px solid #d8e6de; background: #f6fbf8; border-radius: 6px;">
+                                <div class="intervention-filter-box" style="margin-bottom: 12px; padding: 10px 12px; border: 1px solid #d8e6de; background: #f6fbf8; border-radius: 6px;">
                                     <strong>Applied Filters:</strong>
                                     @foreach($appliedFilters as $label => $value)
-                                        <span style="display: inline-block; margin: 4px 6px 0 0; padding: 3px 8px; border-radius: 999px; background: #e8f5ee; color: #17643a; font-size: 12px;">
+                                        <span class="intervention-filter-chip">
                                             {{ $label }}: {{ $value }}
                                         </span>
                                     @endforeach
                                 </div>
                             @endif
-                            <table class="table table-bordered table-striped table-hover table-sm" id="class-table">
+                            <table class="table table-bordered table-striped table-hover table-sm intervention-result-table" id="class-table">
                             <thead>
                                 <tr>
                                     <th style="padding: 8px 12px; text-align: left;">Interventions</th>

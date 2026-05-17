@@ -369,9 +369,14 @@
             padding: 14px;
         }
 
-        .filter-grid,
-        .fields {
+        .filter-grid {
             grid-template-columns: 1fr;
+        }
+
+        .fields {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+            padding: 12px;
         }
 
         .report-panel-toggle,
@@ -386,6 +391,169 @@
 
         .report-submit-bar {
             border-radius: 8px 8px 0 0;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .report-builder {
+            gap: 12px;
+        }
+
+        .report-hero {
+            padding: 14px;
+            border-radius: 7px;
+        }
+
+        .report-hero h1 {
+            font-size: 18px;
+            line-height: 1.3;
+        }
+
+        .report-hero p {
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .report-hero-icon {
+            width: 42px;
+            height: 42px;
+            font-size: 18px;
+        }
+
+        .report-panel {
+            border-radius: 7px;
+        }
+
+        .report-panel-header {
+            padding: 12px 14px;
+        }
+
+        .report-panel-title {
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .report-panel-title h2,
+        .field-toolbar h2 {
+            font-size: 15px;
+        }
+
+        .report-panel-title span,
+        .field-toolbar p {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .report-panel-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+        }
+
+        .report-panel-body {
+            padding: 12px;
+        }
+
+        .filter-grid {
+            gap: 10px;
+        }
+
+        .filter-item label {
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .filter-item .form-control {
+            min-height: 38px;
+            font-size: 13px;
+        }
+
+        .field-toolbar {
+            padding: 12px;
+        }
+
+        .category-grid {
+            gap: 10px;
+        }
+
+        .report-category {
+            border-radius: 7px;
+        }
+
+        .report-category-header {
+            align-items: flex-start;
+            padding: 11px 12px;
+        }
+
+        .report-category-title {
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .select-all-container {
+            justify-content: flex-start;
+            gap: 7px;
+            font-size: 11px;
+        }
+
+        .toggle-switch {
+            width: 38px;
+            height: 20px;
+        }
+
+        .slider:before {
+            width: 14px;
+            height: 14px;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+
+        .fields {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            padding: 10px;
+        }
+
+        .field {
+            min-height: 38px;
+            border-radius: 6px;
+        }
+
+        .field label {
+            gap: 7px;
+            padding: 8px;
+            font-size: 12px;
+            line-height: 1.25;
+        }
+
+        .field input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+        }
+
+        .report-submit-bar {
+            gap: 8px;
+            margin: 0 -8px;
+            padding: 10px 8px;
+        }
+
+        .report-submit-bar span {
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .report-submit-bar .btn {
+            min-width: 0;
+            min-height: 40px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+    }
+
+    @media (max-width: 390px) {
+        .fields {
+            grid-template-columns: 1fr;
         }
     }
 </style>

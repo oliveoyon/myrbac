@@ -246,7 +246,8 @@
 
     @media (max-width: 768px) {
         .lsid-check-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
         }
 
         .lsid-page {
@@ -273,8 +274,9 @@
         }
 
         .lsid-check-card {
-            min-height: 48px;
-            font-size: 14px;
+            min-height: 42px;
+            padding: 9px 10px;
+            font-size: 13px;
         }
 
         .lsid-action-row {
@@ -290,6 +292,154 @@
         .lsid-action-row .btn {
             width: 100%;
             min-height: 44px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .lsid-page {
+            margin: 0 -2px;
+            padding-bottom: 82px;
+        }
+
+        .lsid-header {
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 14px;
+            border-radius: 7px;
+        }
+
+        .lsid-kicker {
+            font-size: 11px;
+        }
+
+        .lsid-header h1 {
+            margin: 3px 0 5px;
+            font-size: 18px;
+            line-height: 1.35;
+        }
+
+        .lsid-header p {
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .lsid-meta {
+            gap: 6px;
+        }
+
+        .lsid-meta span,
+        .lsid-status-pill {
+            min-height: 25px;
+            padding: 3px 8px;
+            font-size: 11px;
+        }
+
+        .lsid-card {
+            margin-bottom: 10px;
+            border-radius: 7px;
+        }
+
+        .lsid-card-header {
+            padding: 11px 12px;
+            background: #fbfcfd;
+        }
+
+        .lsid-card-header h2 {
+            gap: 8px;
+            font-size: 14px;
+            line-height: 1.3;
+        }
+
+        .lsid-card-body {
+            padding: 12px;
+        }
+
+        .lsid-card-body .row {
+            --bs-gutter-x: .75rem;
+            --bs-gutter-y: .75rem;
+        }
+
+        .lsid-card-body .form-label {
+            margin-bottom: 5px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .lsid-card-body .form-control {
+            min-height: 38px;
+            font-size: 13px;
+        }
+
+        .lsid-section-title {
+            margin-bottom: 9px;
+            font-size: 13px;
+            line-height: 1.35;
+        }
+
+        .lsid-section-title::before {
+            width: 7px;
+            height: 7px;
+            box-shadow: 0 0 0 3px #edf6f1;
+        }
+
+        .lsid-option-block {
+            padding: 11px;
+            border-radius: 7px;
+        }
+
+        .lsid-option-block + .lsid-option-block {
+            margin-top: 11px;
+        }
+
+        .lsid-check-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .lsid-check-card {
+            align-items: center;
+            gap: 7px;
+            min-height: 38px;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.25;
+        }
+
+        .lsid-check-card input {
+            width: 14px;
+            height: 14px;
+            margin-top: 0;
+        }
+
+        .lsid-dependent-field {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 7px;
+        }
+
+        .lsid-action-row {
+            gap: 7px;
+            margin: 0 -8px 12px;
+            padding: 9px 8px;
+        }
+
+        .lsid-action-row .btn {
+            min-height: 40px;
+            padding: 8px 10px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+    }
+
+    @media (max-width: 390px) {
+        .lsid-check-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .lsid-action-row {
+            flex-direction: column;
         }
     }
 </style>

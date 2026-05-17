@@ -2,10 +2,126 @@
 
 @section('title', 'PNGO Management')
 
+@push('styles')
+    <style>
+        @media (max-width: 576px) {
+            .pngo-management-page .management-card {
+                overflow: visible;
+            }
 
+            .pngo-management-page .management-table-wrap {
+                overflow: visible;
+            }
+
+            #pngosTable {
+                min-width: 0;
+                border-collapse: separate;
+                border-spacing: 0 7px;
+                font-size: 13px;
+            }
+
+            #pngosTable thead {
+                display: none;
+            }
+
+            #pngosTable,
+            #pngosTable tbody,
+            #pngosTable tr,
+            #pngosTable td {
+                display: block;
+                width: 100%;
+            }
+
+            #pngosTable tr {
+                padding: 8px 10px;
+                border: 1px solid #e5e7eb;
+                border-left: 3px solid #c30f08;
+                border-radius: 7px;
+                background: #fff;
+                box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+            }
+
+            #pngosTable tbody td {
+                display: grid;
+                grid-template-columns: 70px minmax(0, 1fr);
+                align-items: center;
+                gap: 8px;
+                padding: 4px 0;
+                border: 0;
+                text-align: left;
+            }
+
+            #pngosTable tbody td::before {
+                content: attr(data-label);
+                color: #6b7280;
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+            }
+
+            #pngosTable .management-name-cell,
+            #pngosTable .pngo-district {
+                color: #111827;
+                font-weight: 700;
+            }
+
+            #pngosTable .management-actions {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                gap: 5px;
+                width: auto;
+            }
+
+            #pngosTable .management-actions .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                width: auto;
+                min-width: 0;
+                padding: 5px 8px;
+                font-size: 12px;
+                line-height: 1.2;
+                white-space: nowrap;
+            }
+
+            .pngo-management-page .modal-dialog {
+                margin: 10px;
+            }
+
+            .pngo-management-page .modal-body {
+                padding: 14px;
+            }
+
+            .pngo-management-page .custombtn {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                text-align: initial !important;
+            }
+
+            .pngo-management-page .custombtn .btn {
+                width: 100%;
+                margin: 0;
+            }
+        }
+
+        @media (max-width: 380px) {
+            #pngosTable tbody td {
+                grid-template-columns: 62px minmax(0, 1fr);
+            }
+
+            #pngosTable .management-actions .btn {
+                padding: 5px 7px;
+                font-size: 11px;
+            }
+        }
+    </style>
+@endpush
 
 @section('content')
-    <section class="management-page">
+    <section class="management-page pngo-management-page">
         <div class="management-header">
             <div>
                 <h1>PNGO Management</h1>
@@ -36,10 +152,10 @@
                     <tbody>
                         @foreach ($pngos as $pngo)
                             <tr id="pngo-{{ $pngo->id }}">
-                                <td>{{ $loop->iteration }} </td>
-                                <td class="pngo-name management-name-cell">{{ $pngo->name }}</td>
-                                <td class="pngo-district">{{ $pngo->district->name ?? 'Not mapped' }}</td>
-                                <td>
+                                <td data-label="#">{{ $loop->iteration }} </td>
+                                <td data-label="Name" class="pngo-name management-name-cell">{{ $pngo->name }}</td>
+                                <td data-label="District" class="pngo-district">{{ $pngo->district->name ?? 'Not mapped' }}</td>
+                                <td data-label="Actions">
                                     <div class="management-actions">
                                         <button class="btn btn-warning btn-sm editPngoBtn" data-id="{{ $pngo->id }}"
                                             data-name="{{ $pngo->name }}"

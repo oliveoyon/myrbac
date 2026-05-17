@@ -179,6 +179,100 @@
             }
         }
 
+        @media (max-width: 576px) {
+            .role-permissions-page .management-card {
+                overflow: visible;
+            }
+
+            .role-permissions-page .management-table-wrap {
+                overflow: visible;
+            }
+
+            #rolePermissionsTable {
+                min-width: 0;
+                border-collapse: separate;
+                border-spacing: 0 7px;
+                font-size: 13px;
+            }
+
+            #rolePermissionsTable thead {
+                display: none;
+            }
+
+            #rolePermissionsTable,
+            #rolePermissionsTable tbody,
+            #rolePermissionsTable tr,
+            #rolePermissionsTable td {
+                display: block;
+                width: 100%;
+            }
+
+            #rolePermissionsTable tr {
+                padding: 8px 10px;
+                border: 1px solid #e5e7eb;
+                border-left: 3px solid #c30f08;
+                border-radius: 7px;
+                background: #fff;
+                box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+            }
+
+            #rolePermissionsTable tbody td {
+                display: grid;
+                grid-template-columns: 70px minmax(0, 1fr);
+                align-items: center;
+                gap: 8px;
+                padding: 4px 0;
+                border: 0;
+                text-align: left;
+            }
+
+            #rolePermissionsTable tbody td::before {
+                content: attr(data-label);
+                color: #6b7280;
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+            }
+
+            #rolePermissionsTable .management-name-cell {
+                color: #111827;
+                font-weight: 700;
+                overflow-wrap: anywhere;
+            }
+
+            #rolePermissionsTable .management-actions {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                gap: 5px;
+                width: auto;
+            }
+
+            #rolePermissionsTable .management-actions .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                width: auto;
+                min-width: 0;
+                padding: 5px 8px;
+                font-size: 12px;
+                line-height: 1.2;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 380px) {
+            #rolePermissionsTable tbody td {
+                grid-template-columns: 62px minmax(0, 1fr);
+            }
+
+            #rolePermissionsTable .management-actions .btn {
+                padding: 5px 7px;
+                font-size: 11px;
+            }
+        }
+
         /* Classic Checkbox Style */
         .classic-checkbox {
             width: 16px;
@@ -272,7 +366,7 @@
 @endpush
 
 @section('content')
-    <section class="management-page">
+    <section class="management-page role-permissions-page">
         <div class="management-header">
             <div>
                 <h1>Roles and Permissions</h1>
@@ -287,7 +381,7 @@
             </div>
 
             <div class="management-table-wrap table-responsive">
-                    <table class="table table-bordered table-striped table-hover table-sm management-table">
+                    <table class="table table-bordered table-striped table-hover table-sm management-table" id="rolePermissionsTable">
                         <thead>
                             <tr>
                                 <th>Role Name</th>
@@ -297,8 +391,8 @@
                         <tbody>
                             @foreach ($roles as $role)
                                 <tr>
-                                    <td class="management-name-cell">{{ $role->name }}</td>
-                                    <td>
+                                    <td data-label="Role" class="management-name-cell">{{ $role->name }}</td>
+                                    <td data-label="Actions">
                                         <div class="management-actions">
                                             <button class="btn btn-info btn-sm view-permissions" data-id="{{ $role->id }}"
                                                 data-name="{{ $role->name }}"
