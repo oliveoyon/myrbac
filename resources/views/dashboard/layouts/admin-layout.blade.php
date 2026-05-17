@@ -160,7 +160,7 @@
         </div>
         <div class="profile-menu">
             <button class="profile-button">
-                <i class="fas fa-user"></i> {{ Auth::user()->name }}
+                <i class="fas fa-user"></i> {{ Auth::user()->full_name ?: Auth::user()->name }}
             </button>
             <div class="dropdown-menu">
                 <a href="{{ route('users.my-profile') }}"><i class="fas fa-user"></i> My Profile</a>
