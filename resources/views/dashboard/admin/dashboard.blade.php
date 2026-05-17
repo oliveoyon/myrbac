@@ -9,6 +9,16 @@
         gap: 16px;
         color: #17202a;
         min-width: 0;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .smart-dashboard .row,
+    .smart-dashboard [class*="col-"],
+    .dash-panel,
+    .dash-stat-card,
+    .dash-day {
+        min-width: 0;
     }
 
     .dash-hero {
@@ -172,6 +182,7 @@
         background: #fff;
         box-shadow: 0 8px 18px rgba(16, 24, 40, .05);
         overflow: hidden;
+        max-width: 100%;
     }
 
     .dash-panel-header {
@@ -205,6 +216,8 @@
         grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 8px;
         min-width: 0;
+        width: 100%;
+        max-width: 100%;
     }
 
     .dash-day {
@@ -218,6 +231,7 @@
         background: #fff;
         transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
         min-width: 0;
+        overflow: hidden;
     }
 
     .dash-day:hover {
@@ -246,7 +260,17 @@
         font-size: 12px;
         font-weight: 800;
         max-width: 100%;
-        white-space: nowrap;
+        white-space: normal;
+        line-height: 1.2;
+    }
+
+    .dash-panel-body.table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .dash-table {
+        min-width: 640px;
     }
 
     .dash-table {
@@ -294,6 +318,10 @@
         .dash-calendar-row {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             overflow-x: visible;
+        }
+
+        .dash-table {
+            min-width: 600px;
         }
     }
 
@@ -383,6 +411,10 @@
 
         .dash-panel-body {
             padding: 12px;
+        }
+
+        .dash-table {
+            min-width: 560px;
         }
     }
 
