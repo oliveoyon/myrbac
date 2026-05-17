@@ -422,7 +422,14 @@ class UserController extends Controller
 
     public function myProfile()
     {
-        $user = auth()->user();
+        $user = auth()->user()->load([
+            'district:id,name',
+            'pngo:id,name,district_id',
+            'pngoScopes.district:id,name',
+            'pngoScopes.pngo:id,name',
+            'roles:id,name',
+        ]);
+
         return view('dashboard.admin.profile', compact('user'));
     }
 
