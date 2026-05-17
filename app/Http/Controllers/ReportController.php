@@ -82,6 +82,12 @@ class ReportController extends Controller
         $send['data'] = $request->input('pdf_data');
         $send['title'] = $request->input('title');
         $fname = $request->input('fname');
+        $fontDirs = (new ConfigVariables())->getDefaults()['fontDir'];
+        $fontData = (new FontVariables())->getDefaults()['fontdata'];
+        $mpdfTempDir = storage_path('app/mpdf');
+        if (!is_dir($mpdfTempDir)) {
+            mkdir($mpdfTempDir, 0775, true);
+        }
 
         // Get the chart image data
         $chartImage = $request->input('chart_image');
@@ -93,6 +99,10 @@ class ReportController extends Controller
             $decodedData = base64_decode($data);
 
             // Save the chart image to a temporary file
+            $chartDir = public_path('images');
+            if (!is_dir($chartDir)) {
+                mkdir($chartDir, 0775, true);
+            }
             $chartImagePath = public_path('images/chart.png');
             file_put_contents($chartImagePath, $decodedData);
             $send['chartImagePath'] = $chartImagePath;
@@ -106,6 +116,22 @@ class ReportController extends Controller
             'margin_top' => 30,
             'margin_bottom' => 5,
             'margin_header' => 5,
+            'fontDir' => array_merge($fontDirs, [
+                resource_path('fonts'),
+            ]),
+            'fontdata' => $fontData + [
+                'bangla' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+                'solaimanlipi' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+            ],
+            'default_font' => 'bangla',
+            'cacheCleanupInterval' => false,
+            'tempDir' => $mpdfTempDir,
         ]);
 
         $mpdf->setAutoBottomMargin = 'stretch';

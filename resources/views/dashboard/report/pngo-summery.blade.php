@@ -75,7 +75,7 @@
                             <i class="fas fa-chalkboard-teacher mr-1"></i>
                             PNGO Wise Breakdown
                         </h6>
-                        <button class="btn btn-success btn-sm" id="printButton">
+                        <button type="button" class="btn btn-success btn-sm" id="printButton">
                             <i class="fas fa-print mr-1"></i> Print Report
                         </button>
                     </div>
@@ -137,7 +137,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
 <script>
-    $('#printButton').click(function() {
+    $('#printButton').on('click', function(event) {
+        event.preventDefault();
         var data = $('#reportDiv').html(); // Get the HTML content for the report
 
         // Capture the chart image
@@ -148,7 +149,8 @@
         $('#loader-overlay').show();
 
         $.ajax({
-            url: '/mne/generate-pdf-chart',  // Your route to handle the POST request
+            url: '{{ route('generate-pdf-chart') }}',  // Your route to handle the POST request
+            type: 'POST',
             method: 'POST',
             data: {
                 pdf_data: data,  // The HTML content for the report
