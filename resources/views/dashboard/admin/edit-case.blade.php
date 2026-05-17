@@ -312,26 +312,159 @@
         }
 
         @media (max-width: 767px) {
+            .case-edit-page {
+                padding-bottom: 22px;
+            }
+
+            .case-form-shell {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
             .case-form-hero {
                 flex-direction: column;
+                gap: 12px;
+                padding: 14px;
+                margin-bottom: 12px;
             }
 
             .case-form-hero h2 {
                 font-size: 20px;
+                line-height: 1.2;
+                margin-bottom: 8px;
+            }
+
+            .case-form-meta {
+                gap: 6px;
+            }
+
+            .case-form-meta span,
+            .case-status-pill {
+                min-height: 26px;
+                max-width: 100%;
+                font-size: 12px;
+                line-height: 1.25;
+                white-space: normal;
             }
 
             .case-section-nav {
                 top: 58px;
                 border-radius: 6px;
+                gap: 6px;
+                padding: 8px;
+                margin-bottom: 12px;
+                scroll-snap-type: x proximity;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .case-section-nav a {
+                padding: 6px 9px;
+                font-size: 12px;
+                scroll-snap-align: start;
+            }
+
+            .accordion {
+                gap: 10px;
             }
 
             .accordion-button {
                 font-size: 14px;
-                padding: 12px 14px;
+                padding: 11px 12px;
+            }
+
+            .accordion-title {
+                gap: 8px;
+            }
+
+            .accordion-title-no {
+                min-width: 32px;
+                padding: 2px 7px;
+                font-size: 11px;
+            }
+
+            .accordion-title-bn {
+                font-size: 13px;
+                line-height: 1.25;
+            }
+
+            .accordion-title-en {
+                font-size: 11px;
+                line-height: 1.25;
             }
 
             .accordion-body {
-                padding: 14px;
+                padding: 12px;
+            }
+
+            .accordion-body h5 {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+
+            .form-label.manual-label {
+                min-height: auto;
+                gap: 7px;
+                margin-bottom: 5px;
+            }
+
+            .manual-label-no {
+                min-width: 31px;
+                font-size: 10px;
+            }
+
+            .manual-label-bn {
+                font-size: 12px;
+                line-height: 1.25;
+            }
+
+            .manual-label-en {
+                font-size: 10.5px;
+                line-height: 1.25;
+            }
+
+            .form-control,
+            .form-select {
+                min-height: 40px;
+                font-size: 13px;
+                padding: 8px 9px;
+            }
+
+            .form-select {
+                padding-right: 32px;
+                background-position: right 9px center;
+            }
+
+            textarea.form-control {
+                min-height: 82px;
+            }
+
+            .case-submit-bar {
+                padding-top: 10px;
+            }
+
+            .case-submit-bar .btn {
+                width: 100%;
+                min-width: 0;
+                min-height: 42px;
+            }
+        }
+
+        @media (max-width: 390px) {
+            .case-form-shell {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .case-form-hero {
+                padding: 12px;
+            }
+
+            .accordion-body {
+                padding: 10px;
+            }
+
+            .accordion-button {
+                padding: 10px;
             }
         }
     </style>
