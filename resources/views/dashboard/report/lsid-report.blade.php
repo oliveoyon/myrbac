@@ -281,7 +281,7 @@
             <h2>Report Result</h2>
             @can('Generate LSID Report')
                 @if ($reportRequested && $districtSelected && $registers->count())
-                <button class="btn btn-success btn-sm" id="printButton">
+                <button type="button" class="btn btn-success btn-sm" id="printButton">
                     <i class="fas fa-print"></i> Print PDF
                 </button>
                 @endif
@@ -433,11 +433,13 @@
         syncLsidPngoDropdown(form);
     });
 
-    $('#printButton').click(function() {
+    $('#printButton').on('click', function(event) {
+        event.preventDefault();
         $('#loader-overlay').show();
 
         $.ajax({
             url: '{{ route('lsid-register.report.pdf') }}',
+            type: 'POST',
             method: 'POST',
             data: {
                 pdf_data: $('#reportDiv').html(),

@@ -67,6 +67,10 @@ class ReportController extends Controller
 
         // Save the PDF file in the public folder
         $pdfFilePath = public_path($fname);
+        $pdfDirectory = dirname($pdfFilePath);
+        if (!is_dir($pdfDirectory)) {
+            mkdir($pdfDirectory, 0775, true);
+        }
         $mpdf->Output($pdfFilePath, 'F');
 
         // Construct the public URL of the saved PDF
