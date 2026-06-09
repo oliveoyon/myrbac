@@ -58,6 +58,7 @@
             width: 100% !important;
             height: auto !important;
         }
+
     </style>
 @endpush
 
@@ -131,6 +132,30 @@
     </div><!-- /.container-fluid -->
 </section>
 
+<form id="pdfPostForm" method="POST" action="{{ route('generate-pdf-chart', [], false) }}" target="pdfFrame" class="d-none">
+    @csrf
+    <input type="hidden" name="pdf_data" id="pdf_data">
+    <input type="hidden" name="chart_image" id="chart_image">
+    <input type="hidden" name="title" value="PNGO Wise Summery">
+    <input type="hidden" name="orientation" value="P">
+    <input type="hidden" name="fname" value="PNGO Wise Summery.pdf">
+    <input type="hidden" name="inline" value="1">
+</form>
+
+<div class="modal fade modal-fullscreen" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pdfModalLabel">PNGO Wise Summery Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe name="pdfFrame" id="pdfFrame" style="width: 100%; height: 86vh; border: 0;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -139,88 +164,14 @@
 <script>
     $('#printButton').on('click', function(event) {
         event.preventDefault();
-        var data = $('#reportDiv').html(); // Get the HTML content for the report
+        var chartCanvas = document.getElementById('pngoBarChart');
+        $('#pdf_data').val($('#reportDiv').html());
+        $('#chart_image').val(chartCanvas.toDataURL('image/png'));
 
-        // Capture the chart image
-        var chartCanvas = document.getElementById('pngoBarChart'); // Your chart canvas id
-        var chartImage = chartCanvas.toDataURL('image/png'); // Convert canvas to image data URL
-
-        // Show the loader overlay
-        $('#loader-overlay').show();
-
-        $.ajax({
-            url: '{{ route('generate-pdf-chart', [], false) }}',  // Your route to handle the POST request
-            type: 'POST',
-            method: 'POST',
-            data: {
-                pdf_data: data,  // The HTML content for the report
-                chart_image: chartImage,  // The image data URL for the chart
-                title: 'PNGO Wise Summery',
-                orientation: 'P',
-                fname: 'PNGO Wise Summery.pdf',
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
-            },
-            success: function(response) {
-                if (response.pdf_url && isValidUrl(response.pdf_url)) {
-                    // Create a modal element using Bootstrap 5 modal structure
-                    var modalContent = 
-                        '<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">';
-                    modalContent += 
-                        '<div class="modal-dialog modal-dialog-centered modal-fullscreen" role="document">';
-                    modalContent += '<div class="modal-content">';
-                    modalContent += '<div class="modal-header">';
-                    modalContent += '<h5 class="modal-title" id="pdfModalLabel">PNGO Wise Summery Report</h5>';
-                    modalContent += 
-                        '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
-                    modalContent += '</div>';
-                    modalContent += '<div class="modal-body">';
-                    modalContent += 
-                        '<div id="pdfLoaderOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center;">';
-                    modalContent += '<img src="/path/to/loader.gif" alt="Loader">';
-                    modalContent += '</div>';
-                    modalContent += 
-                        '<iframe id="pdfIframe" src="' + response.pdf_url + '" style="width: 100%; height: 80vh; display: none;"></iframe>';
-                    modalContent += '</div>';
-                    modalContent += '</div>';
-                    modalContent += '</div>';
-                    modalContent += '</div>';
-
-                    // Append modal to the body
-                    $('body').append(modalContent);
-
-                    // Show the modal using Bootstrap 5 JavaScript API
-                    var modal = new bootstrap.Modal(document.getElementById('pdfModal'));
-                    modal.show();
-
-                    // Hide the loader overlay when the PDF is loaded
-                    $('#pdfIframe').on('load', function() {
-                        $('#pdfLoaderOverlay').hide();
-                        $('#pdfIframe').show();
-                    });
-
-                    console.log('PDF generated successfully');
-                } else {
-                    console.error('Invalid PDF response:', response);
-                    alert('Error generating PDF. Please try again.');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX request failed:', error);
-                alert('Error generating PDF. Please try again.');
-            },
-            complete: function() {
-                // Hide the loader overlay when the request is complete
-                $('#loader-overlay').hide();
-            }
-        });
+        var modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+        modal.show();
+        $('#pdfPostForm').trigger('submit');
     });
-
-    function isValidUrl(url) {
-        // Implement a function to check if the URL is valid based on your requirements
-        return /^https?:\/\/.+/.test(url);
-    }
 </script>
 
 

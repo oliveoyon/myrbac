@@ -204,6 +204,7 @@
             min-width: 840px;
         }
     }
+
 </style>
 @endpush
 
@@ -387,6 +388,29 @@
         </div>
     </div>
 </section>
+
+<form id="pdfPostForm" method="POST" action="{{ route('lsid-register.report.pdf', [], false) }}" target="pdfFrame" class="d-none">
+    @csrf
+    <input type="hidden" name="pdf_data" id="pdf_data">
+    <input type="hidden" name="title" value="LSID Register Report">
+    <input type="hidden" name="orientation" value="L">
+    <input type="hidden" name="fname" value="lsid-register-report.pdf">
+    <input type="hidden" name="inline" value="1">
+</form>
+
+<div class="modal fade modal-fullscreen" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pdfModalLabel">LSID Register Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe name="pdfFrame" id="pdfFrame" style="width: 100%; height: 86vh; border: 0;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -435,35 +459,11 @@
 
     $('#printButton').on('click', function(event) {
         event.preventDefault();
-        $('#loader-overlay').show();
+        $('#pdf_data').val($('#reportDiv').html());
 
-        $.ajax({
-            url: '{{ route('lsid-register.report.pdf', [], false) }}',
-            type: 'POST',
-            method: 'POST',
-            data: {
-                pdf_data: $('#reportDiv').html(),
-                title: 'LSID Register Report',
-                orientation: 'L',
-                fname: 'lsid-register-report.pdf',
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                if (response.pdf_url) {
-                    window.open(response.pdf_url, '_blank');
-                } else {
-                    alert('Error generating PDF. Please try again.');
-                }
-            },
-            error: function() {
-                alert('Error generating PDF. Please try again.');
-            },
-            complete: function() {
-                $('#loader-overlay').hide();
-            }
-        });
+        var modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+        modal.show();
+        $('#pdfPostForm').trigger('submit');
     });
 </script>
 @endpush

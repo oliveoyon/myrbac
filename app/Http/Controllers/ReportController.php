@@ -65,6 +65,13 @@ class ReportController extends Controller
         $html = view($bladeViewPath, $send)->render();
         $mpdf->WriteHTML($html);
 
+        if ($request->boolean('inline')) {
+            return response($mpdf->Output('', 'S'), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $fname . '"',
+            ]);
+        }
+
         // Save the PDF file in the public folder
         $pdfFilePath = public_path($fname);
         $pdfDirectory = dirname($pdfFilePath);
@@ -146,6 +153,13 @@ class ReportController extends Controller
         $bladeViewPath = 'dashboard.report.common-reports-chart';
         $html = view($bladeViewPath, $send)->render();
         $mpdf->WriteHTML($html);
+
+        if ($request->boolean('inline')) {
+            return response($mpdf->Output('', 'S'), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $fname . '"',
+            ]);
+        }
 
         // Save the PDF file in the public folder
         $pdfFilePath = public_path($fname);
