@@ -170,7 +170,8 @@
 
         var modal = new bootstrap.Modal(document.getElementById('pdfModal'));
         modal.show();
-        $('#pdfPostForm').trigger('submit');
+        document.getElementById('pdfFrame').src = 'about:blank';
+        document.getElementById('pdfPostForm').submit();
     });
 </script>
 
