@@ -132,16 +132,6 @@
     </div><!-- /.container-fluid -->
 </section>
 
-<form id="pdfPostForm" method="POST" action="{{ route('generate-pdf-chart', [], false) }}" target="pdfFrame" class="d-none">
-    @csrf
-    <input type="hidden" name="pdf_data" id="pdf_data">
-    <input type="hidden" name="chart_image" id="chart_image">
-    <input type="hidden" name="title" value="PNGO Wise Summery">
-    <input type="hidden" name="orientation" value="P">
-    <input type="hidden" name="fname" value="PNGO Wise Summery.pdf">
-    <input type="hidden" name="inline" value="1">
-</form>
-
 <div class="modal fade modal-fullscreen" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen" role="document">
         <div class="modal-content">
@@ -164,14 +154,9 @@
 <script>
     $('#printButton').on('click', function(event) {
         event.preventDefault();
-        var chartCanvas = document.getElementById('pngoBarChart');
-        $('#pdf_data').val($('#reportDiv').html());
-        $('#chart_image').val(chartCanvas.toDataURL('image/png'));
-
         var modal = new bootstrap.Modal(document.getElementById('pdfModal'));
         modal.show();
-        document.getElementById('pdfFrame').src = 'about:blank';
-        document.getElementById('pdfPostForm').submit();
+        document.getElementById('pdfFrame').src = '{{ route('pngo.summery.print', [], false) }}';
     });
 </script>
 

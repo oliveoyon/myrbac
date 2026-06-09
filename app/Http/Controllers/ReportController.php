@@ -409,11 +409,47 @@ class ReportController extends Controller
         return view('dashboard.report.district-summery', compact('districtWise'));
     }
 
+    public function districtSummeryPdf()
+    {
+        $commonService = new CommonService();
+        $districtWise = $commonService->showCaseAssistanceDistrictWise();
+
+        $mpdf = $this->reportMpdf('P');
+        $html = view('dashboard.report.summary-report-pdf', [
+            'title' => 'District Wise Summery',
+            'nameColumn' => 'District',
+            'nameKey' => 'district_name',
+            'rows' => $districtWise,
+        ])->render();
+
+        $mpdf->WriteHTML($html);
+
+        return $this->inlinePdfResponse($mpdf, 'district-wise-summery.pdf');
+    }
+
     public function pngoSummery()
     {
         $commonService = new CommonService();
         $pngoWise = $commonService->showCaseAssistancePngoWise();
         return view('dashboard.report.pngo-summery', compact('pngoWise'));
+    }
+
+    public function pngoSummeryPdf()
+    {
+        $commonService = new CommonService();
+        $pngoWise = $commonService->showCaseAssistancePngoWise();
+
+        $mpdf = $this->reportMpdf('P');
+        $html = view('dashboard.report.summary-report-pdf', [
+            'title' => 'PNGO Wise Summery',
+            'nameColumn' => 'PNGO',
+            'nameKey' => 'pngo_name',
+            'rows' => $pngoWise,
+        ])->render();
+
+        $mpdf->WriteHTML($html);
+
+        return $this->inlinePdfResponse($mpdf, 'pngo-wise-summery.pdf');
     }
 
     public function search(Request $request)
@@ -471,6 +507,56 @@ class ReportController extends Controller
         }
 
         return str_ends_with(strtolower($fileName), '.pdf') ? $fileName : $fileName . '.pdf';
+    }
+
+    private function reportMpdf(string $orientation = 'P'): Mpdf
+    {
+        $fontDirs = (new ConfigVariables())->getDefaults()['fontDir'];
+        $fontData = (new FontVariables())->getDefaults()['fontdata'];
+        $mpdfTempDir = storage_path('app/mpdf');
+
+        if (! is_dir($mpdfTempDir)) {
+            mkdir($mpdfTempDir, 0775, true);
+        }
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'orientation' => $orientation,
+            'margin_top' => 10,
+            'margin_bottom' => 8,
+            'margin_left' => 8,
+            'margin_right' => 8,
+            'fontDir' => array_merge($fontDirs, [
+                resource_path('fonts'),
+            ]),
+            'fontdata' => $fontData + [
+                'bangla' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+                'solaimanlipi' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+            ],
+            'default_font' => 'bangla',
+            'cacheCleanupInterval' => false,
+            'tempDir' => $mpdfTempDir,
+        ]);
+
+        $mpdf->SetAutoPageBreak(true);
+        $mpdf->SetAuthor('GIZ');
+
+        return $mpdf;
+    }
+
+    private function inlinePdfResponse(Mpdf $mpdf, string $fileName)
+    {
+        return response($mpdf->Output('', 'S'), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $this->pdfFileName($fileName) . '"',
+        ]);
     }
 }
 

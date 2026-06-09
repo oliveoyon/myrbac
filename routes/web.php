@@ -98,6 +98,7 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::put('/lsid-management/{lsidRegister}', [LsidRegisterController::class, 'update'])->name('lsid-register.update')->middleware('permission:Edit LSID Register');
     Route::delete('/lsid-management/{lsidRegister}', [LsidRegisterController::class, 'destroy'])->name('lsid-register.destroy')->middleware('permission:Delete LSID Register');
     Route::get('/lsid-report', [LsidRegisterController::class, 'report'])->name('lsid-register.report')->middleware('permission:View LSID Report');
+    Route::get('/lsid-report/print', [LsidRegisterController::class, 'reportPdf'])->name('lsid-register.report.print')->middleware('permission:Generate LSID Report');
     Route::post('/lsid-report/pdf', [ReportController::class, 'generatePdf'])->name('lsid-register.report.pdf')->middleware('permission:Generate LSID Report');
     Route::get('/formal-cases/export', [ReportController::class, 'exportExcel'])->name('formal.cases.export')->middleware('permission:Export Formal Cases');
     Route::post('/dashboard/search', [ReportController::class, 'search'])->name('dashboard.search')->middleware('permission:Search Dashboard Reports');
@@ -119,7 +120,9 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::post('/custom-report', [ReportController::class, 'generateCustomReport'])->name('custom.report.generate')->middleware('permission:Generate Custom Report');
     Route::get('/getFormalCaseStats', [ReportController::class, 'getFormalCaseStats'])->name('getFormalCaseStats')->middleware('permission:View Formal Case Statistics');
     Route::get('/district-summery', [ReportController::class, 'districtSummery'])->name('district.summery')->middleware('permission:View District Summary Report');
+    Route::get('/district-summery/print', [ReportController::class, 'districtSummeryPdf'])->name('district.summery.print')->middleware('permission:View District Summary Report');
     Route::get('/pngo-summery', [ReportController::class, 'pngoSummery'])->name('pngo.summery')->middleware('permission:View PNGO Summary Report');
+    Route::get('/pngo-summery/print', [ReportController::class, 'pngoSummeryPdf'])->name('pngo.summery.print')->middleware('permission:View PNGO Summary Report');
     
     
     

@@ -7,6 +7,9 @@ use App\Models\LsidRegister;
 use App\Models\Pngo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Mpdf\Config\ConfigVariables;
+use Mpdf\Config\FontVariables;
+use Mpdf\Mpdf;
 
 class LsidRegisterController extends Controller
 {
@@ -252,6 +255,59 @@ class LsidRegisterController extends Controller
         ]));
     }
 
+    public function reportPdf(Request $request)
+    {
+        $reportRequested = $request->query->count() > 0;
+        $districtSelected = Auth::user()->district_id || $request->filled('district_id');
+
+        $query = $this->scopedQuery()
+            ->with(['district:id,name', 'pngo:id,name', 'creator:id,name'])
+            ->when($request->filled('district_id'), function ($query) use ($request) {
+                $query->where('district_id', $request->district_id);
+            })
+            ->when($request->filled('pngo_id'), function ($query) use ($request) {
+                $query->where('pngo_id', $request->pngo_id);
+            })
+            ->when($request->filled('sex'), function ($query) use ($request) {
+                $query->where('sex', $request->sex);
+            })
+            ->when($request->filled('from_date'), function ($query) use ($request) {
+                $query->whereDate('service_date', '>=', $request->from_date);
+            })
+            ->when($request->filled('to_date'), function ($query) use ($request) {
+                $query->whereDate('service_date', '<=', $request->to_date);
+            })
+            ->when($request->filled('intervention'), function ($query) use ($request) {
+                $query->whereJsonContains('interventions_taken', $request->intervention);
+            });
+
+        $registers = ($reportRequested && $districtSelected)
+            ? $query->latest('service_date')->get()
+            : collect();
+
+        $reportDistrictName = Auth::user()->district_id
+            ? District::whereKey(Auth::user()->district_id)->value('name')
+            : ($request->filled('district_id') ? District::whereKey($request->district_id)->value('name') : null);
+        $reportPngoName = Auth::user()->pngo_id
+            ? Pngo::whereKey(Auth::user()->pngo_id)->value('name')
+            : ($request->filled('pngo_id') ? Pngo::whereKey($request->pngo_id)->value('name') : 'All PNGO');
+
+        $mpdf = $this->reportMpdf('L');
+        $html = view('dashboard.report.lsid-report-pdf', $this->viewData([
+            'registers' => $registers,
+            'appliedFilters' => ($reportRequested && $districtSelected) ? $this->appliedFilters($request) : [],
+            'reportDistrictName' => $reportDistrictName,
+            'reportPngoName' => $reportPngoName,
+        ]))->render();
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output('', 'S'), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="lsid-register-report.pdf"',
+        ]);
+    }
+
     private function scopedQuery()
     {
         $query = LsidRegister::query();
@@ -363,5 +419,47 @@ class LsidRegisterController extends Controller
             ->get();
 
         return [$districts, $pngos];
+    }
+
+    private function reportMpdf(string $orientation = 'P'): Mpdf
+    {
+        $fontDirs = (new ConfigVariables())->getDefaults()['fontDir'];
+        $fontData = (new FontVariables())->getDefaults()['fontdata'];
+        $mpdfTempDir = storage_path('app/mpdf');
+
+        if (! is_dir($mpdfTempDir)) {
+            mkdir($mpdfTempDir, 0775, true);
+        }
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'orientation' => $orientation,
+            'margin_top' => 8,
+            'margin_bottom' => 8,
+            'margin_left' => 7,
+            'margin_right' => 7,
+            'fontDir' => array_merge($fontDirs, [
+                resource_path('fonts'),
+            ]),
+            'fontdata' => $fontData + [
+                'bangla' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+                'solaimanlipi' => [
+                    'R' => 'SolaimanLipi.ttf',
+                    'useOTL' => 0xFF,
+                ],
+            ],
+            'default_font' => 'bangla',
+            'cacheCleanupInterval' => false,
+            'tempDir' => $mpdfTempDir,
+        ]);
+
+        $mpdf->SetAutoPageBreak(true);
+        $mpdf->SetAuthor('GIZ');
+
+        return $mpdf;
     }
 }

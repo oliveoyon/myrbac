@@ -389,15 +389,6 @@
     </div>
 </section>
 
-<form id="pdfPostForm" method="POST" action="{{ route('lsid-register.report.pdf', [], false) }}" target="pdfFrame" class="d-none">
-    @csrf
-    <input type="hidden" name="pdf_data" id="pdf_data">
-    <input type="hidden" name="title" value="LSID Register Report">
-    <input type="hidden" name="orientation" value="L">
-    <input type="hidden" name="fname" value="lsid-register-report.pdf">
-    <input type="hidden" name="inline" value="1">
-</form>
-
 <div class="modal fade modal-fullscreen" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen" role="document">
         <div class="modal-content">
@@ -459,12 +450,9 @@
 
     $('#printButton').on('click', function(event) {
         event.preventDefault();
-        $('#pdf_data').val($('#reportDiv').html());
-
         var modal = new bootstrap.Modal(document.getElementById('pdfModal'));
         modal.show();
-        document.getElementById('pdfFrame').src = 'about:blank';
-        document.getElementById('pdfPostForm').submit();
+        document.getElementById('pdfFrame').src = '{{ route('lsid-register.report.print', [], false) }}' + window.location.search;
     });
 </script>
 @endpush
