@@ -65,7 +65,7 @@
                         <div class="card-tools">
                             <ul class="nav nav-pills ml-auto">
                                 <li class="nav-item">
-                                    <button class="btn btn-success btn-sm" id="printButton"><i
+                                    <button type="button" class="btn btn-success btn-sm" id="printButton"><i
                                             class="fas fa-plus-square mr-1"></i>
                                         {{ __('language.print_report') }}</button>
                                 </li>
@@ -104,14 +104,16 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
 <script>
-    $('#printButton').click(function() {
+    $('#printButton').on('click', function(event) {
+        event.preventDefault();
         var data = $('#reportDiv').html();
 
         // Show the loader overlay
         $('#loader-overlay').show();
 
         $.ajax({
-            url: '/mne/generate-pdf',
+            url: '{{ route('generate-pdf') }}',
+            type: 'POST',
             method: 'POST',
             data: {
                 pdf_data: data,

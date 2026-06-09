@@ -120,7 +120,7 @@
                             <i class="fas fa-chalkboard-teacher me-2"></i>
                             Custom Report
                         </h5>
-                        <button class="btn btn-success btn-sm" id="printButton">
+                        <button type="button" class="btn btn-success btn-sm" id="printButton">
                             <i class="fas fa-plus-square me-2"></i> Print Report
                         </button>
                     </header>
@@ -180,20 +180,22 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
 <script>
-    $('#printButton').click(function() {
+    $('#printButton').on('click', function(event) {
+        event.preventDefault();
         var data = $('#reportDiv').html();
 
         // Show the loader overlay
         $('#loader-overlay').show();
 
         $.ajax({
-            url: '/mne/generate-pdf',
+            url: '{{ route('generate-pdf') }}',
+            type: 'POST',
             method: 'POST',
             data: {
                 pdf_data: data,
                 title: 'Result of Interventions',
                 orientation: 'P',
-                fname: 'Result of Interventions',
+                fname: 'Result of Interventions.pdf',
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

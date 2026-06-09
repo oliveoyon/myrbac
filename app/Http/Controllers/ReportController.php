@@ -23,7 +23,7 @@ class ReportController extends Controller
     {
         $send['data'] = $request->input('pdf_data');
         $send['title'] = $request->input('title');
-        $fname = $request->input('fname');
+        $fname = $this->pdfFileName($request->input('fname', 'report.pdf'));
         $fontDirs = (new ConfigVariables())->getDefaults()['fontDir'];
         $fontData = (new FontVariables())->getDefaults()['fontdata'];
         $mpdfTempDir = storage_path('app/mpdf');
@@ -85,7 +85,7 @@ class ReportController extends Controller
         // Get the input data
         $send['data'] = $request->input('pdf_data');
         $send['title'] = $request->input('title');
-        $fname = $request->input('fname');
+        $fname = $this->pdfFileName($request->input('fname', 'report.pdf'));
         $fontDirs = (new ConfigVariables())->getDefaults()['fontDir'];
         $fontData = (new FontVariables())->getDefaults()['fontdata'];
         $mpdfTempDir = storage_path('app/mpdf');
@@ -149,6 +149,10 @@ class ReportController extends Controller
 
         // Save the PDF file in the public folder
         $pdfFilePath = public_path($fname);
+        $pdfDirectory = dirname($pdfFilePath);
+        if (!is_dir($pdfDirectory)) {
+            mkdir($pdfDirectory, 0775, true);
+        }
         $mpdf->Output($pdfFilePath, 'F');
 
         // Construct the public URL of the saved PDF
@@ -215,7 +219,7 @@ class ReportController extends Controller
         // dd($send['followups']);
         $send['data'] = $request->input('pdf_data');
         $send['title'] = $request->input('title');
-        $fname = $request->input('fname');
+        $fname = $this->pdfFileName($request->input('fname', 'report.pdf'));
         $fontDirs = (new ConfigVariables())->getDefaults()['fontDir'];
         $fontData = (new FontVariables())->getDefaults()['fontdata'];
         $mpdfTempDir = storage_path('app/mpdf');
@@ -259,6 +263,10 @@ class ReportController extends Controller
 
         // Save the PDF file in the public folder
         $pdfFilePath = public_path($fname);
+        $pdfDirectory = dirname($pdfFilePath);
+        if (!is_dir($pdfDirectory)) {
+            mkdir($pdfDirectory, 0775, true);
+        }
         $mpdf->Output($pdfFilePath, 'F');
 
         // Construct the public URL of the saved PDF
@@ -438,6 +446,17 @@ class ReportController extends Controller
             ->get();
 
         return [$districts, $pngos];
+    }
+
+    private function pdfFileName(string $fileName): string
+    {
+        $fileName = trim(str_replace(['\\', '/'], '-', $fileName));
+
+        if ($fileName === '') {
+            $fileName = 'report.pdf';
+        }
+
+        return str_ends_with(strtolower($fileName), '.pdf') ? $fileName : $fileName . '.pdf';
     }
 }
 

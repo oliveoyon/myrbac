@@ -167,14 +167,16 @@
 </script>
 
 <script>
-    $('#printButton').click(function() {
+    $('#printButton').on('click', function(event) {
+        event.preventDefault();
         var data = $('#reportDiv').clone(); // Clone to keep original structure
         data.find('.no-print').remove(); // Remove unwanted elements
 
         $('#loader-overlay').show(); // Show loader
 
         $.ajax({
-            url: '/mne/generate-pdf',
+            url: '{{ route('generate-pdf') }}',
+            type: 'POST',
             method: 'POST',
             data: {
                 pdf_data: data.html(), // Send modified HTML
