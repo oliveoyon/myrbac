@@ -438,7 +438,7 @@
         $('#loader-overlay').show();
 
         $.ajax({
-            url: '{{ route('lsid-register.report.pdf') }}',
+            url: '{{ route('lsid-register.report.pdf', [], false) }}',
             type: 'POST',
             method: 'POST',
             data: {

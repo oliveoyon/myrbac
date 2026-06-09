@@ -188,7 +188,7 @@
         $('#loader-overlay').show();
 
         $.ajax({
-            url: '{{ route('generate-pdf') }}',
+            url: '{{ route('generate-pdf', [], false) }}',
             type: 'POST',
             method: 'POST',
             data: {

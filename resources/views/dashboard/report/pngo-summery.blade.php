@@ -149,7 +149,7 @@
         $('#loader-overlay').show();
 
         $.ajax({
-            url: '{{ route('generate-pdf-chart') }}',  // Your route to handle the POST request
+            url: '{{ route('generate-pdf-chart', [], false) }}',  // Your route to handle the POST request
             type: 'POST',
             method: 'POST',
             data: {
