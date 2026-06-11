@@ -439,8 +439,9 @@
         @endif
 
 
-        <form method="post" action="{{ route('formaction') }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('formaction') }}" enctype="multipart/form-data" data-single-submit-form>
             @csrf
+            <input type="hidden" name="_form_submission_token" value="{{ $submissionToken }}">
             <div class="case-form-hero">
                 <div>
                     <span class="case-kicker">New case entry</span>
@@ -1082,7 +1083,7 @@
                                 <!-- Fine Amount Field (Initially Hidden) -->
                                 <div class="col-md-4" id="fine_field" style="display: none;">
                                     <label for="fine_amount" class="form-label">Fine Amount</label>
-                                    <input type="text" class="form-control" id="fine_amount" name="fine_amount">
+                                    <input type="number" step="0.01" class="form-control" id="fine_amount" name="fine_amount">
                                 </div>
 
                                 <div class="col-md-4">
@@ -1179,7 +1180,7 @@
                                 <div class="col-md-4">
                                     <label for="co_offenders" class="form-label">Number of Co-Offenders (If
                                         any)</label>
-                                    <input type="number" class="form-control" id="co_offenders"
+                                    <input type="text" class="form-control" id="co_offenders"
                                         name="co_offenders">
                                 </div>
                                 <div class="col-md-4">
@@ -1471,8 +1472,8 @@
                                 <div class="col-md-4">
                                     <label for="convicted_length" class="form-label">Convicted-Length of
                                         Sentence</label>
-                                    <input type="date" class="form-control" id="convicted_length"
-                                        name="convicted_length">
+                                    <input type="text" class="form-control" id="convicted_length"
+                                        name="convicted_length" placeholder="e.g. 2 years 6 months">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="convicted_length_details" class="form-label">Details</label>
@@ -1557,8 +1558,8 @@
                                 </div>
                                 <div class="col-md-4" id="reference_no" style="display: none;">
                                     <label for="reference_no" class="form-label">Reference No</label>
-                                    <input type="number" class="form-control" id="reference_no"
-                                        name="reference_no">
+                                    <input type="text" class="form-control" id="reference_no"
+                                        name="reference_no" placeholder="e.g. APP-452-DHK">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="type_of_service" class="form-label">Type of Service</label>
@@ -1693,7 +1694,7 @@
                 </div>
                 @can('Create Formal Case')
                 <div class="case-submit-bar">
-                    <button type="submit" class="btnCustom btn btn-primary">Submit</button>
+                    <button type="submit" class="btnCustom btn btn-primary" data-submit-label="Submit">Submit</button>
                 </div>
                 @endcan
             </div>
@@ -2172,6 +2173,23 @@
             el.addEventListener("change", checkNatureOfAssistanceInputs);
             el.addEventListener("input", checkNatureOfAssistanceInputs); // For text input
         }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('[data-single-submit-form]').forEach(function(form) {
+            form.addEventListener('submit', function() {
+                const submitButton = form.querySelector('[type="submit"]');
+
+                if (!submitButton || submitButton.disabled) {
+                    return;
+                }
+
+                submitButton.dataset.originalText = submitButton.textContent.trim();
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
+            });
+        });
     });
 </script>
 @endpush

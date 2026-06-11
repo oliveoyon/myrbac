@@ -44,6 +44,7 @@ class DashboardController extends Controller
                 $join->on('follow_up_interventions.central_id', '=', 'formal_cases.id')
                     ->orOn('follow_up_interventions.central_id', '=', 'formal_cases.central_id');
             })
+            ->whereNull('formal_cases.deleted_at')
             ->whereNotNull('follow_up_interventions.to_be_taken_date')
             ->whereNotNull('follow_up_interventions.intervention_to_be_taken')
             ->where('follow_up_interventions.task_status', '!=', Todo::STATUS_DONE);

@@ -492,8 +492,9 @@
             @endif
 
 
-            <form method="post" action="{{ route('editformaction') }}" enctype="multipart/form-data">
+            <form method="post" action="{{ route('editformaction') }}" enctype="multipart/form-data" data-single-submit-form>
                 @csrf
+                <input type="hidden" name="_form_submission_token" value="{{ $submissionToken }}">
                 <input type="hidden" name="id" value="{{ $caseData->id }}">
 
                 <div class="case-form-hero">
@@ -1143,7 +1144,7 @@
                                     <!-- Fine Amount Field (Initially Hidden) -->
                                     <div class="col-md-4" id="fine_field" style="{{ $caseData->release_status == 'With Fine' ? 'display:block;' : 'display:none;' }}">
                                         <label for="fine_amount" class="form-label">Fine Amount</label>
-                                        <input type="text" class="form-control" id="fine_amount" name="fine_amount"
+                                        <input type="number" step="0.01" class="form-control" id="fine_amount" name="fine_amount"
                                             value="{{ old('fine_amount', $caseData->fine_amount) }}">
                                     </div>
 
@@ -1202,8 +1203,8 @@
                                         <input type="text" class="form-control" id="prison_reg_no" name="prison_reg_no" value="{{ old('prison_reg_no', $caseData->prison_reg_no) }}">
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="case_no" class="form-label">Case Number(s)</label>
-                                        <input type="text" class="form-control" id="case_no" name="case_no" value="{{ old('case_no', $caseData->case_no) }}">
+                                        <label for="prison_case_no" class="form-label">Case Number(s)</label>
+                                        <input type="text" class="form-control" id="prison_case_no" name="prison_case_no" value="{{ old('prison_case_no', $caseData->prison_case_no) }}">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="section_no" class="form-label">Section Number</label>
@@ -1239,7 +1240,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="co_offenders" class="form-label">Number of Co-Offenders (If any)</label>
-                                        <input type="number" class="form-control" id="co_offenders" name="co_offenders" value="{{ old('co_offenders', $caseData->co_offenders) }}">
+                                        <input type="text" class="form-control" id="co_offenders" name="co_offenders" value="{{ old('co_offenders', $caseData->co_offenders) }}">
                                     </div>
                                     <div class="col-md-4">
                                         <label for="next_court_date" class="form-label">Next Court Date</label>
@@ -1534,7 +1535,8 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="convicted_length" class="form-label">Convicted-Length of Sentence</label>
-                                        <input type="date" class="form-control" id="convicted_length" name="convicted_length"
+                                        <input type="text" class="form-control" id="convicted_length" name="convicted_length"
+                                            placeholder="e.g. 2 years 6 months"
                                             value="{{ old('convicted_length', $caseData->convicted_length ?? '') }}">
                                         @error('convicted_length')
                                             <div class="text-danger">{{ $message }}</div>
@@ -1632,7 +1634,8 @@
 
                                     <div class="col-md-4" id="reference_no" style="{{ old('received_application', $caseData->received_application) == 'Yes' ? 'display:block;' : 'display:none;' }}">
                                         <label for="reference_no" class="form-label">Reference No</label>
-                                        <input type="number" class="form-control" id="reference_no" name="reference_no"
+                                        <input type="text" class="form-control" id="reference_no" name="reference_no"
+                                            placeholder="e.g. APP-452-DHK"
                                             value="{{ old('reference_no', $caseData->reference_no) }}">
                                     </div>
 
@@ -1790,7 +1793,7 @@
                     
 
                     <div class="case-submit-bar">
-                        <button type="submit" class="btnCustom btn btn-primary">Submit</button>
+                        <button type="submit" class="btnCustom btn btn-primary" data-submit-label="Submit">Submit</button>
                     </div>
                 </div>
             </form>
@@ -2018,5 +2021,22 @@ document.addEventListener("DOMContentLoaded", function () {
         toggleLawyerFields();
     });
     
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('[data-single-submit-form]').forEach(function(form) {
+            form.addEventListener('submit', function() {
+                const submitButton = form.querySelector('[type="submit"]');
+
+                if (!submitButton || submitButton.disabled) {
+                    return;
+                }
+
+                submitButton.dataset.originalText = submitButton.textContent.trim();
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
+            });
+        });
+    });
 </script>
 @endpush

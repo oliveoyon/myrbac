@@ -276,19 +276,10 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">বাসা/ গ্রাম&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(House/ Village)</span></p>
                         </td>
                         <td style="width:2.7pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">:</span>{{ $details->address }}</p>
-                        </td>
-                        <td style="width:79.2pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
-                        </td>
-                        <td colspan="2" style="width:101.8pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:11pt;"><span style="font-family:bangla;">থানা&nbsp;</span><span style="line-height:115%; font-family:Arial; font-size:10pt;">(Police Station)</span></p>
-                        </td>
-                        <td style="width:2.7pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:top;">
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">:</span></p>
                         </td>
-                        <td style="width:88.1pt; border-right-style:solid; border-right-width:0.75pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">&nbsp;</span></p>
+                        <td colspan="6" style="width:317.7pt; border-right-style:solid; border-right-width:0.75pt; padding-right:5.03pt; padding-left:5.4pt; vertical-align:top;">
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;"><span style="font-family:bangla;">{{ $details->address }}</span></p>
                         </td>
                     </tr>
                     <tr style="height:4pt;">
@@ -1411,7 +1402,7 @@
                             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:11pt;"><span style="font-family:bangla;">মামলার নাম্বার&nbsp;</span><span style="line-height:150%; font-family:Arial; font-size:10pt;">[Case No(s)]</span></p>
                         </td>
                         <td colspan="3" style="width:218.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:top;">
-                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->prison_reg_no }}</p>
+                            <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:150%; font-size:10pt;"><span style="font-family:Arial;"></span>{{ $details->prison_case_no }}</p>
                         </td>
                     </tr>
                     <tr>
@@ -2072,7 +2063,7 @@
         </td>
         <td style="width:56.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; padding-top:10px; padding-bottom:10px;">
             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;">
-                <span style="font-family:Arial;">&nbsp;</span>{{ $f->intervention_taken_date }}
+                <span style="font-family:Arial;">&nbsp;</span>{{ $f->intervention_taken_date ? \Carbon\Carbon::parse($f->intervention_taken_date)->format('j M Y') : '' }}
             </p>
         </td>
         <td style="width:167.45pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; padding-top:10px; padding-bottom:10px;">
@@ -2087,7 +2078,7 @@
         </td>
         <td style="width:53.25pt; border-top-style:solid; border-top-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; padding-top:10px; padding-bottom:10px;">
             <p style="margin-top:0pt; margin-bottom:0pt; text-align:justify; line-height:115%; font-size:10pt;">
-                <span style="font-family:Arial;">&nbsp;</span>{{ $f->to_be_taken_date }}
+                <span style="font-family:Arial;">&nbsp;</span>{{ $f->to_be_taken_date ? \Carbon\Carbon::parse($f->to_be_taken_date)->format('j M Y') : '' }}
             </p>
         </td>
     </tr>

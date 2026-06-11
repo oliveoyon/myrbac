@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use App\Models\Category;
 use App\Services\LogService;
 
@@ -30,6 +31,7 @@ class PermissionController extends Controller
             'guard_name' => 'web', // Adjust this if needed
             'category' => $request->category, // Store the category
         ]);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         // Log the action
         LogService::logAction('Permission Create', [
@@ -62,6 +64,7 @@ class PermissionController extends Controller
             'name' => $request->name,
             'category' => $request->category,
         ]);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         // Log the update action
         LogService::logAction('Permission Update', [
@@ -85,6 +88,7 @@ class PermissionController extends Controller
         $permissionCategory = $permission->category;
 
         $permission->delete();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         // Log the delete action
         LogService::logAction('Permission Delete', [

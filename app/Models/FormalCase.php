@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FormalCase extends Model
 {
+    use SoftDeletes;
+
     public const STATUS_SUBMITTED = 1;
     public const STATUS_DPO_VERIFIED = 2;
     public const STATUS_MNEO_VERIFIED = 3;
@@ -52,9 +55,24 @@ class FormalCase extends Model
         return $this->belongsTo(Pngo::class, 'pngo_id');
     }
 
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function fileUploads()
     {
         return $this->hasMany(FileUpload::class, 'case_id');
+    }
+
+    public function messageThreads()
+    {
+        return $this->hasMany(CaseMessageThread::class, 'formal_case_id');
+    }
+
+    public function caseMessages()
+    {
+        return $this->hasMany(CaseMessage::class, 'formal_case_id');
     }
 
     public function getTypeOfServiceListAttribute(): array

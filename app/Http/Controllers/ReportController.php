@@ -210,7 +210,26 @@ class ReportController extends Controller
         ];
 
         $whr = array_filter($whr);
-        $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])->where($whr);
+        $cases = FormalCase::with(['district:id,name', 'pngo:id,name', 'creator:id,name,full_name'])
+            ->withCount([
+                'fileUploads',
+                'messageThreads as case_message_threads_count',
+                'caseMessages as unread_case_messages_count' => function ($query) {
+                    $query
+                        ->where('receiver_id', Auth::id())
+                        ->whereNull('read_at');
+                },
+            ])
+            ->where($whr);
+
+        if (Auth::user()->can('View Deleted Formal Cases')) {
+            if ($request->deleted_status === 'deleted') {
+                $cases->onlyTrashed();
+            } elseif ($request->deleted_status === 'all') {
+                $cases->withTrashed();
+            }
+        }
+
         Auth::user()->applyDistrictPngoScope($cases);
 
         if ($request->filled('from_date') && $request->filled('to_date')) {
@@ -221,13 +240,15 @@ class ReportController extends Controller
             $cases->whereBetween('created_at', [$fromDate, $toDate]);
         }
 
-        $cases1 = $cases->get();
+        $cases1 = $cases->latest('id')->get();
         return response()->json(['cases' => $cases1]);
     }
 
     public function generateForm(Request $request)
     {
-        $send['details'] = FormalCase::find($request->id);
+        $send['details'] = Auth::user()->can('View Deleted Formal Cases')
+            ? FormalCase::withTrashed()->find($request->id)
+            : FormalCase::find($request->id);
         abort_if(! $send['details'] || ! Auth::user()->canAccessDistrictPngo($send['details']->district_id, $send['details']->pngo_id), 403);
         $send['followups'] = FollowUpIntervention::where('central_id', $request->id)->get();
         // dd($send['followups']);

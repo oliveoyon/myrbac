@@ -113,6 +113,7 @@ class TodoController extends Controller
                 $join->on('follow_up_interventions.central_id', '=', 'formal_cases.id')
                     ->orOn('follow_up_interventions.central_id', '=', 'formal_cases.central_id');
             })
+            ->whereNull('formal_cases.deleted_at')
             ->whereNotNull('follow_up_interventions.to_be_taken_date')
             ->whereNotNull('follow_up_interventions.intervention_to_be_taken');
 
@@ -126,8 +127,12 @@ class TodoController extends Controller
     private function authorizeFollowUpScope(FollowUpIntervention $followUpIntervention): void
     {
         $case = DB::table('formal_cases')
-            ->where('id', $followUpIntervention->central_id)
-            ->orWhere('central_id', $followUpIntervention->central_id)
+            ->where(function ($query) use ($followUpIntervention) {
+                $query
+                    ->where('id', $followUpIntervention->central_id)
+                    ->orWhere('central_id', $followUpIntervention->central_id);
+            })
+            ->whereNull('deleted_at')
             ->first();
 
         abort_if(! $case, 404);

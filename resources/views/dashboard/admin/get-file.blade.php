@@ -171,7 +171,16 @@
                                 @endif
             
                                 <p class="mt-2 mb-0 small text-secondary">{{ $upload->file_name }}</p>
-                                <a href="{{ $filePath }}" target="_blank" class="btn btn-sm btn-primary mt-2">Open File</a>
+                                <div class="d-flex justify-content-center gap-2 mt-2">
+                                    <a href="{{ $filePath }}" target="_blank" class="btn btn-sm btn-primary">Open File</a>
+                                    @can('Delete Formal Case Attachment')
+                                        <form action="{{ route('edit-file.delete', $upload) }}" method="POST" onsubmit="return confirm('Delete this attachment? This cannot be undone.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </form>
+                                    @endcan
+                                </div>
                             </div>
                         </div>
                     </div>

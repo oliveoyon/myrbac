@@ -15,6 +15,47 @@
     <!-- Font Awesome for Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('dashboard/css/style.css') }}">
+    <style>
+        .notification-link {
+            position: relative;
+        }
+
+        .notification-badge {
+            display: inline-flex;
+            min-width: 18px;
+            height: 18px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #dc3545;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .topbar-notification {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            margin-right: 8px;
+            border: 1px solid #d7e6dd;
+            border-radius: 8px;
+            color: #285d49;
+            background: #f3faf6;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .topbar-notification .notification-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+        }
+    </style>
     @stack('styles')
 
 </head>
@@ -41,6 +82,19 @@
             @endcan
             @can('View ToDo List')
             <li><a class="nav-link" href="{{ route('todos.index') }}"><i class="fas fa-list-check"></i><span class="nav-text">ToDo List</span></a></li>
+            @endcan
+            @can('View Case Messages')
+            @php
+                $caseMessageUnreadCount = \App\Models\CaseMessage::where('receiver_id', auth()->id())->whereNull('read_at')->count();
+            @endphp
+            <li>
+                <a class="nav-link notification-link" href="{{ route('case-messages.index') }}">
+                    <i class="fas fa-bell"></i><span class="nav-text">Case Messages</span>
+                    @if ($caseMessageUnreadCount)
+                        <span class="notification-badge">{{ $caseMessageUnreadCount }}</span>
+                    @endif
+                </a>
+            </li>
             @endcan
         
             @canany(['View Districts', 'View PNGOs'])
@@ -159,6 +213,17 @@
             <div class="page-title">@yield('title')</div>
         </div>
         <div class="profile-menu">
+            @can('View Case Messages')
+            @php
+                $topbarCaseMessageUnreadCount = $caseMessageUnreadCount ?? \App\Models\CaseMessage::where('receiver_id', auth()->id())->whereNull('read_at')->count();
+            @endphp
+            <a href="{{ route('case-messages.index') }}" class="topbar-notification" title="Case message notifications">
+                <i class="fas fa-bell"></i>
+                @if ($topbarCaseMessageUnreadCount)
+                    <span class="notification-badge">{{ $topbarCaseMessageUnreadCount }}</span>
+                @endif
+            </a>
+            @endcan
             <button class="profile-button">
                 <i class="fas fa-user"></i> {{ Auth::user()->full_name ?: Auth::user()->name }}
             </button>

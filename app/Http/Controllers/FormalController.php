@@ -28,7 +28,9 @@ class FormalController extends Controller
             return redirect()->route('dashboard.index')->with('error', $scopeError);
         }
 
-        return view('dashboard.admin.formal1');
+        $submissionToken = $this->createFormSubmissionToken('formal_case_create_tokens');
+
+        return view('dashboard.admin.formal1', compact('submissionToken'));
     }
 
     public function courtPolicePrison(Request $request)
@@ -84,6 +86,10 @@ class FormalController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
           
+        }
+
+        if (! $this->consumeFormSubmissionToken($request, 'formal_case_create_tokens')) {
+            return redirect()->back()->with('error', 'This form has already been submitted. Please open a fresh form before submitting again.');
         }
         
         $districtName = (optional(auth()->user()->district)->name);
@@ -365,6 +371,11 @@ class FormalController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         
         }
+
+        if (! $this->consumeFormSubmissionToken($request, 'formal_case_edit_tokens')) {
+            return redirect()->back()->with('error', 'This edit form has already been submitted. Please reload the case before submitting again.');
+        }
+
         $id = $request->id;
         $case = FormalCase::findOrFail($id);
         $this->authorizeFormalCaseScope($case);
@@ -590,7 +601,9 @@ class FormalController extends Controller
         $caseData = FormalCase::findOrFail($editId);
         $this->authorizeFormalCaseScope($caseData);
 
-        return view('dashboard.admin.edit-case', compact('caseData'));
+        $submissionToken = $this->createFormSubmissionToken('formal_case_edit_tokens');
+
+        return view('dashboard.admin.edit-case', compact('caseData', 'submissionToken'));
     }
 
     public function fileCase(Request $request)
@@ -616,6 +629,86 @@ class FormalController extends Controller
         $caseFiles = FileUpload::where('case_id', $caseId)->orderBy('id', 'asc')->get();
 
         return view('dashboard.admin.get-file', compact('caseFiles'));
+    }
+
+    public function deleteCaseFile(FileUpload $fileUpload)
+    {
+        $case = FormalCase::findOrFail($fileUpload->case_id);
+        $this->authorizeFormalCaseScope($case);
+
+        $paths = array_filter([
+            $fileUpload->file_path,
+            'uploads/formal_cases/' . $fileUpload->file_name,
+        ]);
+
+        foreach (array_unique($paths) as $path) {
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        LogService::logAction('Formal Case Attachment Deleted', [
+            'case_id' => $case->id,
+            'central_id' => $case->central_id,
+            'file_upload_id' => $fileUpload->id,
+            'file_name' => $fileUpload->file_name,
+            'deleted_by' => auth()->id(),
+        ]);
+
+        $fileUpload->delete();
+
+        return redirect()->route('edit-file.get')->with('success', 'Attachment deleted successfully.');
+    }
+
+    public function deleteFormalCase(FormalCase $formalCase)
+    {
+        $this->authorizeFormalCaseScope($formalCase);
+
+        if ($formalCase->trashed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This case is already deleted.',
+            ], 400);
+        }
+
+        $formalCase->delete();
+
+        LogService::logAction('Formal Case Soft Deleted', [
+            'case_id' => $formalCase->id,
+            'central_id' => $formalCase->central_id,
+            'deleted_by' => auth()->user()->name,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Case deleted successfully.',
+        ]);
+    }
+
+    public function restoreFormalCase($id)
+    {
+        $case = FormalCase::withTrashed()->findOrFail($id);
+        $this->authorizeFormalCaseScope($case);
+
+        if (! $case->trashed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This case is not deleted.',
+            ], 400);
+        }
+
+        $case->restore();
+
+        LogService::logAction('Formal Case Restored', [
+            'case_id' => $case->id,
+            'central_id' => $case->central_id,
+            'restored_by' => auth()->user()->name,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Case restored successfully.',
+        ]);
     }
 
     public function importView()
@@ -898,6 +991,38 @@ private function prepareMultiSelectValue($value): ?string
     $values = array_values(array_filter((array) $value, fn ($item) => filled($item)));
 
     return empty($values) ? null : json_encode($values);
+}
+
+private function createFormSubmissionToken(string $sessionKey): string
+{
+    $token = (string) Str::uuid();
+    $tokens = session($sessionKey, []);
+    $tokens[] = $token;
+
+    session([$sessionKey => array_slice(array_values(array_unique($tokens)), -20)]);
+
+    return $token;
+}
+
+private function consumeFormSubmissionToken(Request $request, string $sessionKey): bool
+{
+    $token = $request->input('_form_submission_token');
+
+    if (! $token) {
+        return false;
+    }
+
+    $tokens = session($sessionKey, []);
+    $index = array_search($token, $tokens, true);
+
+    if ($index === false) {
+        return false;
+    }
+
+    unset($tokens[$index]);
+    session([$sessionKey => array_values($tokens)]);
+
+    return true;
 }
 
 

@@ -28,6 +28,107 @@
             display: none !important;
         }
     }
+
+    .case-message-action {
+        position: relative;
+        color: #2f7d62;
+    }
+
+    .case-message-action .message-unread-dot {
+        position: absolute;
+        top: -7px;
+        right: -8px;
+        min-width: 15px;
+        height: 15px;
+        padding: 0 4px;
+        border-radius: 999px;
+        background: #dc3545;
+        color: #fff;
+        font-size: 10px;
+        line-height: 15px;
+        text-align: center;
+        font-weight: 800;
+    }
+
+    .case-message-list {
+        display: grid;
+        gap: 10px;
+        max-height: calc(100vh - 310px);
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .case-message-offcanvas {
+        width: min(100vw, 520px) !important;
+        border-left: 1px solid #dbe7df;
+    }
+
+    .case-message-offcanvas .offcanvas-header {
+        align-items: flex-start;
+        gap: 12px;
+        background: #f8fcfa;
+        border-bottom: 1px solid #dbe7df;
+    }
+
+    .case-message-offcanvas-title {
+        margin: 0;
+        color: #111827;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .case-message-offcanvas .offcanvas-body {
+        display: flex;
+        flex-direction: column;
+        padding: 14px;
+    }
+
+    .case-message-compose {
+        margin-top: auto;
+        background: #fff;
+    }
+
+    .case-message-bubble {
+        max-width: 88%;
+        padding: 9px 11px;
+        border: 1px solid #dbe7df;
+        border-radius: 8px;
+        background: #f8fcfa;
+    }
+
+    .case-message-bubble.mine {
+        margin-left: auto;
+        background: #eef7f1;
+        border-color: #c9ddcf;
+    }
+
+    .case-message-meta {
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .case-message-text {
+        color: #111827;
+        font-size: 13px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+    }
+
+    @media (max-width: 576px) {
+        .case-message-offcanvas {
+            width: 100vw !important;
+        }
+
+        .case-message-list {
+            max-height: calc(100vh - 360px);
+        }
+
+        .case-message-bubble {
+            max-width: 96%;
+        }
+    }
 </style>
 @endpush
 
@@ -144,6 +245,18 @@
                                         </div>
                                     </div>
 
+                                    @can('View Deleted Formal Cases')
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control form-control-sm" name="deleted_status" id="deleted_status">
+                                                <option value="">Active Cases</option>
+                                                <option value="deleted">Deleted Cases</option>
+                                                <option value="all">Active + Deleted</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    @endcan
+
                                     <!-- Submit Button -->
                                     <div class="col-md-2">
                                         <div class="form-group">
@@ -191,6 +304,7 @@
                                         <th>Name</th>
                                         <th>Phone</th>
                                         <th>Date of Interview</th>
+                                        <th>Creator</th>
                                         <th>District</th>
                                         <th>PNGO</th>
                                         <th>Status</th>
@@ -229,6 +343,49 @@
     </div>
 </div>
 
+<div class="offcanvas offcanvas-end case-message-offcanvas" tabindex="-1" id="caseMessageOffcanvas" aria-labelledby="caseMessageOffcanvasLabel">
+    <div class="offcanvas-header">
+        <div>
+            <h5 class="case-message-offcanvas-title" id="caseMessageOffcanvasLabel">Case Messages</h5>
+            <small class="text-muted" id="caseMessageSubTitle">Loading...</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            @can('Resolve Case Message')
+            <button type="button" class="btn btn-outline-success btn-sm d-none" id="resolveCaseMessageThread">
+                <i class="fas fa-check"></i> Resolve
+            </button>
+            @endcan
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+    </div>
+    <div class="offcanvas-body">
+        <div id="caseMessageAlert" class="alert alert-danger d-none"></div>
+        <div class="case-message-list mb-3" id="caseMessageList">
+            <div class="text-muted text-center py-3">Loading messages...</div>
+        </div>
+
+        @canany(['Send Case Message', 'Reply Case Message'])
+        <form id="caseMessageForm" class="case-message-compose border-top pt-3">
+            <input type="hidden" id="caseMessageCaseId">
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label">Send To</label>
+                    <select id="caseMessageReceiver" class="form-control form-control-sm" required></select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Message</label>
+                    <textarea id="caseMessageText" class="form-control form-control-sm" rows="3" maxlength="2000" required></textarea>
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-success btn-sm">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </div>
+            </div>
+        </form>
+        @endcanany
+    </div>
+</div>
 
 
 
@@ -312,19 +469,21 @@
                         response.cases.length > 0) {
                         let serialNumber = 1;
                         response.cases.forEach(function(caseData) {
+                            const isDeleted = Boolean(caseData.deleted_at);
                             var row = `<tr>
                             <td>${serialNumber}</td>
                             <td>${caseData.central_id || 'N/A'}</td>
                             <td>${caseData.institute || 'N/A'}</td>
                             <td>${caseData.full_name || 'N/A'}</td>
                             <td>${caseData.phone_number || 'N/A'}</td>
-                            <td>${caseData.legal_representation_date 
+                            <td>${caseData.interview_date 
                                 ? new Date(caseData.interview_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) 
                                 : 'N/A'}</td>
+                            <td>${caseData.creator?.full_name || caseData.creator?.name || 'N/A'}</td>
                             <td>${caseData.district?.name || 'N/A'}</td>
                             <td>${caseData.pngo?.name || 'N/A'}</td>
                             <td>
-                                ${Number(caseData.status) === 1 ? `
+                                ${isDeleted ? '<span class="badge bg-secondary">Deleted</span>' : Number(caseData.status) === 1 ? `
                                             <div class="d-flex align-items-center gap-2">
                                                 <span class="badge bg-danger">Pending</span>
                                                 @can('Verified by DPO')
@@ -357,12 +516,33 @@
                                 <a href="javascript:void(0);" class="pngo-link" data-pngo-id="${caseData.id}">
                                     <i class="fa fa-eye"></i>
                                 </a>
-                                <a href="javascript:void(0);" class="edit-link" data-edit-id="${caseData.id}">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="file-link" data-file-id="${caseData.id}">
-                                    <i class="fa fa-paperclip"></i>
-                                </a>
+                                ${isDeleted ? `
+                                    @can('Restore Formal Case')
+                                    <a href="javascript:void(0);" class="restore-case-link text-success" data-case-id="${caseData.id}" title="Restore case">
+                                        <i class="fa fa-rotate-left"></i>
+                                    </a>
+                                    @endcan
+                                ` : `
+                                    <a href="javascript:void(0);" class="edit-link" data-edit-id="${caseData.id}" title="Edit case">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    ${Number(caseData.file_uploads_count) > 0 ? `
+                                        <a href="javascript:void(0);" class="file-link" data-file-id="${caseData.id}" title="View attachment">
+                                            <i class="fa fa-paperclip"></i>
+                                        </a>
+                                    ` : ''}
+                                    @can('View Case Messages')
+                                    <a href="javascript:void(0);" class="case-message-link case-message-action" data-case-id="${caseData.id}" title="Case messages">
+                                        <i class="fa fa-comment-dots"></i>
+                                        ${Number(caseData.unread_case_messages_count) > 0 ? `<span class="message-unread-dot">${caseData.unread_case_messages_count}</span>` : ''}
+                                    </a>
+                                    @endcan
+                                    @can('Delete Formal Case')
+                                    <a href="javascript:void(0);" class="delete-case-link text-danger" data-case-id="${caseData.id}" title="Delete case">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                    @endcan
+                                `}
                             </td>
                         </tr>`;
 
@@ -633,6 +813,88 @@
             }
         });
     });
+
+    $(document).on("click", ".delete-case-link", function(event) {
+        event.preventDefault();
+
+        const caseId = $(this).data("case-id");
+
+        Swal.fire({
+            title: 'Delete this case?',
+            text: 'The case will be hidden from active lists and reports, but can be restored by an authorized user.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete it'
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            $.ajax({
+                url: "{{ url('/mne/formal-cases') }}/" + caseId,
+                type: "DELETE",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted',
+                        text: response.message || 'Case deleted successfully.',
+                        timer: 1800,
+                        showConfirmButton: false
+                    });
+                    $('#get-case-list').trigger('submit');
+                },
+                error: function(xhr) {
+                    Swal.fire('Error', xhr.responseJSON?.message || 'Could not delete this case.', 'error');
+                }
+            });
+        });
+    });
+
+    $(document).on("click", ".restore-case-link", function(event) {
+        event.preventDefault();
+
+        const caseId = $(this).data("case-id");
+
+        Swal.fire({
+            title: 'Restore this case?',
+            text: 'The case will return to active lists and reports.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, restore it'
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            $.ajax({
+                url: "{{ url('/mne/formal-cases') }}/" + caseId + "/restore",
+                type: "PATCH",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Restored',
+                        text: response.message || 'Case restored successfully.',
+                        timer: 1800,
+                        showConfirmButton: false
+                    });
+                    $('#get-case-list').trigger('submit');
+                },
+                error: function(xhr) {
+                    Swal.fire('Error', xhr.responseJSON?.message || 'Could not restore this case.', 'error');
+                }
+            });
+        });
+    });
 </script>
 
 <script>
@@ -745,6 +1007,134 @@
                 }
             });
         }
+    });
+</script>
+
+<script>
+    let activeCaseMessageThreadId = null;
+    const caseMessageOffcanvasElement = document.getElementById('caseMessageOffcanvas');
+    const caseMessageOffcanvas = caseMessageOffcanvasElement ? new bootstrap.Offcanvas(caseMessageOffcanvasElement) : null;
+
+    function escapeCaseMessageHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, function(char) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char];
+        });
+    }
+
+    function renderCaseMessages(response) {
+        activeCaseMessageThreadId = response.thread.id;
+        $('#caseMessageCaseId').val(response.case.id);
+        $('#caseMessageSubTitle').text((response.case.central_id || 'N/A') + ' - ' + (response.case.full_name || 'N/A'));
+        $('#caseMessageAlert').addClass('d-none').text('');
+
+        const receiverSelect = $('#caseMessageReceiver');
+        receiverSelect.empty();
+
+        if (response.receivers && response.receivers.length) {
+            response.receivers.forEach(function(receiver) {
+                receiverSelect.append(`<option value="${receiver.id}">${escapeCaseMessageHtml(receiver.name)}${receiver.role ? ' (' + escapeCaseMessageHtml(receiver.role) + ')' : ''}</option>`);
+            });
+            $('#caseMessageForm').removeClass('d-none');
+        } else {
+            receiverSelect.append('<option value="">No eligible receiver found</option>');
+            $('#caseMessageForm').addClass('d-none');
+        }
+
+        const list = $('#caseMessageList');
+        list.empty();
+
+        if (response.messages && response.messages.length) {
+            response.messages.forEach(function(message) {
+                list.append(`
+                    <div class="case-message-bubble ${message.is_mine ? 'mine' : ''}">
+                        <div class="case-message-meta">
+                            ${escapeCaseMessageHtml(message.sender)} to ${escapeCaseMessageHtml(message.receiver)} - ${escapeCaseMessageHtml(message.created_at)}
+                        </div>
+                        <div class="case-message-text">${escapeCaseMessageHtml(message.message)}</div>
+                    </div>
+                `);
+            });
+        } else {
+            list.html('<div class="text-muted text-center py-3">No messages yet for this case.</div>');
+        }
+
+        if (response.thread.status === 'resolved' || !activeCaseMessageThreadId) {
+            $('#resolveCaseMessageThread').addClass('d-none');
+        } else {
+            $('#resolveCaseMessageThread').removeClass('d-none');
+        }
+    }
+
+    function loadCaseMessages(caseId) {
+        if (!caseMessageOffcanvas) {
+            return;
+        }
+
+        $('#caseMessageList').html('<div class="text-muted text-center py-3">Loading messages...</div>');
+        $('#caseMessageText').val('');
+        caseMessageOffcanvas.show();
+
+        $.ajax({
+            url: "{{ url('/mne/case-messages/cases') }}/" + caseId,
+            method: 'GET',
+            success: function(response) {
+                renderCaseMessages(response);
+                $('.case-message-link[data-case-id="' + caseId + '"] .message-unread-dot').remove();
+            },
+            error: function() {
+                $('#caseMessageAlert').removeClass('d-none').text('Could not load case messages.');
+            }
+        });
+    }
+
+    $(document).on('click', '.case-message-link', function(event) {
+        event.preventDefault();
+        loadCaseMessages($(this).data('case-id'));
+    });
+
+    $('#caseMessageForm').on('submit', function(event) {
+        event.preventDefault();
+        const caseId = $('#caseMessageCaseId').val();
+
+        $.ajax({
+            url: "{{ url('/mne/case-messages/cases') }}/" + caseId,
+            method: 'POST',
+            data: {
+                receiver_id: $('#caseMessageReceiver').val(),
+                message: $('#caseMessageText').val()
+            },
+            success: function() {
+                $('#caseMessageText').val('');
+                loadCaseMessages(caseId);
+            },
+            error: function(xhr) {
+                const message = xhr.responseJSON?.message || 'Could not send message.';
+                $('#caseMessageAlert').removeClass('d-none').text(message);
+            }
+        });
+    });
+
+    $('#resolveCaseMessageThread').on('click', function() {
+        if (!activeCaseMessageThreadId) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url('/mne/case-messages/threads') }}/" + activeCaseMessageThreadId + "/resolve",
+            method: 'PATCH',
+            success: function() {
+                $('#resolveCaseMessageThread').addClass('d-none');
+            },
+            error: function() {
+                $('#caseMessageAlert').removeClass('d-none').text('Could not resolve this message thread.');
+            }
+        });
     });
 </script>
 @endpush

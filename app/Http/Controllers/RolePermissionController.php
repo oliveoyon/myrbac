@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Services\LogService;
 
 class RolePermissionController extends Controller
@@ -67,12 +69,19 @@ class RolePermissionController extends Controller
     public function updatePermissions(Request $request, $roleId)
     {
         try {
+            $request->validate([
+                'permissions' => 'nullable|array',
+                'permissions.*' => 'exists:permissions,id',
+            ]);
+
             $role = Role::findOrFail($roleId); // Ensure the role exists
 
-            $permissions = $request->input('permissions'); // Array of permission IDs
+            $permissions = $request->input('permissions', []); // Array of permission IDs
 
             // Sync the permissions with the role
             $role->permissions()->sync($permissions); // Make sure the relationship is correct
+            app(PermissionRegistrar::class)->forgetCachedPermissions();
+            $role->unsetRelation('permissions');
 
             // Log the update permissions action
             LogService::logAction('Update Permissions', [

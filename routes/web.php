@@ -13,6 +13,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\LsidRegisterController;
 use App\Http\Controllers\TodoController;
+use App\Http\Controllers\CaseMessageController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,6 +36,10 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::post('/todos', [TodoController::class, 'store'])->name('todos.store')->middleware('permission:Create ToDo Task');
     Route::patch('/todos/{todo}/status', [TodoController::class, 'updateStatus'])->name('todos.status')->middleware('permission:Update ToDo Task');
     Route::patch('/follow-up-tasks/{followUpIntervention}/status', [TodoController::class, 'updateFollowUpStatus'])->name('follow-up-tasks.status')->middleware('permission:Update ToDo Task');
+    Route::get('/case-messages', [CaseMessageController::class, 'index'])->name('case-messages.index')->middleware('permission:View Case Messages');
+    Route::get('/case-messages/cases/{formalCase}', [CaseMessageController::class, 'show'])->name('case-messages.show')->middleware('permission:View Case Messages');
+    Route::post('/case-messages/cases/{formalCase}', [CaseMessageController::class, 'store'])->name('case-messages.store')->middleware('permission:Send Case Message|Reply Case Message');
+    Route::patch('/case-messages/threads/{thread}/resolve', [CaseMessageController::class, 'resolve'])->name('case-messages.resolve')->middleware('permission:Resolve Case Message');
 
     Route::get('category-management', [CategoryController::class, 'categories'])->name('dashboard.categories')->middleware('permission:View Categories');  
     Route::post('categories', [CategoryController::class, 'categoryAdd'])->name('categories.add')->middleware('permission:Add Category');  
@@ -83,11 +88,14 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
 
     Route::post('/verify-case', [FormalController::class, 'verifyCase'])->name('formal-case.verify')->middleware('permission:Verified by DPO');
     Route::post('/verify-case1', [FormalController::class, 'verifyCaseMneo'])->name('formal-case.verifymneo')->middleware('permission:Verified by MNEO');
+    Route::delete('/formal-cases/{formalCase}', [FormalController::class, 'deleteFormalCase'])->name('formal-case.delete')->middleware('permission:Delete Formal Case');
+    Route::patch('/formal-cases/{id}/restore', [FormalController::class, 'restoreFormalCase'])->name('formal-case.restore')->middleware('permission:Restore Formal Case');
 
 
     Route::post('editformaction', [FormalController::class, 'editCourtPolicePrison'])->name('editformaction')->middleware('permission:Update Formal Case Details');
     Route::get('/edit-file', [FormalController::class, 'fileCaseForm'])->name('edit-file.get')->middleware('permission:View File Formal Case Form');
     Route::post('/edit-file', [FormalController::class, 'fileCase'])->name('edit-file.post')->middleware('permission:File Formal Case');
+    Route::delete('/edit-file/{fileUpload}', [FormalController::class, 'deleteCaseFile'])->name('edit-file.delete')->middleware('permission:Delete Formal Case Attachment');
     Route::get('/import-formal-cases', [FormalController::class, 'importView'])->name('import.view')->middleware('permission:View Formal Case Import Page');
     Route::get('/import-formal-cases/template', [FormalController::class, 'downloadImportTemplate'])->name('import.template')->middleware('permission:View Formal Case Import Page');
     Route::post('/import-formal-cases', [FormalController::class, 'import'])->name('import.store')->middleware('permission:Import Formal Cases');
