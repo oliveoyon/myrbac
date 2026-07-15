@@ -232,6 +232,7 @@ class FormalCaseImportTemplateFields
             ['key' => 'reference_no', 'no' => '14.2', 'label' => 'Reference No'],
             ['key' => 'type_of_service', 'no' => '14.3', 'label' => 'Type of Service', 'note' => 'For multiple values, separate with comma: Legal Advice, Filing New Lawsuit'],
             ['key' => 'type_of_service_date', 'no' => '14.3', 'label' => 'Type of Service Date'],
+            ['key' => 'service_description', 'no' => '14.3', 'label' => 'Service Description'],
             ['key' => 'result_description', 'no' => '15.1', 'label' => 'Description of Service'],
             ['key' => 'file_closure_date', 'no' => '16.2', 'label' => 'File Closed Date'],
         ];

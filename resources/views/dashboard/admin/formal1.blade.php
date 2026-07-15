@@ -1247,8 +1247,8 @@
                                     <input type="text" class="form-control" id="special_condition_details" name="special_condition_details">
                                 </div>
                                 <div class="col-md-4">
-                                    <label for="arrest_date" class="form-label">Date of Arrest</label>
-                                    <input type="date" class="form-control" id="arrest_date" name="arrest_date">
+                                    <label for="prison_arrest_date" class="form-label">Date of Arrest</label>
+                                    <input type="date" class="form-control" id="prison_arrest_date" name="prison_arrest_date">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="surrender_date" class="form-label">Date of Surrender</label>

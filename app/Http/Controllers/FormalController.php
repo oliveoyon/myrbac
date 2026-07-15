@@ -47,19 +47,19 @@ class FormalController extends Controller
             'family_informed' => 'required|string|max:255',
             'child_age' => 'nullable|integer|min:0|max:150',
             'child_2_age' => 'nullable|integer|min:0|max:150',
-            'guardian_relation_details' => 'nullable|string|max:255',
-            'lawyer_type_details' => 'nullable|string|max:255',
-            'legal_representation_details' => 'nullable|string|max:255',
-            'referral_service_details' => 'nullable|string|max:255',
-            'source_of_interview_details' => 'nullable|string|max:255',
-            'special_condition_details' => 'nullable|string|max:255',
-            'prison_legal_representation_details' => 'nullable|string|max:255',
-            'other_legal_assistance_details' => 'nullable|string|max:255',
-            'send_to_details' => 'nullable|string|max:255',
-            'other_result_details' => 'nullable|string|max:255',
-            'ministerial_communication_details' => 'nullable|string|max:255',
-            'convicted_length_details' => 'nullable|string|max:255',
-            'convicted_sentence_expire_details' => 'nullable|string|max:255',
+            'guardian_relation_details' => 'nullable|string',
+            'lawyer_type_details' => 'nullable|string',
+            'legal_representation_details' => 'nullable|string',
+            'referral_service_details' => 'nullable|string',
+            'source_of_interview_details' => 'nullable|string',
+            'special_condition_details' => 'nullable|string',
+            'prison_legal_representation_details' => 'nullable|string',
+            'other_legal_assistance_details' => 'nullable|string',
+            'send_to_details' => 'nullable|string',
+            'other_result_details' => 'nullable|string',
+            'ministerial_communication_details' => 'nullable|string',
+            'convicted_length_details' => 'nullable|string',
+            'convicted_sentence_expire_details' => 'nullable|string',
             'intervention_taken' => 'required|string|max:255',
         ], [
             'institute.required' => 'Institute is required. Please enter your name.',
@@ -95,16 +95,17 @@ class FormalController extends Controller
         $districtName = (optional(auth()->user()->district)->name);
         $districtId = Auth::user()->district_id;
         $pngoId = Auth::user()->pngo_id;
-        $existingCentralIds = FormalCase::where('district_id', $districtId)
-        ->where('pngo_id', $pngoId)
-        ->orderByDesc('id')
-        ->first();
-                            
+        $lastNumber = FormalCase::withTrashed()
+            ->where('district_id', $districtId)
+            ->where('pngo_id', $pngoId)
+            ->pluck('central_id')
+            ->reduce(function ($highest, $centralId) {
+                preg_match('/(\d+)$/', (string) $centralId, $matches);
 
-        $highestCentralId = $existingCentralIds?->central_id;
-        preg_match('/(\d+)$/', (string) $highestCentralId, $matches);
-        $lastNumber = isset($matches[1]) ? $matches[1] : null;
-        $nextNumber = $lastNumber ? $lastNumber + 1 : 1;
+                return isset($matches[1]) ? max($highest, (int) $matches[1]) : $highest;
+            }, 0);
+
+        $nextNumber = $lastNumber + 1;
 
         $centralId = strtoupper(substr($districtName, 0, 3)) . '-LA-' . $nextNumber;
 
@@ -331,19 +332,19 @@ class FormalController extends Controller
             'family_informed' => 'required|string|max:255',
             'child_age' => 'nullable|integer|min:0|max:150',
             'child_2_age' => 'nullable|integer|min:0|max:150',
-            'guardian_relation_details' => 'nullable|string|max:255',
-            'lawyer_type_details' => 'nullable|string|max:255',
-            'legal_representation_details' => 'nullable|string|max:255',
-            'referral_service_details' => 'nullable|string|max:255',
-            'source_of_interview_details' => 'nullable|string|max:255',
-            'special_condition_details' => 'nullable|string|max:255',
-            'prison_legal_representation_details' => 'nullable|string|max:255',
-            'other_legal_assistance_details' => 'nullable|string|max:255',
-            'send_to_details' => 'nullable|string|max:255',
-            'other_result_details' => 'nullable|string|max:255',
-            'ministerial_communication_details' => 'nullable|string|max:255',
-            'convicted_length_details' => 'nullable|string|max:255',
-            'convicted_sentence_expire_details' => 'nullable|string|max:255',
+            'guardian_relation_details' => 'nullable|string',
+            'lawyer_type_details' => 'nullable|string',
+            'legal_representation_details' => 'nullable|string',
+            'referral_service_details' => 'nullable|string',
+            'source_of_interview_details' => 'nullable|string',
+            'special_condition_details' => 'nullable|string',
+            'prison_legal_representation_details' => 'nullable|string',
+            'other_legal_assistance_details' => 'nullable|string',
+            'send_to_details' => 'nullable|string',
+            'other_result_details' => 'nullable|string',
+            'ministerial_communication_details' => 'nullable|string',
+            'convicted_length_details' => 'nullable|string',
+            'convicted_sentence_expire_details' => 'nullable|string',
             'intervention_taken' => 'required|string|max:255',
         ], [
             'institute.required' => 'Institute is required. Please enter your name.',
@@ -772,191 +773,309 @@ class FormalController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+            'file' => 'required|mimes:xlsx,xls,csv|max:51200',
         ]);
 
-        // Process the uploaded file and loop through the rows
+        class_exists(\App\Exports\FormalCaseImportTemplateExport::class);
+
         $data = Excel::toArray(new FormalCaseImport, $request->file('file'))[0];
+        $templateFields = array_column(\App\Exports\FormalCaseImportTemplateFields::fields(), 'key');
+        $preparedRows = [];
+        $importErrors = [];
+        $seenCentralIds = [];
 
-        foreach ($data as $row) {
-            // Ensure that child_age is null if empty
-            $row['child_age'] = !empty($row['child_age']) && is_numeric($row['child_age']) ? $row['child_age'] : null;
-            $row['child_2_age'] = !empty($row['child_2_age']) && is_numeric($row['child_2_age']) ? $row['child_2_age'] : null;
+        foreach ($data as $index => $row) {
+            $rowNumber = $index + 2;
+            $row = $this->normalizeFormalCaseImportRow($row, $templateFields);
 
-            // Convert dates to proper format (if necessary) and handle missing dates collected_case_doc
-            $row['interview_date'] = $this->convertToDateFormat($row['interview_date']);
-            $row['arrest_date'] = $this->convertToDateFormat($row['arrest_date']);
-            $row['legal_representation_date'] = $this->convertToDateFormat($row['legal_representation_date']);
-            $row['collected_vokalatnama_date'] = $this->convertToDateFormat($row['collected_vokalatnama_date']);
-            $row['family_communication_date'] = $this->convertToDateFormat($row['family_communication_date']);
-            $row['witness_communication_date'] = $this->convertToDateFormat($row['witness_communication_date']);
-            $row['medical_report_date'] = $this->convertToDateFormat($row['medical_report_date']);
-            $row['legal_assistance_date'] = $this->convertToDateFormat($row['legal_assistance_date']);
-            $row['assistance_under_custody_date'] = $this->convertToDateFormat($row['assistance_under_custody_date']);
-            $row['referral_service_date'] = $this->convertToDateFormat($row['referral_service_date']);
-            $row['case_resolved_date'] = $this->convertToDateFormat($row['case_resolved_date'] ?? null);
-            $row['resolved_dispute_date'] = $this->convertToDateFormat($row['resolved_dispute_date']);
-            $row['appoint_lawyer_date'] = $this->convertToDateFormat($row['appoint_lawyer_date']);
-            $row['release_status_date'] = $this->convertToDateFormat($row['release_status_date']);
-            $row['other_result_date'] = $this->convertToDateFormat($row['other_result_date'] ?? null);
-            $row['application_mode_date'] = $this->convertToDateFormat($row['application_mode_date']);
-            $row['type_of_service_date'] = $this->convertToDateFormat($row['type_of_service_date']);
-            $row['collected_case_doc'] = $this->convertToDateFormat($row['collected_case_doc']);
-            $row['identify_sureties_date'] = $this->convertToDateFormat($row['identify_sureties_date'] ?? null);
-            $row['entry_date'] = $this->convertToDateFormat($row['entry_date']);
-            $row['next_court_date'] = $this->convertToDateFormat($row['next_court_date']);
-            $row['surrender_date'] = $this->convertToDateFormat($row['surrender_date']);
-            $row['prison_family_communication'] = $this->convertToDateFormat($row['prison_family_communication']);
-            $row['prison_legal_representation'] = $this->convertToDateFormat($row['prison_legal_representation']);
-            $row['prison_legal_representation_date'] = $this->convertToDateFormat($row['prison_legal_representation_date']);
-            $row['prison_next_court_date'] = $this->convertToDateFormat($row['prison_next_court_date']);
-            $row['identify_sureties_prison_date'] = $this->convertToDateFormat($row['identify_sureties_prison_date'] ?? null);
-            $row['witness_communication_prison'] = $this->convertToDateFormat($row['witness_communication_prison']);
-            $row['bail_bond_submission'] = $this->convertToDateFormat($row['bail_bond_submission']);
-            $row['court_order_communication'] = $this->convertToDateFormat($row['court_order_communication']);
-            $row['application_certified_copies'] = $this->convertToDateFormat($row['application_certified_copies']);
-            $row['other_legal_assistance_date'] = $this->convertToDateFormat($row['other_legal_assistance_date']);
-            $row['released_on'] = $this->convertToDateFormat($row['released_on']);
-            $row['released_on_date'] = $this->convertToDateFormat($row['released_on_date']);
-            $row['send_to_date'] = $this->convertToDateFormat($row['send_to_date']);
-            $row['convicted_sentence_expire'] = $this->convertToDateFormat($row['convicted_sentence_expire']);
-            $row['result_of_appeal_date'] = $this->convertToDateFormat($row['result_of_appeal_date'] ?? null);
-            $row['prison_case_resolved_date'] = $this->convertToDateFormat($row['prison_case_resolved_date'] ?? null);
-            $row['date_of_reliefe'] = $this->convertToDateFormat($row['date_of_reliefe']);
-            $row['file_closure_date'] = $this->convertToDateFormat($row['file_closure_date']);
-
-            if (!empty($row['reference_no'])) {
-                $row['received_application'] = 'Yes';
+            if ($this->isEmptyImportRow($row)) {
+                continue;
             }
 
-            if (! Auth::user()->canAccessDistrictPngo($row['district_id'], $row['pngo_id'])) {
-                return redirect()->back()->with('error', 'The import contains a district-PNGO pair outside your assigned access scope.');
+            $rowErrors = $this->validateFormalCaseImportRow($row, $rowNumber, $seenCentralIds);
+
+            if (! empty($rowErrors)) {
+                $importErrors = array_merge($importErrors, $rowErrors);
+                continue;
             }
 
-            
-            // Insert the row into the database
-            FormalCase::create([
-                'institute' => $row['institute'],
-                'central_id' => $row['central_id'],
-                'user_id' => auth()->id(),
-                'district_id' => $row['district_id'],
-                'pngo_id' => $row['pngo_id'],
-                'status' => $row['status'],
-                'full_name' => $row['full_name'],
-                'nick_name' => $row['nick_name'],
-                'father_name' => $row['father_name'],
-                'mother_name' => $row['mother_name'],
-                'sex' => $row['sex'],
-                'age' => $row['age'],
-                'disability' => $row['disability'],
-                'nationality' => $row['nationality'],
-                'nid_passport' => $row['nid_passport'],
-                'phone_number' => $row['phone_number'],
-                'address' => $row['address'],
-                'interview_date' => $row['interview_date'],
-                'interview_time' => $row['interview_time'],
-                'interview_place' => $row['interview_place'],
-                'marital_status' => $row['marital_status'],
-                'spouse_name' => $row['spouse_name'],
-                'education_level' => $row['education_level'],
-                'occupation' => $row['occupation'],
-                'monthly_income' => $row['monthly_income'],
-                'family_informed' => $row['family_informed'],
-                'children_with_prisoner' => $row['children_with_prisoner'],
-                'child_sex' => $row['child_sex'],
-                'child_age' => $row['child_age'],  // Now null if empty
-                'child_2_sex' => $row['child_2_sex'] ?? null,
-                'child_2_age' => $row['child_2_age'] ?? null,
-                'has_guardian' => $row['has_guardian'],
-                'guardian_name' => $row['guardian_name'],
-                'guardian_phone' => $row['guardian_phone'],
-                'guardian_address' => $row['guardian_address'],
-                'guardian_relation' => $row['guardian_relation'],
-                'guardian_relation_details' => $row['guardian_relation_details'] ?? null,
-                'guardian_surety' => $row['guardian_surety'],
-                'has_lawyer' => $row['has_lawyer'],
-                'lawyer_type' => $row['lawyer_type'],
-                'lawyer_type_details' => $row['lawyer_type_details'] ?? null,
-                'lawyer_name' => $row['lawyer_name'],
-                'lawyer_membership' => $row['lawyer_membership'],
-                'lawyer_phone' => $row['lawyer_phone'],
-                'incident_details' => $row['incident_details'],
-                'custody_status' => $row['custody_status'],
-                'charges_details' => $row['charges_details'],
-                'arrest_date' => $row['arrest_date'],
-                'case_no' => $row['case_no'],
-                'family_communication_date' => $row['family_communication_date'],
-                'legal_representation' => $row['legal_representation'],
-                'legal_representation_details' => $row['legal_representation_details'] ?? null,
-                'legal_representation_date' => $row['legal_representation_date'],
-                'collected_vokalatnama_date' => $row['collected_vokalatnama_date'],
-                'collected_case_doc' => $row['collected_case_doc'],
-                'identify_sureties' => $row['identify_sureties'],
-                'identify_sureties_date' => $row['identify_sureties_date'] ?? null,
-                'witness_communication_date' => $row['witness_communication_date'],
-                'medical_report_date' => $row['medical_report_date'],
-                'legal_assistance_date' => $row['legal_assistance_date'],
-                'assistance_under_custody_date' => $row['assistance_under_custody_date'],
-                'referral_service' => $row['referral_service'],
-                'referral_service_details' => $row['referral_service_details'] ?? null,
-                'referral_service_date' => $row['referral_service_date'],
-                'case_resolved_date' => $row['case_resolved_date'] ?? null,
-                'resolved_dispute_date' => $row['resolved_dispute_date'],
-                'appoint_lawyer_date' => $row['appoint_lawyer_date'],
-                'release_status' => $row['release_status'],
-                'fine_amount' => $row['fine_amount'],
-                'release_status_date' => $row['release_status_date'],
-                'other_result_details' => $row['other_result_details'] ?? null,
-                'other_result_date' => $row['other_result_date'] ?? null,
-                'application_mode' => $row['application_mode'],
-                'application_mode_date' => $row['application_mode_date'],
-                'received_application' => $row['received_application'],
-                'reference_no' => $row['reference_no'],
-                'type_of_service' => $this->prepareMultiSelectValue($row['type_of_service'] ?? null),
-                'type_of_service_date' => $row['type_of_service_date'],
-                'source_of_interview' => $row['source_of_interview'],
-                'source_of_interview_details' => $row['source_of_interview_details'] ?? null,
-                'prison_reg_no' => $row['prison_reg_no'],
-                'prison_case_no' => $row['prison_case_no'],
-                'entry_date' => $row['entry_date'],
-                'case_transferred' => $row['case_transferred'],
-                'current_court' => $row['current_court'],
-                'case_status' => $row['case_status'],
-                'next_court_date' => $row['next_court_date'],
-                'facts_of_case' => $row['facts_of_case'],
-                'imprisonment_condition' => $row['imprisonment_condition'],
-                'special_condition' => $row['special_condition'],
-                'special_condition_details' => $row['special_condition_details'] ?? null,
-                'prison_arrest_date' => $row['prison_arrest_date'],
-                'surrender_date' => $row['surrender_date'],
-                'released_on' => $row['released_on'],
-                'identify_sureties_prison_date' => $row['identify_sureties_prison_date'] ?? null,
-                'prison_legal_representation_details' => $row['prison_legal_representation_details'] ?? null,
-                'ministerial_communication_details' => $row['ministerial_communication_details'] ?? null,
-                'other_legal_assistance_details' => $row['other_legal_assistance_details'] ?? null,
-                'result_of_appeal' => $row['result_of_appeal'],
-                'convicted_length_details' => $row['convicted_length_details'] ?? null,
-                'convicted_sentence_expire_details' => $row['convicted_sentence_expire_details'] ?? null,
-                'result_of_appeal_date' => $row['result_of_appeal_date'] ?? null,
-                'prison_case_resolved_date' => $row['prison_case_resolved_date'] ?? null,
-                'send_to_details' => $row['send_to_details'] ?? null,
-                'date_of_reliefe' => $row['date_of_reliefe'],
-                'result_description' => $row['result_description'] ?? null,
-                'file_closure_date' => $row['file_closure_date'],
-            ]);
-
-            $followup = new FollowUpIntervention();
-            $followup->central_id = $row['central_id']; 
-            $followup->user_id = auth()->id();
-            $followup->intervention_taken = 'Initial Information Collected'; 
-            $followup->intervention_taken_date = $row['interview_date']; 
-            // $followup->intervention_to_be_taken = $row['intervention_to_be_taken']; 
-            // $followup->to_be_taken_date = $this->convertToDateFormat($row['to_be_taken_date']); 
-            $followup->save();
+            $row['__row_number'] = $rowNumber;
+            $seenCentralIds[] = strtolower((string) $row['central_id']);
+            $preparedRows[] = $row;
         }
 
-        return redirect()->back()->with('success', 'Data Imported Successfully.');
+        if (! empty($importErrors)) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('import_errors', $importErrors);
+        }
+
+        if (empty($preparedRows)) {
+            return redirect()->back()->with('error', 'No importable rows found in the uploaded file.');
+        }
+
+        $insertedCaseIds = [];
+        $currentImportRow = null;
+
+        try {
+            foreach ($preparedRows as $row) {
+                $currentImportRow = $row['__row_number'] ?? null;
+                $caseData = array_intersect_key($row, array_flip($templateFields));
+                $caseData['user_id'] = auth()->id();
+                $caseData['type_of_service'] = $this->prepareMultiSelectValue($caseData['type_of_service'] ?? null);
+
+                if (blank($caseData['result_description'] ?? null) && filled($caseData['service_description'] ?? null)) {
+                    $caseData['result_description'] = $caseData['service_description'];
+                }
+
+                if (! empty($caseData['reference_no'])) {
+                    $caseData['received_application'] = 'Yes';
+                }
+
+                $case = FormalCase::create($caseData);
+                $insertedCaseIds[] = $case->id;
+
+                FollowUpIntervention::create([
+                    'central_id' => $case->id,
+                    'user_id' => auth()->id(),
+                    'intervention_taken' => 'Initial Information Collected',
+                    'intervention_taken_date' => $case->interview_date,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            if (! empty($insertedCaseIds)) {
+                FollowUpIntervention::whereIn('central_id', $insertedCaseIds)->delete();
+                FileUpload::whereIn('case_id', $insertedCaseIds)->delete();
+                FormalCase::withTrashed()->whereIn('id', $insertedCaseIds)->forceDelete();
+            }
+
+            $message = 'Import stopped before completion. No rows from this upload were kept.';
+
+            if ($currentImportRow) {
+                $message .= " Database error near row {$currentImportRow}.";
+            }
+
+            $message .= ' ' . $e->getMessage();
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('import_errors', [$message]);
+        }
+
+        return redirect()->back()->with('success', count($preparedRows) . ' case(s) imported successfully.');
     }
+
+private function normalizeFormalCaseImportRow(array $row, array $templateFields): array
+{
+    $normalized = [];
+
+    foreach ($templateFields as $field) {
+        $value = $row[$field] ?? null;
+
+        if (is_string($value)) {
+            $value = trim($value);
+        }
+
+        $normalized[$field] = blank($value) ? null : $value;
+    }
+
+    if (blank($normalized['disability'] ?? null)) {
+        $normalized['disability'] = 'No';
+    }
+
+    foreach ($this->formalCaseImportIntegerFields() as $field) {
+        if (filled($normalized[$field] ?? null)) {
+            if (! is_numeric($normalized[$field]) || (float) $normalized[$field] != floor((float) $normalized[$field])) {
+                $normalized['__import_errors'][] = "{$field} must be a whole number.";
+            } else {
+                $normalized[$field] = (int) $normalized[$field];
+            }
+        }
+    }
+
+    foreach ($this->formalCaseImportDateFields() as $field) {
+        if (array_key_exists($field, $normalized)) {
+            $rawDateValue = $normalized[$field];
+            $normalized[$field] = $this->parseImportDate($rawDateValue);
+
+            if (filled($rawDateValue) && blank($normalized[$field])) {
+                $normalized['__import_errors'][] = "{$field} has an invalid date value.";
+            }
+        }
+    }
+
+    return $normalized;
+}
+
+private function isEmptyImportRow(array $row): bool
+{
+    foreach ($row as $value) {
+        if (filled($value)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+private function validateFormalCaseImportRow(array $row, int $rowNumber, array $seenCentralIds): array
+{
+    $errors = [];
+
+    foreach (($row['__import_errors'] ?? []) as $message) {
+        $errors[] = "Row {$rowNumber}: {$message}";
+    }
+
+    foreach (['institute', 'central_id', 'district_id', 'pngo_id', 'status', 'full_name', 'sex', 'age', 'family_informed'] as $field) {
+        if (blank($row[$field] ?? null)) {
+            $errors[] = "Row {$rowNumber}: {$field} is required.";
+        }
+    }
+
+    if (filled($row['institute'] ?? null) && ! in_array($row['institute'], ['Court', 'Police Station', 'Prison'], true)) {
+        $errors[] = "Row {$rowNumber}: institute must be Court, Police Station, or Prison.";
+    }
+
+    if (filled($row['status'] ?? null) && ! in_array((string) $row['status'], ['1', '2', '3'], true)) {
+        $errors[] = "Row {$rowNumber}: status must be 1, 2, or 3.";
+    }
+
+    if (filled($row['sex'] ?? null) && ! in_array($row['sex'], ['Male', 'Female', 'Transgender'], true)) {
+        $errors[] = "Row {$rowNumber}: sex must be Male, Female, or Transgender.";
+    }
+
+    foreach ($this->formalCaseImportIntegerFields() as $field) {
+        if (filled($row[$field] ?? null) && (! is_int($row[$field]) || $row[$field] < 0 || $row[$field] > 150)) {
+            $errors[] = "Row {$rowNumber}: {$field} must be a valid age between 0 and 150.";
+        }
+    }
+
+    foreach (['monthly_income', 'fine_amount'] as $field) {
+        if (filled($row[$field] ?? null) && ! is_numeric($row[$field])) {
+            $errors[] = "Row {$rowNumber}: {$field} must be numeric.";
+        }
+    }
+
+    if (filled($row['central_id'] ?? null)) {
+        $centralIdKey = strtolower((string) $row['central_id']);
+
+        if (in_array($centralIdKey, $seenCentralIds, true)) {
+            $errors[] = "Row {$rowNumber}: duplicate central_id in uploaded file.";
+        }
+
+        if (FormalCase::withTrashed()->where('central_id', $row['central_id'])->exists()) {
+            $errors[] = "Row {$rowNumber}: central_id already exists in the system.";
+        }
+    }
+
+    if (filled($row['district_id'] ?? null) && filled($row['pngo_id'] ?? null)) {
+        $pngo = Pngo::find($row['pngo_id']);
+
+        if (! $pngo) {
+            $errors[] = "Row {$rowNumber}: PNGO ID was not found.";
+        } elseif ((int) $pngo->district_id !== (int) $row['district_id']) {
+            $errors[] = "Row {$rowNumber}: PNGO does not belong to the selected district.";
+        } elseif (! Auth::user()->canAccessDistrictPngo($row['district_id'], $row['pngo_id'])) {
+            $errors[] = "Row {$rowNumber}: district-PNGO pair is outside your access scope.";
+        }
+    }
+
+    return $errors;
+}
+
+private function parseImportDate($value): ?string
+{
+    if (blank($value)) {
+        return null;
+    }
+
+    if ($value instanceof \DateTimeInterface) {
+        return Carbon::instance($value)->format('Y-m-d');
+    }
+
+    if (is_numeric($value)) {
+        try {
+            return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value))->format('Y-m-d');
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    $value = trim((string) $value);
+    $formats = ['Y-m-d', 'd-M-y', 'd-M-Y', 'j M Y', 'j M, Y', 'm/d/Y', 'm/d/y', 'n/j/Y', 'n/j/y', 'd/m/Y', 'd/m/y', 'd-m-Y', 'd-m-y'];
+
+    foreach ($formats as $format) {
+        try {
+            $date = Carbon::createFromFormat($format, $value);
+            $errors = Carbon::getLastErrors();
+
+            if ($date !== false && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))) {
+                return $date->format('Y-m-d');
+            }
+        } catch (\Throwable $e) {
+            continue;
+        }
+    }
+
+    try {
+        return Carbon::parse($value)->format('Y-m-d');
+    } catch (\Throwable $e) {
+        return null;
+    }
+}
+
+private function formalCaseImportIntegerFields(): array
+{
+    return ['age', 'child_age', 'child_2_age'];
+}
+
+private function formalCaseImportDateFields(): array
+{
+    return [
+        'interview_date',
+        'arrest_date',
+        'family_communication_date',
+        'legal_representation_date',
+        'collected_vokalatnama_date',
+        'collected_case_doc',
+        'identify_sureties_date',
+        'witness_communication_date',
+        'medical_report_date',
+        'legal_assistance_date',
+        'assistance_under_custody_date',
+        'referral_service_date',
+        'resolved_dispute_date',
+        'case_resolved_date',
+        'appoint_lawyer_date',
+        'release_status_date',
+        'other_result_date',
+        'application_mode_date',
+        'type_of_service_date',
+        'entry_date',
+        'next_court_date',
+        'prison_arrest_date',
+        'surrender_date',
+        'prison_family_communication',
+        'prison_legal_representation_date',
+        'next_court_collection_date',
+        'prison_next_court_date',
+        'identify_sureties_prison_date',
+        'witness_communication_prison',
+        'bail_bond_submission',
+        'court_order_communication',
+        'application_certified_copies',
+        'other_legal_assistance_date',
+        'released_on_date',
+        'send_to_date',
+        'convicted_sentence_expire',
+        'result_of_appeal_date',
+        'prison_case_resolved_date',
+        'date_of_reliefe',
+        'file_closure_date',
+    ];
+}
 
 // Function to convert date format to 'Y-m-d' using Carbon
 private function convertToDateFormat($date)

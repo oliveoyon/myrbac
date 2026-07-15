@@ -1310,8 +1310,8 @@
 
                                     <!-- Date of Arrest -->
                                     <div class="col-md-4">
-                                        <label for="arrest_date" class="form-label">Date of Arrest</label>
-                                        <input type="date" class="form-control" id="arrest_date" name="arrest_date" value="{{ old('arrest_date', $caseData->arrest_date) }}">
+                                        <label for="prison_arrest_date" class="form-label">Date of Arrest</label>
+                                        <input type="date" class="form-control" id="prison_arrest_date" name="prison_arrest_date" value="{{ old('prison_arrest_date', $caseData->prison_arrest_date) }}">
                                     </div>
 
                                     <!-- Date of Surrender -->

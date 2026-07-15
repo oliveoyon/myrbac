@@ -30,19 +30,19 @@ class FormalCase extends Model
         'case_resolved_date', 'resolved_dispute_date', 'appoint_lawyer_date', 'release_status', 'fine_amount', 
         'release_status_date', 'other_result_details', 'other_result_date', 'application_mode', 'application_mode_date', 'received_application', 
         'reference_no', 'type_of_service', 'type_of_service_date', 'service_description', 
-        'source_of_interview', 'source_of_interview_details', 'prison_reg_no', 'section_no', 'present_court', 'lockup_no', 
+        'source_of_interview', 'source_of_interview_details', 'prison_reg_no', 'prison_case_no', 'section_no', 'present_court', 'lockup_no', 
         'entry_date', 'case_transferred', 'current_court', 'case_status', 'co_offenders', 
         'next_court_date', 'facts_of_case', 'imprisonment_condition', 'imprisonment_status', 
-        'special_condition', 'special_condition_details', 'surrender_date', 'prison_family_communication', 
+        'special_condition', 'special_condition_details', 'prison_arrest_date', 'surrender_date', 'prison_family_communication', 
         'prison_legal_representation', 'prison_legal_representation_details', 'prison_legal_representation_date', 
-        'next_court_collection_date', 'collected_case_doc_prison', 
+        'next_court_collection_date', 'prison_next_court_date', 'collected_case_doc_prison', 
         'identify_sureties_prison_nid', 'identify_sureties_prison_phone', 'identify_sureties_prison_date',
         'witness_communication_prison', 'bail_bond_submission', 'court_order_communication', 
         'application_certified_copies', 'appeal_assistance', 'ministerial_communication', 'ministerial_communication_details',
         'other_legal_assistance', 'other_legal_assistance_details', 'other_legal_assistance_date', 'released_on', 
         'released_on_date', 'send_to', 'send_to_details', 'send_to_date', 'convicted_length', 'convicted_length_details',
         'convicted_sentence_expire', 'convicted_sentence_expire_details', 'result_of_appeal',
-        'result_of_appeal_date', 'prison_case_resolved_date', 'date_of_reliefe', 'file_closure_date'
+        'result_of_appeal_date', 'prison_case_resolved_date', 'date_of_reliefe', 'result_description', 'file_closure_date'
     ];
 
     public function district()
