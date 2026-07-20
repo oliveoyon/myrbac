@@ -97,7 +97,7 @@
 
     .dash-stat-grid {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
         gap: 12px;
     }
 
@@ -170,10 +170,22 @@
         --accent-dark: #8b4c77;
     }
 
+    .dash-stat-card.transgender {
+        --accent: #7c8fb0;
+        --accent-soft: #f1f5f9;
+        --accent-dark: #475569;
+    }
+
     .dash-stat-card.child {
         --accent: #d9a441;
         --accent-soft: #fff7e5;
         --accent-dark: #9a6e19;
+    }
+
+    .dash-stat-card.disability {
+        --accent: #6f7bc8;
+        --accent-soft: #f0f2ff;
+        --accent-dark: #48549f;
     }
 
     .dash-panel {
@@ -443,9 +455,26 @@
     $totalCases = $districtWise->sum('total');
     $totalMale = $districtWise->sum('male');
     $totalFemale = $districtWise->sum('female');
+    $totalTransgender = $districtWise->sum('transgender');
     $totalUnder18 = $districtWise->sum('under_18');
-    $topDistricts = $districtWise->sortByDesc('total')->take(6);
-    $topPngos = $pngoWise->sortByDesc('total')->take(6);
+    $totalDisability = $districtWise->sum('disability');
+    $topDistricts = $districtWise->sortByDesc('total');
+    $topPngos = $pngoWise
+        ->groupBy(fn ($row) => trim(mb_strtolower($row['pngo_name'] ?? 'Unknown')))
+        ->map(function ($rows) {
+            $firstRow = $rows->first();
+
+            return [
+                'pngo_name' => $firstRow['pngo_name'] ?? 'Unknown',
+                'male' => $rows->sum('male'),
+                'female' => $rows->sum('female'),
+                'transgender' => $rows->sum('transgender'),
+                'under_18' => $rows->sum('under_18'),
+                'total' => $rows->sum('total'),
+            ];
+        })
+        ->sortByDesc('total')
+        ->values();
 @endphp
 
 <section class="smart-dashboard">
@@ -491,12 +520,26 @@
             </div>
             <div class="dash-stat-icon"><i class="fas fa-female"></i></div>
         </div>
+        <div class="dash-stat-card transgender">
+            <div>
+                <span>Transgender</span>
+                <strong>{{ $totalTransgender }}</strong>
+            </div>
+            <div class="dash-stat-icon"><i class="fas fa-transgender-alt"></i></div>
+        </div>
         <div class="dash-stat-card child">
             <div>
                 <span>Under 18</span>
                 <strong>{{ $totalUnder18 }}</strong>
             </div>
             <div class="dash-stat-icon"><i class="fas fa-child"></i></div>
+        </div>
+        <div class="dash-stat-card disability">
+            <div>
+                <span>Disability Yes</span>
+                <strong>{{ $totalDisability }}</strong>
+            </div>
+            <div class="dash-stat-icon"><i class="fas fa-wheelchair"></i></div>
         </div>
     </div>
 
@@ -533,7 +576,7 @@
                 <div class="dash-panel-header">
                     <div>
                         <h2>District Summary</h2>
-                        <small>Top districts by total cases</small>
+                        <small>All accessible districts by total cases</small>
                     </div>
                     <a href="{{ route('district.summery') }}" class="btn btn-outline-secondary btn-sm">Details</a>
                 </div>
@@ -575,7 +618,7 @@
                 <div class="dash-panel-header">
                     <div>
                         <h2>PNGO Summary</h2>
-                        <small>Top PNGOs by total cases</small>
+                        <small>All accessible PNGOs by total cases</small>
                     </div>
                     <a href="{{ route('pngo.summery') }}" class="btn btn-outline-secondary btn-sm">Details</a>
                 </div>

@@ -29,10 +29,11 @@ class CommonService
         
         $query = FormalCase::select(
             'institute',
-            DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
-            DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
-            DB::raw('COUNT(CASE WHEN sex = "Transgender" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as transgender'),
+            DB::raw('COUNT(CASE WHEN sex = "Male" AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
+            DB::raw('COUNT(CASE WHEN sex = "Female" AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
+            DB::raw('COUNT(CASE WHEN sex = "Transgender" AND (' . $this->buildCondition() . ') THEN 1 END) as transgender'),
             DB::raw('COUNT(CASE WHEN age < 18 AND (' . $this->buildCondition() . ') THEN 1 END) as under_18'),
+            DB::raw('COUNT(CASE WHEN LOWER(TRIM(disability)) = "yes" AND (' . $this->buildCondition() . ') THEN 1 END) as disability'),
             DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
         )
         // ->where('district_id', $districtId)
@@ -94,10 +95,11 @@ class CommonService
         // Fetch the district data grouped by district_id
         $query = FormalCase::select(
             'district_id',
-            DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
-            DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
-            DB::raw('COUNT(CASE WHEN sex = "Transgender" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as transgender'),
+            DB::raw('COUNT(CASE WHEN sex = "Male" AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
+            DB::raw('COUNT(CASE WHEN sex = "Female" AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
+            DB::raw('COUNT(CASE WHEN sex = "Transgender" AND (' . $this->buildCondition() . ') THEN 1 END) as transgender'),
             DB::raw('COUNT(CASE WHEN age < 18 AND (' . $this->buildCondition() . ') THEN 1 END) as under_18'),
+            DB::raw('COUNT(CASE WHEN LOWER(TRIM(disability)) = "yes" AND (' . $this->buildCondition() . ') THEN 1 END) as disability'),
             DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
         )
         // Add condition to filter by status (if required)
@@ -119,6 +121,7 @@ class CommonService
                 'female' => $row->female,
                 'transgender' => $row->transgender,
                 'under_18' => $row->under_18,
+                'disability' => $row->disability,
                 'total' => $row->total
             ];
         });
@@ -132,10 +135,11 @@ class CommonService
         // Fetch the case data grouped by pngo_id
         $query = FormalCase::select(
             'pngo_id',
-            DB::raw('COUNT(CASE WHEN sex = "Male" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
-            DB::raw('COUNT(CASE WHEN sex = "Female" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
-            DB::raw('COUNT(CASE WHEN sex = "Transgender" AND age >= 18 AND (' . $this->buildCondition() . ') THEN 1 END) as transgender'),
+            DB::raw('COUNT(CASE WHEN sex = "Male" AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
+            DB::raw('COUNT(CASE WHEN sex = "Female" AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
+            DB::raw('COUNT(CASE WHEN sex = "Transgender" AND (' . $this->buildCondition() . ') THEN 1 END) as transgender'),
             DB::raw('COUNT(CASE WHEN age < 18 AND (' . $this->buildCondition() . ') THEN 1 END) as under_18'),
+            DB::raw('COUNT(CASE WHEN LOWER(TRIM(disability)) = "yes" AND (' . $this->buildCondition() . ') THEN 1 END) as disability'),
             DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
         )
         ->where('status', '>', 1) 
@@ -156,6 +160,7 @@ class CommonService
                 'female' => $row->female,
                 'transgender' => $row->transgender,
                 'under_18' => $row->under_18,
+                'disability' => $row->disability,
                 'total' => $row->total
             ];
         });

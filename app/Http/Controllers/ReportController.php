@@ -451,14 +451,14 @@ class ReportController extends Controller
     public function pngoSummery()
     {
         $commonService = new CommonService();
-        $pngoWise = $commonService->showCaseAssistancePngoWise();
+        $pngoWise = $this->mergePngoSummaryByName($commonService->showCaseAssistancePngoWise());
         return view('dashboard.report.pngo-summery', compact('pngoWise'));
     }
 
     public function pngoSummeryPdf()
     {
         $commonService = new CommonService();
-        $pngoWise = $commonService->showCaseAssistancePngoWise();
+        $pngoWise = $this->mergePngoSummaryByName($commonService->showCaseAssistancePngoWise());
 
         $mpdf = $this->reportMpdf('P');
         $html = view('dashboard.report.summary-report-pdf', [
@@ -471,6 +471,26 @@ class ReportController extends Controller
         $mpdf->WriteHTML($html);
 
         return $this->inlinePdfResponse($mpdf, 'pngo-wise-summery.pdf');
+    }
+
+    private function mergePngoSummaryByName($pngoWise)
+    {
+        return collect($pngoWise)
+            ->groupBy(fn ($row) => trim(mb_strtolower($row['pngo_name'] ?? 'Unknown')))
+            ->map(function ($rows) {
+                $firstRow = $rows->first();
+
+                return [
+                    'pngo_name' => $firstRow['pngo_name'] ?? 'Unknown',
+                    'male' => $rows->sum('male'),
+                    'female' => $rows->sum('female'),
+                    'transgender' => $rows->sum('transgender'),
+                    'under_18' => $rows->sum('under_18'),
+                    'total' => $rows->sum('total'),
+                ];
+            })
+            ->sortByDesc('total')
+            ->values();
     }
 
     public function search(Request $request)
