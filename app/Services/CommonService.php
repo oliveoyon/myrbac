@@ -90,7 +90,7 @@ class CommonService
                 OR (institute = 'Police Station' AND ($policeCondition))";
     }
 
-    public function showCaseAssistanceDistrictWise()
+    public function showCaseAssistanceDistrictWise($fromDate = null, $toDate = null)
     {
         // Fetch the district data grouped by district_id
         $query = FormalCase::select(
@@ -105,6 +105,8 @@ class CommonService
         // Add condition to filter by status (if required)
         ->where('status', '>', 1) 
         ->groupBy('district_id'); // Group by district only, not by institute
+
+        $this->applyDateRange($query, $fromDate, $toDate);
 
         $data = Auth::user()->applyDistrictPngoScope($query)->get();
 
@@ -130,7 +132,7 @@ class CommonService
   
     }
 
-    public function showCaseAssistancePngoWise()
+    public function showCaseAssistancePngoWise($fromDate = null, $toDate = null)
     {
         // Fetch the case data grouped by pngo_id
         $query = FormalCase::select(
@@ -144,6 +146,8 @@ class CommonService
         )
         ->where('status', '>', 1) 
         ->groupBy('pngo_id'); // Group by pngo_id instead of district_id
+
+        $this->applyDateRange($query, $fromDate, $toDate);
 
         $data = Auth::user()->applyDistrictPngoScope($query)->get();
 
@@ -166,6 +170,51 @@ class CommonService
         });
 
         return $resultData;
+    }
+
+    public function showCaseAssistanceInstitutionWise(array $filters = [])
+    {
+        $query = FormalCase::select(
+            'institute',
+            DB::raw('COUNT(CASE WHEN sex = "Male" AND (' . $this->buildCondition() . ') THEN 1 END) as male'),
+            DB::raw('COUNT(CASE WHEN sex = "Female" AND (' . $this->buildCondition() . ') THEN 1 END) as female'),
+            DB::raw('COUNT(CASE WHEN sex = "Transgender" AND (' . $this->buildCondition() . ') THEN 1 END) as transgender'),
+            DB::raw('COUNT(CASE WHEN age < 18 AND (' . $this->buildCondition() . ') THEN 1 END) as under_18'),
+            DB::raw('COUNT(CASE WHEN LOWER(TRIM(disability)) = "yes" AND (' . $this->buildCondition() . ') THEN 1 END) as disability'),
+            DB::raw('COUNT(CASE WHEN (' . $this->buildCondition() . ') THEN 1 END) as total')
+        )
+            ->where('status', '>', 1)
+            ->when(! empty($filters['district_id']), fn ($query) => $query->where('district_id', $filters['district_id']))
+            ->when(! empty($filters['pngo_id']), fn ($query) => $query->where('pngo_id', $filters['pngo_id']))
+            ->when(! empty($filters['institute']), fn ($query) => $query->where('institute', $filters['institute']))
+            ->groupBy('institute');
+
+        $this->applyDateRange($query, $filters['from_date'] ?? null, $filters['to_date'] ?? null);
+
+        return Auth::user()->applyDistrictPngoScope($query)
+            ->get()
+            ->map(fn ($row) => [
+                'institution_name' => $row->institute ?: 'Unknown',
+                'male' => $row->male,
+                'female' => $row->female,
+                'transgender' => $row->transgender,
+                'under_18' => $row->under_18,
+                'disability' => $row->disability,
+                'total' => $row->total,
+            ])
+            ->sortByDesc('total')
+            ->values();
+    }
+
+    private function applyDateRange($query, $fromDate = null, $toDate = null): void
+    {
+        if ($fromDate) {
+            $query->whereDate('interview_date', '>=', $fromDate);
+        }
+
+        if ($toDate) {
+            $query->whereDate('interview_date', '<=', $toDate);
+        }
     }
 
 

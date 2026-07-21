@@ -154,7 +154,7 @@
             </li>
             @endcanany
 
-            @canany(['View Case List Report', 'View Intervention Report Page', 'View LSID Report', 'View District Summary Report', 'View PNGO Summary Report', 'Export Formal Cases'])
+            @canany(['View Case List Report', 'View Intervention Report Page', 'View LSID Report', 'View District Summary Report', 'View PNGO Summary Report', 'View Institution Wise Report', 'Export Formal Cases'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-file-alt"></i><span class="nav-text">Reports & Analytics</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
@@ -172,6 +172,9 @@
                     @endcan
                     @can('View PNGO Summary Report')
                     <li><a class="nav-link nav-sublink" href="{{ route('pngo.summery') }}"><i class="fas fa-lock"></i><span class="nav-text">PNGO Summery</span></a></li>
+                    @endcan
+                    @can('View Institution Wise Report')
+                    <li><a class="nav-link nav-sublink" href="{{ route('institution.wise.report') }}"><i class="fas fa-building"></i><span class="nav-text">Institution Wise Report</span></a></li>
                     @endcan
                     @can('Export Formal Cases')
                     <li><a class="nav-link nav-sublink" href="{{ route('formal.cases.export') }}"><i class="fa fa-download"></i><span class="nav-text">Download Excel</span></a></li>

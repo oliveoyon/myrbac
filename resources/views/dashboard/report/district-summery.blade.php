@@ -46,17 +46,60 @@
             overflow-y: auto;
         }
 
+        .summary-filter {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, auto));
+            gap: 10px;
+            align-items: end;
+            padding: 12px;
+            margin-bottom: 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .summary-filter label {
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .summary-filter .form-control {
+            min-width: 170px;
+        }
+
         .chart-wrapper {
             width: 100%;
             max-width: 100%;
             position: relative;
-            padding: 20px;
+            height: 320px;
+            padding: 12px;
             box-sizing: border-box;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
         }
 
         #districtBarChart {
             width: 100% !important;
-            height: auto !important;
+            height: 100% !important;
+        }
+
+        @media (max-width: 768px) {
+            .summary-filter {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .summary-filter .form-control,
+            .summary-filter .btn {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .chart-wrapper {
+                height: 260px;
+            }
         }
 
     </style>
@@ -84,6 +127,18 @@
                         <div class="alert alert-danger" id="errorAlert" style="display: none;">
                             <ul id="errorList"></ul>
                         </div>
+                        <form method="GET" action="{{ route('district.summery') }}" class="summary-filter">
+                            <div>
+                                <label for="from_date">From Date</label>
+                                <input type="date" name="from_date" id="from_date" class="form-control form-control-sm" value="{{ $filters['from_date'] ?? '' }}">
+                            </div>
+                            <div>
+                                <label for="to_date">To Date</label>
+                                <input type="date" name="to_date" id="to_date" class="form-control form-control-sm" value="{{ $filters['to_date'] ?? '' }}">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-filter mr-1"></i> Filter</button>
+                            <a href="{{ route('district.summery') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+                        </form>
                         <div id="reportDiv" class="container-fluid">
                             <div class="row">
                                 <!-- Chart Section -->
@@ -157,7 +212,7 @@
         event.preventDefault();
         var modal = new bootstrap.Modal(document.getElementById('pdfModal'));
         modal.show();
-        document.getElementById('pdfFrame').src = '{{ route('district.summery.print', [], false) }}';
+        document.getElementById('pdfFrame').src = '{{ route('district.summery.print', [], false) }}' + window.location.search;
     });
 </script>
 
@@ -224,6 +279,7 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'top', // Position of the legend

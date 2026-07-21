@@ -27,18 +27,22 @@
             text-align: center;
         }
 
-        .printed-date {
-            margin: 0 0 12px;
+        .printed-date,
+        .filter-line {
+            margin: 0 0 8px;
             color: #475569;
             text-align: center;
             font-size: 9pt;
         }
 
-        .filter-line {
-            margin: -4px 0 12px;
+        .filter-line span {
+            display: inline-block;
+            margin: 0 4px 4px;
+            padding: 3px 7px;
+            border: 1px solid #d7dee3;
+            border-radius: 10px;
+            background: #f8fafc;
             color: #334155;
-            text-align: center;
-            font-size: 9pt;
         }
 
         table {
@@ -75,39 +79,41 @@
 
     <h1>{{ $title }}</h1>
     <p class="printed-date">Printed on {{ now()->format('j M, Y') }}</p>
-    @if (!empty($filters['from_date']) || !empty($filters['to_date']))
+
+    @if (!empty($appliedFilters))
         <p class="filter-line">
-            Interview Date:
-            {{ !empty($filters['from_date']) ? \Carbon\Carbon::parse($filters['from_date'])->format('j M, Y') : 'Start' }}
-            to
-            {{ !empty($filters['to_date']) ? \Carbon\Carbon::parse($filters['to_date'])->format('j M, Y') : 'Today' }}
+            @foreach ($appliedFilters as $label => $value)
+                <span>{{ $label }}: {{ $value }}</span>
+            @endforeach
         </p>
     @endif
 
     <table>
         <thead>
             <tr>
-                <th>{{ $nameColumn }}</th>
+                <th>Institution</th>
                 <th>Male</th>
                 <th>Female</th>
                 <th>Transgender</th>
                 <th>Under 18</th>
+                <th>Disability Yes</th>
                 <th>Total</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($rows as $row)
                 <tr>
-                    <td>{{ $row[$nameKey] ?? '-' }}</td>
+                    <td>{{ $row['institution_name'] ?? '-' }}</td>
                     <td>{{ $row['male'] ?? 0 }}</td>
                     <td>{{ $row['female'] ?? 0 }}</td>
                     <td>{{ $row['transgender'] ?? 0 }}</td>
                     <td>{{ $row['under_18'] ?? 0 }}</td>
+                    <td>{{ $row['disability'] ?? 0 }}</td>
                     <td><strong>{{ $row['total'] ?? 0 }}</strong></td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" style="text-align: center;">No data found.</td>
+                    <td colspan="7" style="text-align: center;">No data found.</td>
                 </tr>
             @endforelse
         </tbody>

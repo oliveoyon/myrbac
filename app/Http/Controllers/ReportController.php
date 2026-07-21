@@ -425,15 +425,17 @@ class ReportController extends Controller
 
     public function districtSummery()
     {
+        $filters = $this->summaryDateFilters();
         $commonService = new CommonService();
-        $districtWise = $commonService->showCaseAssistanceDistrictWise();
-        return view('dashboard.report.district-summery', compact('districtWise'));
+        $districtWise = $commonService->showCaseAssistanceDistrictWise($filters['from_date'], $filters['to_date']);
+        return view('dashboard.report.district-summery', compact('districtWise', 'filters'));
     }
 
     public function districtSummeryPdf()
     {
+        $filters = $this->summaryDateFilters();
         $commonService = new CommonService();
-        $districtWise = $commonService->showCaseAssistanceDistrictWise();
+        $districtWise = $commonService->showCaseAssistanceDistrictWise($filters['from_date'], $filters['to_date']);
 
         $mpdf = $this->reportMpdf('P');
         $html = view('dashboard.report.summary-report-pdf', [
@@ -441,6 +443,7 @@ class ReportController extends Controller
             'nameColumn' => 'District',
             'nameKey' => 'district_name',
             'rows' => $districtWise,
+            'filters' => $filters,
         ])->render();
 
         $mpdf->WriteHTML($html);
@@ -450,15 +453,17 @@ class ReportController extends Controller
 
     public function pngoSummery()
     {
+        $filters = $this->summaryDateFilters();
         $commonService = new CommonService();
-        $pngoWise = $this->mergePngoSummaryByName($commonService->showCaseAssistancePngoWise());
-        return view('dashboard.report.pngo-summery', compact('pngoWise'));
+        $pngoWise = $this->mergePngoSummaryByName($commonService->showCaseAssistancePngoWise($filters['from_date'], $filters['to_date']));
+        return view('dashboard.report.pngo-summery', compact('pngoWise', 'filters'));
     }
 
     public function pngoSummeryPdf()
     {
+        $filters = $this->summaryDateFilters();
         $commonService = new CommonService();
-        $pngoWise = $this->mergePngoSummaryByName($commonService->showCaseAssistancePngoWise());
+        $pngoWise = $this->mergePngoSummaryByName($commonService->showCaseAssistancePngoWise($filters['from_date'], $filters['to_date']));
 
         $mpdf = $this->reportMpdf('P');
         $html = view('dashboard.report.summary-report-pdf', [
@@ -466,6 +471,7 @@ class ReportController extends Controller
             'nameColumn' => 'PNGO',
             'nameKey' => 'pngo_name',
             'rows' => $pngoWise,
+            'filters' => $filters,
         ])->render();
 
         $mpdf->WriteHTML($html);
@@ -491,6 +497,125 @@ class ReportController extends Controller
             })
             ->sortByDesc('total')
             ->values();
+    }
+
+    public function institutionWiseReport(Request $request)
+    {
+        $filters = $this->institutionWiseFilters($request);
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
+        $institutionOptions = $this->institutionOptions();
+        $rows = (new CommonService())->showCaseAssistanceInstitutionWise($filters);
+        $appliedFilters = $this->institutionWiseAppliedFilters($filters);
+
+        return view('dashboard.report.institution-wise-report', compact(
+            'rows',
+            'filters',
+            'districts',
+            'pngos',
+            'institutionOptions',
+            'appliedFilters'
+        ));
+    }
+
+    public function institutionWiseReportPdf(Request $request)
+    {
+        $filters = $this->institutionWiseFilters($request);
+        $rows = (new CommonService())->showCaseAssistanceInstitutionWise($filters);
+        $appliedFilters = $this->institutionWiseAppliedFilters($filters);
+
+        $mpdf = $this->reportMpdf('P');
+        $html = view('dashboard.report.institution-wise-report-pdf', [
+            'title' => 'Institution Wise Report',
+            'rows' => $rows,
+            'appliedFilters' => $appliedFilters,
+        ])->render();
+
+        $mpdf->WriteHTML($html);
+
+        return $this->inlinePdfResponse($mpdf, 'institution-wise-report.pdf');
+    }
+
+    private function summaryDateFilters(): array
+    {
+        request()->validate([
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date|after_or_equal:from_date',
+        ]);
+
+        return [
+            'from_date' => request('from_date'),
+            'to_date' => request('to_date'),
+        ];
+    }
+
+    private function institutionWiseFilters(Request $request): array
+    {
+        $validated = $request->validate([
+            'district_id' => 'nullable|integer|exists:districts,id',
+            'pngo_id' => 'nullable|integer|exists:pngos,id',
+            'institute' => 'nullable|in:Court,Police Station,Prison',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date|after_or_equal:from_date',
+        ]);
+
+        if (! empty($validated['pngo_id'])) {
+            $pngo = Pngo::find($validated['pngo_id']);
+
+            if (! empty($validated['district_id']) && $pngo && (int) $pngo->district_id !== (int) $validated['district_id']) {
+                abort(403);
+            }
+        }
+
+        $districtIds = Auth::user()->accessibleDistrictIds();
+        $pngoIds = Auth::user()->accessiblePngoIds();
+
+        if (! empty($validated['district_id']) && is_array($districtIds)) {
+            abort_if(! in_array((int) $validated['district_id'], array_map('intval', $districtIds), true), 403);
+        }
+
+        if (! empty($validated['pngo_id']) && is_array($pngoIds)) {
+            abort_if(! in_array((int) $validated['pngo_id'], array_map('intval', $pngoIds), true), 403);
+        }
+
+        return [
+            'district_id' => $validated['district_id'] ?? null,
+            'pngo_id' => $validated['pngo_id'] ?? null,
+            'institute' => $validated['institute'] ?? null,
+            'from_date' => $validated['from_date'] ?? null,
+            'to_date' => $validated['to_date'] ?? null,
+        ];
+    }
+
+    private function institutionWiseAppliedFilters(array $filters): array
+    {
+        $applied = [];
+
+        if (! empty($filters['district_id'])) {
+            $applied['District'] = District::where('id', $filters['district_id'])->value('name') ?: 'Unknown';
+        }
+
+        if (! empty($filters['pngo_id'])) {
+            $applied['PNGO'] = Pngo::where('id', $filters['pngo_id'])->value('name') ?: 'Unknown';
+        }
+
+        if (! empty($filters['institute'])) {
+            $applied['Institution'] = $filters['institute'];
+        }
+
+        if (! empty($filters['from_date'])) {
+            $applied['From Date'] = \Carbon\Carbon::parse($filters['from_date'])->format('j M, Y');
+        }
+
+        if (! empty($filters['to_date'])) {
+            $applied['To Date'] = \Carbon\Carbon::parse($filters['to_date'])->format('j M, Y');
+        }
+
+        return $applied;
+    }
+
+    private function institutionOptions(): array
+    {
+        return ['Court', 'Police Station', 'Prison'];
     }
 
     public function search(Request $request)

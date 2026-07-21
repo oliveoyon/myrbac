@@ -131,6 +131,8 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('/district-summery/print', [ReportController::class, 'districtSummeryPdf'])->name('district.summery.print')->middleware('permission:View District Summary Report');
     Route::get('/pngo-summery', [ReportController::class, 'pngoSummery'])->name('pngo.summery')->middleware('permission:View PNGO Summary Report');
     Route::get('/pngo-summery/print', [ReportController::class, 'pngoSummeryPdf'])->name('pngo.summery.print')->middleware('permission:View PNGO Summary Report');
+    Route::get('/institution-wise-report', [ReportController::class, 'institutionWiseReport'])->name('institution.wise.report')->middleware('permission:View Institution Wise Report');
+    Route::get('/institution-wise-report/print', [ReportController::class, 'institutionWiseReportPdf'])->name('institution.wise.report.print')->middleware('permission:View Institution Wise Report');
     
     
     
