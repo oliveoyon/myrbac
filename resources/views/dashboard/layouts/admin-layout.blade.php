@@ -177,7 +177,7 @@
                     <li><a class="nav-link nav-sublink" href="{{ route('institution.wise.report') }}"><i class="fas fa-building"></i><span class="nav-text">Institution Wise Report</span></a></li>
                     @endcan
                     @can('Export Formal Cases')
-                    <li><a class="nav-link nav-sublink" href="{{ route('formal.cases.export') }}"><i class="fa fa-download"></i><span class="nav-text">Download Excel</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('formal.cases.export') }}"><i class="fa fa-download"></i><span class="nav-text">Export Excel</span></a></li>
                     @endcan
 
                 </ul>

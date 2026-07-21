@@ -3,302 +3,150 @@
 namespace App\Exports;
 
 use App\Models\FormalCase;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use DateTimeInterface;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
-class FormalCaseExport implements FromCollection, WithHeadings, WithMapping
+class FormalCaseExport implements WithMultipleSheets
 {
-    public function collection()
+    public function sheets(): array
     {
-        return auth()->user()
-            ->applyDistrictPngoScope(FormalCase::with(['district:id,name', 'pngo:id,name']))
-            ->get();
+        return [
+            new FormalCaseDataExportSheet(),
+            new FormalCaseExportFieldGuideSheet(),
+        ];
+    }
+}
+
+class FormalCaseDataExportSheet implements FromQuery, WithHeadings, WithMapping, WithTitle, WithEvents
+{
+    public function title(): string
+    {
+        return 'Cases';
+    }
+
+    public function query(): Builder
+    {
+        class_exists(FormalCaseImportTemplateExport::class);
+
+        $query = FormalCase::query()
+            ->select($this->fieldKeys())
+            ->orderBy('district_id')
+            ->orderBy('pngo_id')
+            ->orderBy('id');
+
+        return auth()->user()->applyDistrictPngoScope($query);
+    }
+
+    public function headings(): array
+    {
+        return $this->fieldKeys();
     }
 
     public function map($case): array
     {
+        return array_map(function (string $field) use ($case) {
+            $value = $field === 'type_of_service'
+                ? implode(', ', $case->type_of_service_list)
+                : $case->{$field};
+
+            if ($value instanceof DateTimeInterface) {
+                return $value->format('Y-m-d');
+            }
+
+            return $value;
+        }, $this->fieldKeys());
+    }
+
+    public function registerEvents(): array
+    {
         return [
-            $case->id,
-            $case->institute,
-            $case->central_id,
-            $case->user_id,
-            $case->district_id,
-            $case->pngo_id,
-            $case->status,
-            $case->full_name,
-            $case->nick_name,
-            $case->father_name,
-            $case->mother_name,
-            $case->sex,
-            $case->age,
-            $case->disability,
-            $case->nationality,
-            $case->nid_passport,
-            $case->phone_number,
-            $case->address,
-            $case->interview_date,
-            $case->interview_time,
-            $case->interview_place,
-            $case->marital_status,
-            $case->spouse_name,
-            $case->education_level,
-            $case->occupation,
-            $case->monthly_income,
-            $case->family_informed,
-            $case->children_with_prisoner,
-            $case->child_sex,
-            $case->child_age,
-            $case->child_2_sex,
-            $case->child_2_age,
-            $case->has_guardian,
-            $case->guardian_name,
-            $case->guardian_phone,
-            $case->guardian_address,
-            $case->guardian_relation,
-            $case->guardian_relation_details,
-            $case->guardian_surety,
-            $case->has_lawyer,
-            $case->lawyer_type,
-            $case->lawyer_type_details,
-            $case->lawyer_name,
-            $case->lawyer_membership,
-            $case->lawyer_phone,
-            $case->incident_details,
-            $case->custody_status,
-            $case->charges_details,
-            $case->arrest_date,
-            $case->case_no,
-            $case->family_communication_date,
-            $case->legal_representation,
-            $case->legal_representation_details,
-            $case->legal_representation_date,
-            $case->collected_vokalatnama_date,
-            $case->collected_case_doc,
-            $case->identify_sureties,
-            $case->identify_sureties_date,
-            $case->witness_communication_date,
-            $case->medical_report_date,
-            $case->legal_assistance_date,
-            $case->assistance_under_custody_date,
-            $case->referral_service,
-            $case->referral_service_details,
-            $case->referral_service_date,
-            $case->case_resolved_date,
-            $case->resolved_dispute_date,
-            $case->appoint_lawyer_date,
-            $case->release_status,
-            $case->fine_amount,
-            $case->release_status_date,
-            $case->other_result_details,
-            $case->other_result_date,
-            $case->application_mode,
-            $case->application_mode_date,
-            $case->received_application,
-            $case->reference_no,
-            implode(', ', $case->type_of_service_list),
-            $case->type_of_service_date,
-            $case->source_of_interview,
-            $case->source_of_interview_details,
-            $case->prison_reg_no,
-            $case->prison_case_no,
-            $case->section_no,
-            $case->present_court,
-            $case->lockup_no,
-            $case->entry_date,
-            $case->case_transferred,
-            $case->current_court,
-            $case->case_status,
-            $case->co_offenders,
-            $case->next_court_date,
-            $case->facts_of_case,
-            $case->imprisonment_condition,
-            $case->imprisonment_status,
-            $case->special_condition,
-            $case->special_condition_details,
-            $case->prison_arrest_date,
-            $case->surrender_date,
-            $case->prison_family_communication,
-            $case->prison_legal_representation,
-            $case->prison_legal_representation_details,
-            $case->prison_legal_representation_date,
-            $case->next_court_collection_date,
-            $case->prison_next_court_date,
-            $case->collected_case_doc_prison,
-            $case->identify_sureties_prison_nid,
-            $case->identify_sureties_prison_phone,
-            $case->identify_sureties_prison_date,
-            $case->witness_communication_prison,
-            $case->bail_bond_submission,
-            $case->court_order_communication,
-            $case->application_certified_copies,
-            $case->appeal_assistance,
-            $case->ministerial_communication,
-            $case->ministerial_communication_details,
-            $case->other_legal_assistance,
-            $case->other_legal_assistance_details,
-            $case->other_legal_assistance_date,
-            $case->released_on,
-            $case->released_on_date,
-            $case->send_to,
-            $case->send_to_details,
-            $case->send_to_date,
-            $case->convicted_length,
-            $case->convicted_length_details,
-            $case->convicted_sentence_expire,
-            $case->convicted_sentence_expire_details,
-            $case->result_of_appeal,
-            $case->result_of_appeal_date,
-            $case->prison_case_resolved_date,
-            $case->date_of_reliefe,
-            $case->result_description,
-            $case->file_closure_date,
-            $case->created_at,
-            $case->updated_at,
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                $lastColumn = $sheet->getHighestColumn();
+
+                $sheet->freezePane('A2');
+                $sheet->setAutoFilter("A1:{$lastColumn}1");
+                $sheet->getStyle("A1:{$lastColumn}1")->getFont()->setBold(true)->getColor()->setARGB('FF173B2F');
+                $sheet->getStyle("A1:{$lastColumn}1")->getFill()
+                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFE8F5EE');
+                $sheet->getStyle("A1:{$lastColumn}1")->getAlignment()
+                    ->setWrapText(true)
+                    ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                $sheet->getRowDimension(1)->setRowHeight(34);
+
+                $lastColumnIndex = Coordinate::columnIndexFromString($lastColumn);
+
+                for ($columnIndex = 1; $columnIndex <= $lastColumnIndex; $columnIndex++) {
+                    $column = Coordinate::stringFromColumnIndex($columnIndex);
+                    $sheet->getColumnDimension($column)->setWidth(18);
+                }
+
+                foreach (['F', 'G', 'H', 'J', 'K'] as $wideColumn) {
+                    $sheet->getColumnDimension($wideColumn)->setWidth(24);
+                }
+            },
         ];
     }
 
+    private function fieldKeys(): array
+    {
+        class_exists(FormalCaseImportTemplateExport::class);
+
+        return array_column(FormalCaseImportTemplateFields::fields(), 'key');
+    }
+}
+
+class FormalCaseExportFieldGuideSheet implements FromArray, WithHeadings, WithTitle, WithEvents, ShouldAutoSize
+{
+    public function title(): string
+    {
+        return 'Field Guide';
+    }
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Institute',
-            'Central ID',
-            'User ID',
-            'District ID',
-            'PNGO ID',
-            'Status',
-            'Full Name',
-            'Nick Name',
-            'Father Name',
-            'Mother Name',
-            'Sex',
-            'Age',
-            'Disability',
-            'Nationality',
-            'NID/Passport',
-            'Phone Number',
-            'Address',
-            'Interview Date',
-            'Interview Time',
-            'Interview Place',
-            'Marital Status',
-            'Spouse Name',
-            'Education Level',
-            'Occupation',
-            'Monthly Income',
-            'Family Informed',
-            'Children With Prisoner',
-            'Child Sex',
-            'Child Age',
-            'Second Child Sex',
-            'Second Child Age',
-            'Has Guardian',
-            'Guardian Name',
-            'Guardian Phone',
-            'Guardian Address',
-            'Guardian Relation',
-            'Guardian Relation Details',
-            'Guardian Surety',
-            'Has Lawyer',
-            'Lawyer Type',
-            'Lawyer Type Details',
-            'Lawyer Name',
-            'Lawyer Membership',
-            'Lawyer Phone',
-            'Incident Details',
-            'Custody Status',
-            'Charges Details',
-            'Arrest Date',
-            'Case No',
-            'Family Communication Date',
-            'Legal Representation',
-            'Legal Representation Details',
-            'Legal Representation Date',
-            'Collected Vokalatnama Date',
-            'Collected Case Doc',
-            'Identify Sureties',
-            'Identify Sureties Date',
-            'Witness Communication Date',
-            'Medical Report Date',
-            'Legal Assistance Date',
-            'Assistance Under Custody Date',
-            'Referral Service',
-            'Referral Service Details',
-            'Referral Service Date',
-            'Case Resolved Date',
-            'Resolved Dispute Date',
-            'Appoint Lawyer Date',
-            'Release Status',
-            'Fine Amount',
-            'Release Status Date',
-            'Other Result Details',
-            'Other Result Date',
-            'Application Mode',
-            'Application Mode Date',
-            'Received Application',
-            'Reference No',
-            'Type of Service',
-            'Type of Service Date',
-            'Source of Interview',
-            'Source of Interview Details',
-            'Prison Reg No',
-            'Prison Case No',
-            'Section No',
-            'Present Court',
-            'Lockup No',
-            'Entry Date',
-            'Case Transferred',
-            'Current Court',
-            'Case Status',
-            'Co-Offenders',
-            'Next Court Date',
-            'Facts of Case',
-            'Imprisonment Condition',
-            'Imprisonment Status',
-            'Special Condition',
-            'Special Condition Details',
-            'Prison Arrest Date',
-            'Surrender Date',
-            'Prison Family Communication',
-            'Prison Legal Representation',
-            'Prison Legal Representation Details',
-            'Prison Legal Representation Date',
-            'Next Court Collection Date',
-            'Prison Next Court Date',
-            'Collected Case Doc Prison',
-            'Identify Sureties Prison NID',
-            'Identify Sureties Prison Phone',
-            'Identify Sureties Prison Date',
-            'Witness Communication Prison',
-            'Bail Bond Submission',
-            'Court Order Communication',
-            'Application Certified Copies',
-            'Appeal Assistance',
-            'Ministerial Communication',
-            'Ministerial Communication Details',
-            'Other Legal Assistance',
-            'Other Legal Assistance Details',
-            'Other Legal Assistance Date',
-            'Released On',
-            'Released On Date',
-            'Send To',
-            'Send To Details',
-            'Send To Date',
-            'Convicted Length',
-            'Convicted Length Details',
-            'Convicted Sentence Expire',
-            'Convicted Sentence Expire Details',
-            'Result of Appeal',
-            'Result of Appeal Date',
-            'Prison Case Resolved Date',
-            'Date of Relief',
-            'Result Description',
-            'File Closure Date',
-            'Created At',
-            'Updated At',
-        ];
+        return ['Upload header', 'Form no.', 'Field label', 'Required', 'Notes / sample values'];
     }
 
+    public function array(): array
+    {
+        class_exists(FormalCaseImportTemplateExport::class);
+
+        return array_map(function (array $field) {
+            return [
+                $field['key'],
+                $field['no'] ?? '',
+                $field['label'],
+                $field['required'] ?? '',
+                $field['note'] ?? '',
+            ];
+        }, FormalCaseImportTemplateFields::fields());
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                $sheet->freezePane('A2');
+                $sheet->setAutoFilter('A1:E1');
+                $sheet->getStyle('A1:E1')->getFont()->setBold(true)->getColor()->setARGB('FF173B2F');
+                $sheet->getStyle('A1:E1')->getFill()
+                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFE8F5EE');
+                $sheet->getStyle('A:E')->getAlignment()->setWrapText(true);
+            },
+        ];
+    }
 }

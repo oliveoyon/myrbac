@@ -12,10 +12,11 @@ use Mpdf\Config\ConfigVariables;
 use Mpdf\Config\FontVariables;
 use Mpdf\Mpdf;
 use App\Services\CommonService;
-use App\Exports\FormalCaseExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\FormalCaseImportTemplateExport;
+use App\Exports\FormalCaseImportTemplateFields;
 use Illuminate\Support\Facades\Auth;
 use App\Services\LogService;
+use ZipArchive;
 
 class ReportController extends Controller
 {
@@ -633,16 +634,245 @@ class ReportController extends Controller
         // return response()->json(['cases' => $cases1]);
     }
 
-    public function exportExcel()
+    public function exportExcel(Request $request)
     {
-        // Log the export action
+        class_exists(FormalCaseImportTemplateExport::class);
+
+        $filters = $this->formalCaseExportFilters($request);
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
+        $institutionOptions = $this->institutionOptions();
+
+        if (! $request->boolean('download')) {
+            $estimatedCount = $this->formalCaseExportQuery($filters)->count();
+
+            return view('dashboard.report.formal-case-export', compact(
+                'filters',
+                'districts',
+                'pngos',
+                'institutionOptions',
+                'estimatedCount'
+            ));
+        }
+
+        $fields = FormalCaseImportTemplateFields::fields();
+        $fileName = 'formal_cases_export_' . now()->format('Ymd_His') . '.xlsx';
+        $exportPath = $this->buildFormalCasesStreamingXlsx($fields, $fileName, $filters);
+
         LogService::logAction('Formal Cases Exported', [
             'exported_by' => auth()->user()->name,
             'exported_at' => now(),
+            'filters' => $filters,
         ]);
 
-        // Proceed with the Excel download
-        return Excel::download(new FormalCaseExport, 'formal_cases.xlsx');
+        return response()
+            ->download($exportPath, $fileName, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])
+            ->deleteFileAfterSend(true);
+    }
+
+    private function buildFormalCasesStreamingXlsx(array $fields, string $fileName, array $filters = []): string
+    {
+        $exportDir = storage_path('app/exports');
+
+        if (! is_dir($exportDir)) {
+            mkdir($exportDir, 0775, true);
+        }
+
+        $baseName = pathinfo($fileName, PATHINFO_FILENAME) . '_' . uniqid();
+        $xlsxPath = $exportDir . DIRECTORY_SEPARATOR . $baseName . '.xlsx';
+        $casesXmlPath = $exportDir . DIRECTORY_SEPARATOR . $baseName . '_cases.xml';
+        $guideXmlPath = $exportDir . DIRECTORY_SEPARATOR . $baseName . '_guide.xml';
+        $fieldKeys = array_column($fields, 'key');
+
+        $this->writeFormalCasesSheetXml($casesXmlPath, $fieldKeys, $filters);
+        $this->writeFormalCaseFieldGuideSheetXml($guideXmlPath, $fields);
+        $this->createFormalCasesXlsxArchive($xlsxPath, $casesXmlPath, $guideXmlPath);
+
+        @unlink($casesXmlPath);
+        @unlink($guideXmlPath);
+
+        return $xlsxPath;
+    }
+
+    private function writeFormalCasesSheetXml(string $path, array $fieldKeys, array $filters = []): void
+    {
+        $handle = fopen($path, 'wb');
+        $lastColumn = $this->excelColumnName(count($fieldKeys));
+        $rowCount = $this->formalCaseExportQuery($filters)->count();
+
+        fwrite($handle, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>');
+        fwrite($handle, '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">');
+        fwrite($handle, '<dimension ref="A1:' . $lastColumn . max(1, $rowCount + 1) . '"/>');
+        fwrite($handle, '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>');
+        fwrite($handle, '<sheetFormatPr defaultRowHeight="15"/>');
+        fwrite($handle, '<cols>');
+        for ($i = 1; $i <= count($fieldKeys); $i++) {
+            fwrite($handle, '<col min="' . $i . '" max="' . $i . '" width="18" customWidth="1"/>');
+        }
+        fwrite($handle, '</cols><sheetData>');
+        fwrite($handle, $this->xlsxRow(1, $fieldKeys, 1));
+
+        $rowIndex = 2;
+        $this->formalCaseExportQuery($filters)
+            ->select(array_merge(['id'], $fieldKeys))
+            ->chunkById(300, function ($cases) use ($handle, $fieldKeys, &$rowIndex) {
+                foreach ($cases as $case) {
+                    $values = array_map(function (string $field) use ($case) {
+                        $value = $field === 'type_of_service'
+                            ? implode(', ', $case->type_of_service_list)
+                            : $case->{$field};
+
+                        if ($value instanceof \DateTimeInterface) {
+                            return $value->format('Y-m-d');
+                        }
+
+                        return $value;
+                    }, $fieldKeys);
+
+                    fwrite($handle, $this->xlsxRow($rowIndex, $values));
+                    $rowIndex++;
+                }
+            });
+
+        fwrite($handle, '</sheetData><autoFilter ref="A1:' . $lastColumn . max(1, $rowIndex - 1) . '"/>');
+        fwrite($handle, '</worksheet>');
+        fclose($handle);
+    }
+
+    private function writeFormalCaseFieldGuideSheetXml(string $path, array $fields): void
+    {
+        $handle = fopen($path, 'wb');
+        $headings = ['Upload header', 'Form no.', 'Field label', 'Required', 'Notes / sample values'];
+
+        fwrite($handle, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>');
+        fwrite($handle, '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">');
+        fwrite($handle, '<dimension ref="A1:E' . (count($fields) + 1) . '"/>');
+        fwrite($handle, '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>');
+        fwrite($handle, '<sheetFormatPr defaultRowHeight="15"/>');
+        fwrite($handle, '<cols><col min="1" max="1" width="28" customWidth="1"/><col min="2" max="2" width="14" customWidth="1"/><col min="3" max="3" width="34" customWidth="1"/><col min="4" max="4" width="12" customWidth="1"/><col min="5" max="5" width="46" customWidth="1"/></cols><sheetData>');
+        fwrite($handle, $this->xlsxRow(1, $headings, 1));
+
+        $rowIndex = 2;
+        foreach ($fields as $field) {
+            fwrite($handle, $this->xlsxRow($rowIndex, [
+                $field['key'],
+                $field['no'] ?? '',
+                $field['label'],
+                $field['required'] ?? '',
+                $field['note'] ?? '',
+            ]));
+            $rowIndex++;
+        }
+
+        fwrite($handle, '</sheetData><autoFilter ref="A1:E' . max(1, $rowIndex - 1) . '"/></worksheet>');
+        fclose($handle);
+    }
+
+    private function createFormalCasesXlsxArchive(string $xlsxPath, string $casesXmlPath, string $guideXmlPath): void
+    {
+        $zip = new ZipArchive();
+        $zip->open($xlsxPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+        $zip->addFromString('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>');
+        $zip->addFromString('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>');
+        $zip->addFromString('xl/workbook.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Cases" sheetId="1" r:id="rId1"/><sheet name="Field Guide" sheetId="2" r:id="rId2"/></sheets></workbook>');
+        $zip->addFromString('xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>');
+        $zip->addFromString('xl/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><color rgb="FF173B2F"/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE8F5EE"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment wrapText="1" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>');
+        $zip->addFile($casesXmlPath, 'xl/worksheets/sheet1.xml');
+        $zip->addFile($guideXmlPath, 'xl/worksheets/sheet2.xml');
+        $zip->close();
+    }
+
+    private function xlsxRow(int $rowIndex, array $values, int $styleIndex = 0): string
+    {
+        $cells = '';
+
+        foreach (array_values($values) as $index => $value) {
+            $cellRef = $this->excelColumnName($index + 1) . $rowIndex;
+            $style = $styleIndex ? ' s="' . $styleIndex . '"' : '';
+            $cells .= '<c r="' . $cellRef . '" t="inlineStr"' . $style . '><is><t>' . $this->xlsxEscape($value) . '</t></is></c>';
+        }
+
+        return '<row r="' . $rowIndex . '">' . $cells . '</row>';
+    }
+
+    private function xlsxEscape($value): string
+    {
+        if ($value === null) {
+            $value = '';
+        }
+
+        $value = preg_replace('/[^\P{C}\t\r\n]/u', '', (string) $value);
+
+        return htmlspecialchars($value ?? '', ENT_XML1 | ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    private function excelColumnName(int $index): string
+    {
+        $name = '';
+
+        while ($index > 0) {
+            $index--;
+            $name = chr(65 + ($index % 26)) . $name;
+            $index = intdiv($index, 26);
+        }
+
+        return $name;
+    }
+
+    private function formalCaseExportFilters(Request $request): array
+    {
+        $validated = $request->validate([
+            'district_id' => 'nullable|integer|exists:districts,id',
+            'pngo_id' => 'nullable|integer|exists:pngos,id',
+            'institute' => 'nullable|in:Court,Police Station,Prison',
+            'status' => 'nullable|in:1,2,3',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date|after_or_equal:from_date',
+        ]);
+
+        if (! empty($validated['pngo_id'])) {
+            $pngo = Pngo::find($validated['pngo_id']);
+
+            if (! empty($validated['district_id']) && $pngo && (int) $pngo->district_id !== (int) $validated['district_id']) {
+                abort(403);
+            }
+        }
+
+        $districtIds = Auth::user()->accessibleDistrictIds();
+        $pngoIds = Auth::user()->accessiblePngoIds();
+
+        if (! empty($validated['district_id']) && is_array($districtIds)) {
+            abort_if(! in_array((int) $validated['district_id'], array_map('intval', $districtIds), true), 403);
+        }
+
+        if (! empty($validated['pngo_id']) && is_array($pngoIds)) {
+            abort_if(! in_array((int) $validated['pngo_id'], array_map('intval', $pngoIds), true), 403);
+        }
+
+        return [
+            'district_id' => $validated['district_id'] ?? null,
+            'pngo_id' => $validated['pngo_id'] ?? null,
+            'institute' => $validated['institute'] ?? null,
+            'status' => $validated['status'] ?? null,
+            'from_date' => $validated['from_date'] ?? null,
+            'to_date' => $validated['to_date'] ?? null,
+        ];
+    }
+
+    private function formalCaseExportQuery(array $filters)
+    {
+        $query = FormalCase::query()
+            ->when(! empty($filters['district_id']), fn ($query) => $query->where('district_id', $filters['district_id']))
+            ->when(! empty($filters['pngo_id']), fn ($query) => $query->where('pngo_id', $filters['pngo_id']))
+            ->when(! empty($filters['institute']), fn ($query) => $query->where('institute', $filters['institute']))
+            ->when(! empty($filters['status']), fn ($query) => $query->where('status', $filters['status']))
+            ->when(! empty($filters['from_date']), fn ($query) => $query->whereDate('interview_date', '>=', $filters['from_date']))
+            ->when(! empty($filters['to_date']), fn ($query) => $query->whereDate('interview_date', '<=', $filters['to_date']))
+            ->orderBy('id');
+
+        return Auth::user()->applyDistrictPngoScope($query);
     }
 
     private function allowedDistrictsAndPngos(): array
