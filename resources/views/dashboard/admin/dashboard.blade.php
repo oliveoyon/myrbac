@@ -470,6 +470,7 @@
                 'female' => $rows->sum('female'),
                 'transgender' => $rows->sum('transgender'),
                 'under_18' => $rows->sum('under_18'),
+                'disability' => $rows->sum('disability'),
                 'total' => $rows->sum('total'),
             ];
         })
@@ -536,7 +537,7 @@
         </div>
         <div class="dash-stat-card disability">
             <div>
-                <span>Disability Yes</span>
+                <span>Disability</span>
                 <strong>{{ $totalDisability }}</strong>
             </div>
             <div class="dash-stat-icon"><i class="fas fa-wheelchair"></i></div>
@@ -589,8 +590,9 @@
                                     <th>Male</th>
                                     <th>Female</th>
                                     <th>Transgender</th>
-                                    <th>Under 18</th>
                                     <th>Total</th>
+                                    <th>Under 18</th>
+                                    <th>Disability</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -600,8 +602,9 @@
                                         <td>{{ $row['male'] }}</td>
                                         <td>{{ $row['female'] }}</td>
                                         <td>{{ $row['transgender'] }}</td>
-                                        <td>{{ $row['under_18'] }}</td>
                                         <td><strong>{{ $row['total'] }}</strong></td>
+                                        <td>{{ $row['under_18'] }}</td>
+                                        <td>{{ $row['disability'] ?? 0 }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -631,8 +634,9 @@
                                     <th>Male</th>
                                     <th>Female</th>
                                     <th>Transgender</th>
-                                    <th>Under 18</th>
                                     <th>Total</th>
+                                    <th>Under 18</th>
+                                    <th>Disability</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -642,8 +646,9 @@
                                         <td>{{ $row['male'] }}</td>
                                         <td>{{ $row['female'] }}</td>
                                         <td>{{ $row['transgender'] }}</td>
-                                        <td>{{ $row['under_18'] }}</td>
                                         <td><strong>{{ $row['total'] }}</strong></td>
+                                        <td>{{ $row['under_18'] }}</td>
+                                        <td>{{ $row['disability'] ?? 0 }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -158,8 +158,9 @@
                                                     <th>Male</th>
                                                     <th>Female</th>
                                                     <th>Transgender</th>
-                                                    <th>Under 18</th>
                                                     <th>Total</th>
+                                                    <th>Under 18</th>
+                                                    <th>Disability</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -169,8 +170,9 @@
                                                         <td>{{ $row['male'] }}</td>
                                                         <td>{{ $row['female'] }}</td>
                                                         <td>{{ $row['transgender'] }}</td>
-                                                        <td>{{ $row['under_18'] }}</td>
                                                         <td>{{ $row['total'] }}</td>
+                                                        <td>{{ $row['under_18'] }}</td>
+                                                        <td>{{ $row['disability'] ?? 0 }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -226,6 +228,7 @@
     const femaleData = districtData.map(item => item.female);
     const transgenderData = districtData.map(item => item.transgender);
     const under18Data = districtData.map(item => item.under_18);
+    const disabilityData = districtData.map(item => item.disability || 0);
     const totalData = districtData.map(item => item.total); // Total cases per district
 
     const districtBarCtx = document.getElementById('districtBarChart').getContext('2d');
@@ -274,6 +277,14 @@
                     borderWidth: 2,
                     borderColor: '#155724', // Dark green border for total
                     borderRadius: 5, // Rounded corners
+                },
+                {
+                    label: 'Disability',
+                    data: disabilityData,
+                    backgroundColor: '#6f7bc8',
+                    borderRadius: 5,
+                    borderWidth: 1,
+                    borderColor: '#4f5dab',
                 },
             ],
         },

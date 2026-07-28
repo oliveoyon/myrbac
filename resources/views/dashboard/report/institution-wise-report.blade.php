@@ -209,7 +209,7 @@
         <div class="institution-panel-header">
             <div>
                 <h2>Report Result</h2>
-                <small>Male + Female + Transgender equals total; Under 18 and Disability Yes are subset indicators.</small>
+                <small>Male + Female + Transgender equals total; Under 18 and Disability are subset indicators.</small>
             </div>
         </div>
         <div class="institution-panel-body">
@@ -225,9 +225,9 @@
                                 <th>Male</th>
                                 <th>Female</th>
                                 <th>Transgender</th>
-                                <th>Under 18</th>
-                                <th>Disability Yes</th>
                                 <th>Total</th>
+                                <th>Under 18</th>
+                                <th>Disability</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -237,9 +237,9 @@
                                     <td>{{ $row['male'] }}</td>
                                     <td>{{ $row['female'] }}</td>
                                     <td>{{ $row['transgender'] }}</td>
+                                    <td><strong>{{ $row['total'] }}</strong></td>
                                     <td>{{ $row['under_18'] }}</td>
                                     <td>{{ $row['disability'] }}</td>
-                                    <td><strong>{{ $row['total'] }}</strong></td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -321,7 +321,7 @@
                     { label: 'Female', data: institutionRows.map((row) => row.female), backgroundColor: '#b86fa0' },
                     { label: 'Transgender', data: institutionRows.map((row) => row.transgender), backgroundColor: '#7c8fb0' },
                     { label: 'Under 18', data: institutionRows.map((row) => row.under_18), backgroundColor: '#d9a441' },
-                    { label: 'Disability Yes', data: institutionRows.map((row) => row.disability), backgroundColor: '#6f7bc8' },
+                    { label: 'Disability', data: institutionRows.map((row) => row.disability), backgroundColor: '#6f7bc8' },
                 ],
             },
             options: {

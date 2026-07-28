@@ -158,8 +158,9 @@
                                                     <th>Male</th>
                                                     <th>Female</th>
                                                     <th>Transgender</th>
-                                                    <th>Under 18</th>
                                                     <th>Total</th>
+                                                    <th>Under 18</th>
+                                                    <th>Disability</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -169,8 +170,9 @@
                                                         <td>{{ $row['male'] }}</td>
                                                         <td>{{ $row['female'] }}</td>
                                                         <td>{{ $row['transgender'] }}</td>
-                                                        <td>{{ $row['under_18'] }}</td>
                                                         <td>{{ $row['total'] }}</td>
+                                                        <td>{{ $row['under_18'] }}</td>
+                                                        <td>{{ $row['disability'] ?? 0 }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -231,6 +233,8 @@
         const femaleData = pngoData.map(item => item.female);
         const transgenderData = pngoData.map(item => item.transgender);
         const under18Data = pngoData.map(item => item.under_18);
+        const totalData = pngoData.map(item => item.total);
+        const disabilityData = pngoData.map(item => item.disability || 0);
 
         const ctx = document.getElementById("pngoBarChart").getContext("2d");
 
@@ -261,6 +265,18 @@
                         label: "Under 18",
                         data: under18Data,
                         backgroundColor: "#ffc107",
+                        barThickness: 40,
+                    },
+                    {
+                        label: "Total",
+                        data: totalData,
+                        backgroundColor: "#28a745",
+                        barThickness: 40,
+                    },
+                    {
+                        label: "Disability",
+                        data: disabilityData,
+                        backgroundColor: "#6f7bc8",
                         barThickness: 40,
                     }
                 ]

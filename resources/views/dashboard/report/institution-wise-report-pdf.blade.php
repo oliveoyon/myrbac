@@ -95,9 +95,9 @@
                 <th>Male</th>
                 <th>Female</th>
                 <th>Transgender</th>
-                <th>Under 18</th>
-                <th>Disability Yes</th>
                 <th>Total</th>
+                <th>Under 18</th>
+                <th>Disability</th>
             </tr>
         </thead>
         <tbody>
@@ -107,9 +107,9 @@
                     <td>{{ $row['male'] ?? 0 }}</td>
                     <td>{{ $row['female'] ?? 0 }}</td>
                     <td>{{ $row['transgender'] ?? 0 }}</td>
+                    <td><strong>{{ $row['total'] ?? 0 }}</strong></td>
                     <td>{{ $row['under_18'] ?? 0 }}</td>
                     <td>{{ $row['disability'] ?? 0 }}</td>
-                    <td><strong>{{ $row['total'] ?? 0 }}</strong></td>
                 </tr>
             @empty
                 <tr>

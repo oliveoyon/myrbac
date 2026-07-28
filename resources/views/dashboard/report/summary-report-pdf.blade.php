@@ -91,8 +91,9 @@
                 <th>Male</th>
                 <th>Female</th>
                 <th>Transgender</th>
-                <th>Under 18</th>
                 <th>Total</th>
+                <th>Under 18</th>
+                <th>Disability</th>
             </tr>
         </thead>
         <tbody>
@@ -102,12 +103,13 @@
                     <td>{{ $row['male'] ?? 0 }}</td>
                     <td>{{ $row['female'] ?? 0 }}</td>
                     <td>{{ $row['transgender'] ?? 0 }}</td>
-                    <td>{{ $row['under_18'] ?? 0 }}</td>
                     <td><strong>{{ $row['total'] ?? 0 }}</strong></td>
+                    <td>{{ $row['under_18'] ?? 0 }}</td>
+                    <td>{{ $row['disability'] ?? 0 }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" style="text-align: center;">No data found.</td>
+                    <td colspan="7" style="text-align: center;">No data found.</td>
                 </tr>
             @endforelse
         </tbody>

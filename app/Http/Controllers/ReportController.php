@@ -493,6 +493,7 @@ class ReportController extends Controller
                     'female' => $rows->sum('female'),
                     'transgender' => $rows->sum('transgender'),
                     'under_18' => $rows->sum('under_18'),
+                    'disability' => $rows->sum('disability'),
                     'total' => $rows->sum('total'),
                 ];
             })
