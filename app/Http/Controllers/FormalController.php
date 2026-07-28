@@ -6,6 +6,7 @@ use App\Models\FormalCase;
 use App\Models\FollowUpIntervention;
 use App\Models\FileUpload; 
 use App\Models\Pngo;
+use App\Models\District;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -24,22 +25,26 @@ class FormalController extends Controller
 {
     public function index()
     {
-        if ($scopeError = $this->formalCaseScopeError()) {
-            return redirect()->route('dashboard.index')->with('error', $scopeError);
+        $formalCaseEntryScope = $this->formalCaseEntryScope();
+
+        if ($formalCaseEntryScope['error']) {
+            return redirect()->route('dashboard.index')->with('error', $formalCaseEntryScope['error']);
         }
 
         $submissionToken = $this->createFormSubmissionToken('formal_case_create_tokens');
 
-        return view('dashboard.admin.formal1', compact('submissionToken'));
+        return view('dashboard.admin.formal1', compact('submissionToken', 'formalCaseEntryScope'));
     }
 
     public function courtPolicePrison(Request $request)
     {
-        if ($scopeError = $this->formalCaseScopeError()) {
-            return redirect()->back()->withInput()->with('error', $scopeError);
+        $formalCaseEntryScope = $this->formalCaseEntryScope();
+
+        if ($formalCaseEntryScope['error']) {
+            return redirect()->back()->withInput()->with('error', $formalCaseEntryScope['error']);
         }
 
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'institute' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
             'sex' => 'required|string|max:255',
@@ -61,7 +66,16 @@ class FormalController extends Controller
             'convicted_length_details' => 'nullable|string',
             'convicted_sentence_expire_details' => 'nullable|string',
             'intervention_taken' => 'required|string|max:255',
-        ], [
+        ];
+
+        if ($formalCaseEntryScope['requires_selection']) {
+            $rules['district_id'] = 'required|integer|exists:districts,id';
+            $rules['pngo_id'] = 'required|integer|exists:pngos,id';
+        }
+
+        $validator = Validator::make($request->all(), $rules, [
+            'district_id.required' => 'Please select the district for this case.',
+            'pngo_id.required' => 'Please select the PNGO for this case.',
             'institute.required' => 'Institute is required. Please enter your name.',
             'institute.string' => 'Institute must be a valid text.',
             'institute.max' => 'Institute should not exceed 255 characters.',
@@ -88,13 +102,19 @@ class FormalController extends Controller
           
         }
 
+        $resolvedScope = $this->resolveFormalCaseEntryScope($request, $formalCaseEntryScope);
+
+        if ($resolvedScope['error']) {
+            return redirect()->back()->withInput()->withErrors(['pngo_id' => $resolvedScope['error']]);
+        }
+
         if (! $this->consumeFormSubmissionToken($request, 'formal_case_create_tokens')) {
             return redirect()->back()->with('error', 'This form has already been submitted. Please open a fresh form before submitting again.');
         }
         
-        $districtName = (optional(auth()->user()->district)->name);
-        $districtId = Auth::user()->district_id;
-        $pngoId = Auth::user()->pngo_id;
+        $districtName = $resolvedScope['district_name'];
+        $districtId = $resolvedScope['district_id'];
+        $pngoId = $resolvedScope['pngo_id'];
         $lastNumber = FormalCase::withTrashed()
             ->where('district_id', $districtId)
             ->where('pngo_id', $pngoId)
@@ -1231,25 +1251,122 @@ private function consumeFormSubmissionToken(Request $request, string $sessionKey
         return response()->json(['success' => true, 'message' => 'Case verified successfully by MNEO.']);
     }
 
-    private function formalCaseScopeError(): ?string
+    private function formalCaseEntryScope(): array
     {
         $user = Auth::user();
 
-        if (! $user->district_id || ! $user->pngo_id) {
-            return 'Your user account must be assigned to both a district and a PNGO before entering court, police, or prison case data.';
+        $scope = [
+            'requires_selection' => false,
+            'fixed_district_id' => $user->district_id,
+            'fixed_pngo_id' => $user->pngo_id,
+            'fixed_district_name' => optional($user->district)->name,
+            'fixed_pngo_name' => optional($user->pngo)->name,
+            'districts' => collect(),
+            'pngos' => collect(),
+            'error' => null,
+        ];
+
+        if ($user->district_id && $user->pngo_id) {
+            $pngo = Pngo::with('district')->find($user->pngo_id);
+
+            if (! $pngo) {
+                $scope['error'] = 'Your assigned PNGO could not be found. Please contact the administrator.';
+            } elseif ((int) $pngo->district_id !== (int) $user->district_id) {
+                $scope['error'] = 'Your assigned PNGO is not mapped to your assigned district. Please contact the administrator to correct your user profile.';
+            } else {
+                $scope['fixed_district_name'] = optional($pngo->district)->name;
+                $scope['fixed_pngo_name'] = $pngo->name;
+            }
+
+            return $scope;
         }
 
-        $pngo = Pngo::find($user->pngo_id);
+        if ($user->district_id || $user->pngo_id) {
+            $scope['error'] = 'Your user account must be assigned to both a district and a PNGO before entering court, police, or prison case data.';
 
-        if (! $pngo) {
-            return 'Your assigned PNGO could not be found. Please contact the administrator.';
+            return $scope;
         }
 
-        if ((int) $pngo->district_id !== (int) $user->district_id) {
-            return 'Your assigned PNGO is not mapped to your assigned district. Please contact the administrator to correct your user profile.';
+        $availablePngos = Pngo::with('district')
+            ->orderBy('name')
+            ->get()
+            ->filter(fn ($pngo) => $pngo->district && $this->userCanSelectFormalCaseScopePair($user, $pngo->district_id, $pngo->id))
+            ->values();
+
+        if ($availablePngos->isEmpty()) {
+            $scope['error'] = 'No district-PNGO scope is available for your account. Please contact the administrator.';
+
+            return $scope;
         }
 
-        return null;
+        $scope['requires_selection'] = true;
+        $scope['pngos'] = $availablePngos;
+        $scope['districts'] = District::whereIn('id', $availablePngos->pluck('district_id')->unique())
+            ->orderBy('name')
+            ->get();
+
+        return $scope;
+    }
+
+    private function resolveFormalCaseEntryScope(Request $request, array $formalCaseEntryScope): array
+    {
+        if (! $formalCaseEntryScope['requires_selection']) {
+            return [
+                'district_id' => $formalCaseEntryScope['fixed_district_id'],
+                'pngo_id' => $formalCaseEntryScope['fixed_pngo_id'],
+                'district_name' => $formalCaseEntryScope['fixed_district_name'],
+                'error' => null,
+            ];
+        }
+
+        $districtId = (int) $request->district_id;
+        $pngoId = (int) $request->pngo_id;
+        $pngo = Pngo::with('district')->find($pngoId);
+
+        if (! $pngo || (int) $pngo->district_id !== $districtId) {
+            return [
+                'district_id' => null,
+                'pngo_id' => null,
+                'district_name' => null,
+                'error' => 'Selected PNGO is not mapped to the selected district.',
+            ];
+        }
+
+        if (! $this->userCanSelectFormalCaseScopePair(Auth::user(), $districtId, $pngoId)) {
+            return [
+                'district_id' => null,
+                'pngo_id' => null,
+                'district_name' => null,
+                'error' => 'You are not allowed to create a case for the selected district and PNGO.',
+            ];
+        }
+
+        return [
+            'district_id' => $districtId,
+            'pngo_id' => $pngoId,
+            'district_name' => optional($pngo->district)->name,
+            'error' => null,
+        ];
+    }
+
+    private function userCanSelectFormalCaseScopePair($user, int $districtId, int $pngoId): bool
+    {
+        if ($user->hasPngoScopes()) {
+            return $user->pngoScopes()
+                ->where('district_id', $districtId)
+                ->where('pngo_id', $pngoId)
+                ->exists();
+        }
+
+        if ($user->hasAnyRole(['Super Admin', 'Admin'])) {
+            return true;
+        }
+
+        if ($user->district_id && $user->pngo_id) {
+            return (int) $user->district_id === $districtId && (int) $user->pngo_id === $pngoId;
+        }
+
+        return false;
     }
 
     private function authorizeFormalCaseScope(FormalCase $case): void

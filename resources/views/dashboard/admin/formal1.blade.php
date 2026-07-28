@@ -163,6 +163,30 @@
         font-weight: 600;
     }
 
+    .entry-scope-card {
+        margin-bottom: 16px;
+        padding: 14px 16px;
+        border: 1px solid #dfe7e3;
+        border-left: 4px solid #2f7d62;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    }
+
+    .entry-scope-card h3 {
+        margin: 0 0 4px;
+        color: #111827;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .entry-scope-note {
+        margin: 0;
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
     .case-section-placeholder {
         display: none;
         padding: 18px;
@@ -454,15 +478,64 @@
                 <div class="case-status-pill">Draft entry</div>
             </div>
 
+            <div class="entry-scope-card">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-4">
+                        <h3>Case ownership</h3>
+                        <p class="entry-scope-note">District and PNGO are used to generate the Central ID.</p>
+                    </div>
+
+                    @if ($formalCaseEntryScope['requires_selection'])
+                    <div class="col-md-4">
+                        <label for="district_id" class="form-label">District <span class="text-danger">*</span></label>
+                        <select class="form-select @error('district_id') is-invalid @enderror" id="district_id" name="district_id" required>
+                            <option value="">Select district</option>
+                            @foreach ($formalCaseEntryScope['districts'] as $district)
+                            <option value="{{ $district->id }}" @selected((string) old('district_id') === (string) $district->id)>{{ $district->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('district_id')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                    <div class="col-md-4">
+                        <label for="pngo_id" class="form-label">PNGO <span class="text-danger">*</span></label>
+                        <select class="form-select @error('pngo_id') is-invalid @enderror" id="pngo_id" name="pngo_id" required>
+                            <option value="">Select PNGO</option>
+                            @foreach ($formalCaseEntryScope['pngos'] as $pngo)
+                            <option value="{{ $pngo->id }}" data-district="{{ $pngo->district_id }}" @selected((string) old('pngo_id') === (string) $pngo->id)>{{ $pngo->name }} - {{ optional($pngo->district)->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('pngo_id')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                    @else
+                    <div class="col-md-4">
+                        <label class="form-label">District</label>
+                        <div class="case-status-pill w-100 justify-content-start">{{ $formalCaseEntryScope['fixed_district_name'] }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">PNGO</label>
+                        <div class="case-status-pill w-100 justify-content-start">{{ $formalCaseEntryScope['fixed_pngo_name'] }}</div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
             <div class="support-selector-card">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-4">
                         <label for="institute" class="form-label">সহায়তার স্থান <span class="text-muted">Support in</span></label>
                         <select class="form-select @error('institute') is-invalid @enderror" id="institute" name="institute">
                             <option value="">Select</option>
-                            <option value="Court">Court</option>
-                            <option value="Prison">Prison</option>
-                            <option value="Police Station">Police Station</option>
+                            <option value="Court" @selected(old('institute') === 'Court')>Court</option>
+                            <option value="Prison" @selected(old('institute') === 'Prison')>Prison</option>
+                            <option value="Police Station" @selected(old('institute') === 'Police Station')>Police Station</option>
                         </select>
                         @error('institute')
                         <span class="invalid-feedback" role="alert">
@@ -1709,6 +1782,43 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         window.applyCourtPolicePrisonManualLabels();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const districtSelect = document.getElementById('district_id');
+        const pngoSelect = document.getElementById('pngo_id');
+
+        if (!districtSelect || !pngoSelect) {
+            return;
+        }
+
+        function filterPngos() {
+            const districtId = districtSelect.value;
+            const currentPngo = pngoSelect.value;
+            let currentPngoStillVisible = false;
+
+            Array.from(pngoSelect.options).forEach(function(option) {
+                if (!option.value) {
+                    option.hidden = false;
+                    return;
+                }
+
+                const visible = option.dataset.district === districtId;
+                option.hidden = !visible;
+
+                if (visible && option.value === currentPngo) {
+                    currentPngoStillVisible = true;
+                }
+            });
+
+            if (!currentPngoStillVisible) {
+                pngoSelect.value = '';
+            }
+        }
+
+        districtSelect.addEventListener('change', filterPngos);
+        filterPngos();
     });
 </script>
 <script>
