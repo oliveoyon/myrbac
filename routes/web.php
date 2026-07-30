@@ -125,6 +125,7 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('case-list', [ReportController::class, 'districtWiseCaselist'])->name('case_list')->middleware('permission:View Case List Report');
     Route::post('/case-list', [ReportController::class, 'districtWiseCaselistDetail'])->name('case_list1')->middleware('permission:View Case List Report Details');
     Route::get('/intervention-report', [ReportController::class, 'customReport'])->name('customReport')->middleware('permission:View Intervention Report Page');
+    Route::get('/intervention-date-audit', [ReportController::class, 'interventionDateAudit'])->name('intervention.date.audit')->middleware('permission:View Intervention Report Page');
     Route::post('/custom-report', [ReportController::class, 'generateCustomReport'])->name('custom.report.generate')->middleware('permission:Generate Custom Report');
     Route::get('/getFormalCaseStats', [ReportController::class, 'getFormalCaseStats'])->name('getFormalCaseStats')->middleware('permission:View Formal Case Statistics');
     Route::get('/district-summery', [ReportController::class, 'districtSummery'])->name('district.summery')->middleware('permission:View District Summary Report');
@@ -133,6 +134,8 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('/pngo-summery/print', [ReportController::class, 'pngoSummeryPdf'])->name('pngo.summery.print')->middleware('permission:View PNGO Summary Report');
     Route::get('/institution-wise-report', [ReportController::class, 'institutionWiseReport'])->name('institution.wise.report')->middleware('permission:View Institution Wise Report');
     Route::get('/institution-wise-report/print', [ReportController::class, 'institutionWiseReportPdf'])->name('institution.wise.report.print')->middleware('permission:View Institution Wise Report');
+    Route::get('/project-achievement-report', [ReportController::class, 'projectAchievementReport'])->name('project.achievement.report')->middleware('permission:View Project Achievement Report');
+    Route::get('/project-achievement-report/print', [ReportController::class, 'projectAchievementReportPdf'])->name('project.achievement.report.print')->middleware('permission:View Project Achievement Report');
     
     
     

@@ -87,6 +87,12 @@
         background: #f8fafc;
     }
 
+    .institution-total-row td {
+        background: #f1f5f9 !important;
+        color: #111827;
+        font-weight: 800;
+    }
+
     .institution-empty {
         padding: 18px;
         color: #64748b;
@@ -242,6 +248,15 @@
                                     <td>{{ $row['disability'] }}</td>
                                 </tr>
                             @endforeach
+                            <tr class="institution-total-row">
+                                <td>Total</td>
+                                <td>{{ $rows->sum('male') }}</td>
+                                <td>{{ $rows->sum('female') }}</td>
+                                <td>{{ $rows->sum('transgender') }}</td>
+                                <td><strong>{{ $rows->sum('total') }}</strong></td>
+                                <td>{{ $rows->sum('under_18') }}</td>
+                                <td>{{ $rows->sum('disability') }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

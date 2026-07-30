@@ -86,6 +86,12 @@
             height: 100% !important;
         }
 
+        .summary-total-row td {
+            background: #f1f5f9 !important;
+            color: #111827;
+            font-weight: 800;
+        }
+
         @media (max-width: 768px) {
             .summary-filter {
                 grid-template-columns: 1fr 1fr;
@@ -175,6 +181,17 @@
                                                         <td>{{ $row['disability'] ?? 0 }}</td>
                                                     </tr>
                                                 @endforeach
+                                                @if ($districtWise->count())
+                                                    <tr class="summary-total-row">
+                                                        <td>Total</td>
+                                                        <td>{{ $districtWise->sum('male') }}</td>
+                                                        <td>{{ $districtWise->sum('female') }}</td>
+                                                        <td>{{ $districtWise->sum('transgender') }}</td>
+                                                        <td>{{ $districtWise->sum('total') }}</td>
+                                                        <td>{{ $districtWise->sum('under_18') }}</td>
+                                                        <td>{{ $districtWise->sum('disability') }}</td>
+                                                    </tr>
+                                                @endif
                                             </tbody>
                                         </table>
                                     </div>

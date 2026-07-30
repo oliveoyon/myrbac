@@ -68,6 +68,12 @@
         th:first-child {
             text-align: left;
         }
+
+        .total-row td {
+            background: #f1f5f9;
+            color: #111827;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -116,6 +122,17 @@
                     <td colspan="7" style="text-align: center;">No data found.</td>
                 </tr>
             @endforelse
+            @if (count($rows))
+                <tr class="total-row">
+                    <td>Total</td>
+                    <td>{{ collect($rows)->sum('male') }}</td>
+                    <td>{{ collect($rows)->sum('female') }}</td>
+                    <td>{{ collect($rows)->sum('transgender') }}</td>
+                    <td><strong>{{ collect($rows)->sum('total') }}</strong></td>
+                    <td>{{ collect($rows)->sum('under_18') }}</td>
+                    <td>{{ collect($rows)->sum('disability') }}</td>
+                </tr>
+            @endif
         </tbody>
     </table>
 </body>

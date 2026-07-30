@@ -1380,7 +1380,7 @@
                                     <!-- Collected case document -->
                                     <div class="col-md-4">
                                         <label for="collected_case_doc_prison" class="form-label">Collected case document (FIR, Charge Sheet, etc.)</label>
-                                        <input type="date" class="form-control" id="collected_case_doc_prison" name="collected_case_doc_prison" value="{{ old('collected_case_doc_prison', $caseData->collected_case_doc_prison) }}">
+                                        <input type="date" class="form-control" id="collected_case_doc_prison" name="collected_case_doc_prison" value="{{ old('collected_case_doc_prison', $dateInputValues['collected_case_doc_prison'] ?? $caseData->collected_case_doc_prison) }}">
                                     </div>
 
                                     <!-- Identify Sureties (With National ID) -->

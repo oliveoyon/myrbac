@@ -235,7 +235,7 @@ class FormalController extends Controller
         $case->prison_legal_representation_date = $request->prison_legal_representation_date;
         $case->next_court_collection_date = $request->next_court_collection_date;
         $case->prison_next_court_date = $request->prison_next_court_date;
-        $case->collected_case_doc_prison = $request->collected_case_doc_prison;
+        $case->collected_case_doc_prison = $this->parseImportDate($request->collected_case_doc_prison) ?: $request->collected_case_doc_prison;
         $case->identify_sureties_prison_nid = $request->identify_sureties_prison_nid;
         $case->identify_sureties_prison_phone = $request->identify_sureties_prison_phone;
         $case->identify_sureties_prison_date = $request->identify_sureties_prison_date;
@@ -500,7 +500,7 @@ class FormalController extends Controller
         $case->prison_legal_representation_date = $request->prison_legal_representation_date;
         $case->next_court_collection_date = $request->next_court_collection_date;
         $case->prison_next_court_date = $request->prison_next_court_date;
-        $case->collected_case_doc_prison = $request->collected_case_doc_prison;
+        $case->collected_case_doc_prison = $this->parseImportDate($request->collected_case_doc_prison) ?: $request->collected_case_doc_prison;
         $case->identify_sureties_prison_nid = $request->identify_sureties_prison_nid;
         $case->identify_sureties_prison_phone = $request->identify_sureties_prison_phone;
         $case->identify_sureties_prison_date = $request->identify_sureties_prison_date;
@@ -622,9 +622,13 @@ class FormalController extends Controller
         $caseData = FormalCase::findOrFail($editId);
         $this->authorizeFormalCaseScope($caseData);
 
+        $dateInputValues = [
+            'collected_case_doc_prison' => $this->parseImportDate($caseData->collected_case_doc_prison) ?: $caseData->collected_case_doc_prison,
+        ];
+
         $submissionToken = $this->createFormSubmissionToken('formal_case_edit_tokens');
 
-        return view('dashboard.admin.edit-case', compact('caseData', 'submissionToken'));
+        return view('dashboard.admin.edit-case', compact('caseData', 'submissionToken', 'dateInputValues'));
     }
 
     public function fileCase(Request $request)

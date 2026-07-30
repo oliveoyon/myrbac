@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\FormalCase;
 use App\Models\District;
 use App\Models\FollowUpIntervention;
+use App\Models\LsidRegister;
 use App\Models\Pngo;
 use Illuminate\Support\Facades\DB;
 use Mpdf\Config\ConfigVariables;
@@ -233,13 +234,7 @@ class ReportController extends Controller
 
         Auth::user()->applyDistrictPngoScope($cases);
 
-        if ($request->filled('from_date') && $request->filled('to_date')) {
-            $fromDate = \Carbon\Carbon::createFromFormat('Y-m-d', $request->from_date)->startOfDay();
-            $toDate = \Carbon\Carbon::createFromFormat('Y-m-d', $request->to_date)->endOfDay();
-
-            // Apply the date filter
-            $cases->whereBetween('created_at', [$fromDate, $toDate]);
-        }
+        (new CommonService())->applyInterventionDateRange($cases, $request->from_date, $request->to_date);
 
         $cases1 = $cases->latest('id')->get();
         return response()->json(['cases' => $cases1]);
@@ -329,11 +324,11 @@ class ReportController extends Controller
             'referral_service_date',
         ];
 
-        $districtId = 1; // Set your district ID
-        $pngoId = 1; // Set your PNGO ID
+        $commonService = new CommonService();
+        $interventionCondition = $commonService->interventionConditionSql();
 
-        $results = collect($fields)->map(function ($field) use ($districtId, $pngoId) {
-            return FormalCase::selectRaw("
+        $results = collect($fields)->map(function ($field) use ($interventionCondition) {
+            $query = FormalCase::selectRaw("
                 '$field' AS field,
                 SUM(CASE WHEN sex = 'Male' AND age >= 18 THEN 1 ELSE 0 END) AS adult_males,
                 SUM(CASE WHEN sex = 'Female' AND age >= 18 THEN 1 ELSE 0 END) AS adult_females,
@@ -342,9 +337,11 @@ class ReportController extends Controller
                 COUNT(*) AS total
             ")
                 ->whereNotNull($field)
-                // ->where('district_id', $districtId)
-                // ->where('pngo_id', $pngoId)
-                ->first();
+                ->whereRaw("CAST({$field} AS CHAR) <> ''")
+                ->where('status', '>', 1)
+                ->whereRaw($interventionCondition);
+
+            return Auth::user()->applyDistrictPngoScope($query)->first();
         });
 
         return response()->json($results);
@@ -357,12 +354,46 @@ class ReportController extends Controller
         return view('dashboard.report.custom-report', compact('fields', 'districts', 'pngos'));
     }
 
+    public function interventionDateAudit()
+    {
+        $auditRows = (new CommonService())->interventionDateAuditCases();
+        $summary = [
+            'total' => $auditRows->count(),
+            'by_institute' => $auditRows
+                ->groupBy('institute')
+                ->map(fn ($rows) => $rows->count())
+                ->sortDesc(),
+            'top_fields' => $auditRows
+                ->flatMap(fn ($row) => $row['filled_fields']->pluck('label'))
+                ->countBy()
+                ->sortDesc()
+                ->take(10),
+        ];
+
+        return view('dashboard.report.intervention-date-audit', compact('auditRows', 'summary'));
+    }
+
     public function generateCustomReport(Request $request)
     {
+        $request->validate([
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date|after_or_equal:from_date',
+        ]);
+
         $fields = $request->input('fields', []); // 'fields' is the name of the checkbox array in your form
         $flatFields = collect($fields)->flatMap(function ($fieldGroup) {
             return is_array($fieldGroup) ? $fieldGroup : [$fieldGroup];
         })->all();
+
+        $allfields = include(app_path('Services/DbFields.php'));
+        $flattenedFields = [];
+
+        foreach ($allfields as $category) {
+            $flattenedFields = array_merge($flattenedFields, $category);
+        }
+
+        $allowedFieldKeys = array_keys($flattenedFields);
+        $flatFields = array_values(array_intersect($flatFields, $allowedFieldKeys));
 
         if (empty($flatFields)) {
             return redirect()->back()->with('error', 'No fields selected');
@@ -396,9 +427,19 @@ class ReportController extends Controller
             $appliedFilters['Application Mode'] = $request->application_mode;
         }
 
+        if ($request->filled('from_date')) {
+            $appliedFilters['From Date'] = \Carbon\Carbon::parse($request->from_date)->format('j M, Y');
+        }
+
+        if ($request->filled('to_date')) {
+            $appliedFilters['To Date'] = \Carbon\Carbon::parse($request->to_date)->format('j M, Y');
+        }
+
         // Fix: Pass $whr inside the closure
         $user = Auth::user();
-        $results = collect($flatFields)->map(function ($field) use ($whr, $user) {
+        $commonService = new CommonService();
+        $interventionCondition = $commonService->interventionConditionSql();
+        $results = collect($flatFields)->map(function ($field) use ($whr, $user, $request, $commonService, $interventionCondition) {
             $query = FormalCase::selectRaw("
                 '$field' AS field,
                 SUM(CASE WHEN sex = 'Male' AND age >= 18 THEN 1 ELSE 0 END) AS adult_males,
@@ -408,18 +449,15 @@ class ReportController extends Controller
                 COUNT(*) AS total
             ")
                 ->whereNotNull($field)
+                ->whereRaw("CAST({$field} AS CHAR) <> ''")
+                ->where('status', '>', 1)
+                ->whereRaw($interventionCondition)
                 ->where($whr);
+
+            $commonService->applyInterventionDateRange($query, $request->from_date, $request->to_date);
 
             return $user->applyDistrictPngoScope($query)->first();
         });
-
-        // Load field names
-        $allfields = include(app_path('Services/DbFields.php'));
-        $flattenedFields = [];
-
-        foreach ($allfields as $category) {
-            $flattenedFields = array_merge($flattenedFields, $category);
-        }
 
         return view('dashboard.report.result-custom-report', compact('results', 'flattenedFields', 'appliedFilters'));
     }
@@ -537,6 +575,105 @@ class ReportController extends Controller
         return $this->inlinePdfResponse($mpdf, 'institution-wise-report.pdf');
     }
 
+    public function projectAchievementReport(Request $request)
+    {
+        $filters = $this->projectAchievementFilters($request);
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
+        $rows = $this->projectAchievementRows($filters);
+        $appliedFilters = $this->projectAchievementAppliedFilters($filters);
+        $monthOptions = $this->projectAchievementMonthOptions();
+
+        return view('dashboard.report.project-achievement-report', compact(
+            'rows',
+            'filters',
+            'districts',
+            'pngos',
+            'appliedFilters',
+            'monthOptions'
+        ));
+    }
+
+    public function projectAchievementReportPdf(Request $request)
+    {
+        $filters = $this->projectAchievementFilters($request);
+        $rows = $this->projectAchievementRows($filters);
+        $appliedFilters = $this->projectAchievementAppliedFilters($filters);
+        $pdfMeta = $this->projectAchievementPdfMeta($filters);
+
+        $mpdf = $this->reportMpdf('P');
+        $html = view('dashboard.report.project-achievement-report-pdf', [
+            'rows' => $rows,
+            'appliedFilters' => $appliedFilters,
+            'pdfMeta' => $pdfMeta,
+        ])->render();
+
+        $mpdf->WriteHTML($html);
+
+        return $this->inlinePdfResponse($mpdf, 'project-achievement-endorsement-report.pdf');
+    }
+
+    private function projectAchievementRows(array $filters)
+    {
+        $formalCounts = (new CommonService())->projectAchievementFormalCounts($filters);
+        $lsidCount = $this->projectAchievementLsidCount($filters);
+
+        return collect([
+            [
+                'serial' => '১',
+                'activity' => 'আদালতে আইনি সহায়তাপ্রাপ্ত বিচারপ্রার্থী',
+                'unit' => 'জন',
+                'count' => $formalCounts['court_count'],
+            ],
+            [
+                'serial' => '২',
+                'activity' => 'কারাগারে আইনি সহায়তাপ্রাপ্ত কারাবন্দি',
+                'unit' => 'জন',
+                'count' => $formalCounts['prison_count'],
+            ],
+            [
+                'serial' => '৩',
+                'activity' => 'থানায় আইনি সহায়তাপ্রাপ্ত কারাবন্দি',
+                'unit' => 'জন',
+                'count' => $formalCounts['police_station_count'],
+            ],
+            [
+                'serial' => '৪',
+                'activity' => 'আইনি তথ্য সেবা ডেস্কে সহায়তাপ্রাপ্ত বিচারপ্রার্থী',
+                'unit' => 'জন',
+                'count' => $lsidCount,
+            ],
+            [
+                'serial' => '৫',
+                'activity' => 'আইনি সহায়তার জন্য জেলা লিগ্যাল এইড অফিসে সেবার প্রাপ্তির জন্য রেফার',
+                'unit' => 'জন',
+                'count' => $formalCounts['dlao_general_count'],
+            ],
+            [
+                'serial' => '৬',
+                'activity' => 'কারাবন্দীর আইনগত সহায়তা প্রাপ্তির জন্য প্রয়োজনীয় তথ্য কারাগার ও আদালত থেকে জেলা লিগ্যাল এইড অফিসে প্রেরণে সহযোগিতা',
+                'unit' => 'জন',
+                'count' => $formalCounts['dlao_prison_count'],
+            ],
+        ]);
+    }
+
+    private function projectAchievementLsidCount(array $filters): int
+    {
+        $query = LsidRegister::query()
+            ->when(! empty($filters['district_id']), fn ($query) => $query->where('district_id', $filters['district_id']))
+            ->when(! empty($filters['pngo_id']), fn ($query) => $query->where('pngo_id', $filters['pngo_id']));
+
+        if (! empty($filters['from_date'])) {
+            $query->whereDate('service_date', '>=', $filters['from_date']);
+        }
+
+        if (! empty($filters['to_date'])) {
+            $query->whereDate('service_date', '<=', $filters['to_date']);
+        }
+
+        return (int) Auth::user()->applyDistrictPngoScope($query)->count();
+    }
+
     private function summaryDateFilters(): array
     {
         request()->validate([
@@ -618,6 +755,125 @@ class ReportController extends Controller
     private function institutionOptions(): array
     {
         return ['Court', 'Police Station', 'Prison'];
+    }
+
+    private function projectAchievementFilters(Request $request): array
+    {
+        $validated = $request->validate([
+            'district_id' => 'nullable|integer|exists:districts,id',
+            'pngo_id' => 'nullable|integer|exists:pngos,id',
+            'month' => 'nullable|date_format:Y-m',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date|after_or_equal:from_date',
+        ]);
+
+        if (! empty($validated['pngo_id'])) {
+            $pngo = Pngo::find($validated['pngo_id']);
+
+            if (! empty($validated['district_id']) && $pngo && (int) $pngo->district_id !== (int) $validated['district_id']) {
+                abort(403);
+            }
+        }
+
+        $districtIds = Auth::user()->accessibleDistrictIds();
+        $pngoIds = Auth::user()->accessiblePngoIds();
+
+        if (! empty($validated['district_id']) && is_array($districtIds)) {
+            abort_if(! in_array((int) $validated['district_id'], array_map('intval', $districtIds), true), 403);
+        }
+
+        if (! empty($validated['pngo_id']) && is_array($pngoIds)) {
+            abort_if(! in_array((int) $validated['pngo_id'], array_map('intval', $pngoIds), true), 403);
+        }
+
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
+        $month = $validated['month'] ?? (empty($fromDate) && empty($toDate) ? now()->format('Y-m') : null);
+
+        if (! empty($month)) {
+            $monthDate = \Carbon\Carbon::createFromFormat('Y-m', $month);
+            $fromDate = $monthDate->copy()->startOfMonth()->toDateString();
+            $toDate = $monthDate->copy()->endOfMonth()->toDateString();
+        }
+
+        return [
+            'district_id' => $validated['district_id'] ?? null,
+            'pngo_id' => $validated['pngo_id'] ?? null,
+            'month' => $month,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
+        ];
+    }
+
+    private function projectAchievementAppliedFilters(array $filters): array
+    {
+        $applied = [];
+
+        if (! empty($filters['district_id'])) {
+            $applied['District'] = District::where('id', $filters['district_id'])->value('name') ?: 'Unknown';
+        }
+
+        if (! empty($filters['pngo_id'])) {
+            $applied['PNGO'] = Pngo::where('id', $filters['pngo_id'])->value('name') ?: 'Unknown';
+        }
+
+        if (! empty($filters['month'])) {
+            $applied['Month'] = \Carbon\Carbon::createFromFormat('Y-m', $filters['month'])->format('F Y');
+        } else {
+            if (! empty($filters['from_date'])) {
+                $applied['From Date'] = \Carbon\Carbon::parse($filters['from_date'])->format('j M, Y');
+            }
+
+            if (! empty($filters['to_date'])) {
+                $applied['To Date'] = \Carbon\Carbon::parse($filters['to_date'])->format('j M, Y');
+            }
+        }
+
+        return $applied;
+    }
+
+    private function projectAchievementPdfMeta(array $filters): array
+    {
+        $districtName = ! empty($filters['district_id'])
+            ? District::where('id', $filters['district_id'])->value('name')
+            : 'সকল জেলা';
+
+        $pngoName = ! empty($filters['pngo_id'])
+            ? Pngo::where('id', $filters['pngo_id'])->value('name')
+            : 'সকল বাস্তবায়নকারী সংস্থা';
+
+        if (! empty($filters['month'])) {
+            $month = \Carbon\Carbon::createFromFormat('Y-m', $filters['month'])->format('F Y');
+        } elseif (! empty($filters['from_date']) || ! empty($filters['to_date'])) {
+            $from = ! empty($filters['from_date']) ? \Carbon\Carbon::parse($filters['from_date'])->format('j M, Y') : 'শুরুর তারিখ নেই';
+            $to = ! empty($filters['to_date']) ? \Carbon\Carbon::parse($filters['to_date'])->format('j M, Y') : 'শেষ তারিখ নেই';
+            $month = $from . ' - ' . $to;
+        } else {
+            $month = now()->format('F Y');
+        }
+
+        return [
+            'district' => $districtName ?: 'সকল জেলা',
+            'month' => $month,
+            'pngo' => $pngoName ?: 'সকল বাস্তবায়নকারী সংস্থা',
+        ];
+    }
+
+    private function projectAchievementMonthOptions(): array
+    {
+        $currentMonth = now()->copy()->startOfMonth();
+
+        return collect(range(0, 24))
+            ->map(function ($offset) use ($currentMonth) {
+                $date = $currentMonth->copy()->subMonths($offset);
+
+                return [
+                    'value' => $date->format('Y-m'),
+                    'label' => $date->format('F Y'),
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     public function search(Request $request)
@@ -864,14 +1120,15 @@ class ReportController extends Controller
 
     private function formalCaseExportQuery(array $filters)
     {
+        $commonService = new CommonService();
         $query = FormalCase::query()
             ->when(! empty($filters['district_id']), fn ($query) => $query->where('district_id', $filters['district_id']))
             ->when(! empty($filters['pngo_id']), fn ($query) => $query->where('pngo_id', $filters['pngo_id']))
             ->when(! empty($filters['institute']), fn ($query) => $query->where('institute', $filters['institute']))
             ->when(! empty($filters['status']), fn ($query) => $query->where('status', $filters['status']))
-            ->when(! empty($filters['from_date']), fn ($query) => $query->whereDate('interview_date', '>=', $filters['from_date']))
-            ->when(! empty($filters['to_date']), fn ($query) => $query->whereDate('interview_date', '<=', $filters['to_date']))
             ->orderBy('id');
+
+        $commonService->applyInterventionDateRange($query, $filters['from_date'] ?? null, $filters['to_date'] ?? null);
 
         return Auth::user()->applyDistrictPngoScope($query);
     }

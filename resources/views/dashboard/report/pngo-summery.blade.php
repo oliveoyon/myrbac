@@ -86,6 +86,12 @@
             height: 100% !important;
         }
 
+        .summary-total-row td {
+            background: #f1f5f9 !important;
+            color: #111827;
+            font-weight: 800;
+        }
+
         @media (max-width: 768px) {
             .summary-filter {
                 grid-template-columns: 1fr 1fr;
@@ -175,6 +181,17 @@
                                                         <td>{{ $row['disability'] ?? 0 }}</td>
                                                     </tr>
                                                 @endforeach
+                                                @if ($pngoWise->count())
+                                                    <tr class="summary-total-row">
+                                                        <td>Total</td>
+                                                        <td>{{ $pngoWise->sum('male') }}</td>
+                                                        <td>{{ $pngoWise->sum('female') }}</td>
+                                                        <td>{{ $pngoWise->sum('transgender') }}</td>
+                                                        <td>{{ $pngoWise->sum('total') }}</td>
+                                                        <td>{{ $pngoWise->sum('under_18') }}</td>
+                                                        <td>{{ $pngoWise->sum('disability') }}</td>
+                                                    </tr>
+                                                @endif
                                             </tbody>
                                         </table>
                                     </div>

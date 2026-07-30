@@ -652,6 +652,16 @@
                         </select>
                     </div>
 
+                    <div class="filter-item">
+                        <label for="from_date">From Date</label>
+                        <input type="date" class="form-control form-control-sm" id="from_date" name="from_date">
+                    </div>
+
+                    <div class="filter-item">
+                        <label for="to_date">To Date</label>
+                        <input type="date" class="form-control form-control-sm" id="to_date" name="to_date">
+                    </div>
+
                 </div>
             </div>
         </div>
