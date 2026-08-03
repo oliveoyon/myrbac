@@ -171,7 +171,7 @@
         <tbody>
             @forelse ($printRows as $row)
                 <tr>
-                    <td class="serial">{{ $row['serial'] }}</td>
+                    <td class="serial">{{ $loop->iteration }}</td>
                     <td>{{ $row['activity'] }}</td>
                     <td class="count">{{ $row['count'] }} {{ $row['unit'] }}</td>
                 </tr>

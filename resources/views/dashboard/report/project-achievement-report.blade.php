@@ -245,7 +245,7 @@
                 <tbody>
                     @forelse ($displayRows as $row)
                         <tr>
-                            <td class="achievement-serial">{{ $row['serial'] }}</td>
+                            <td class="achievement-serial">{{ $loop->iteration }}</td>
                             <td>{{ $row['activity'] }}</td>
                             <td class="achievement-count">{{ $row['count'] }}</td>
                             <td class="achievement-unit">{{ $row['unit'] }}</td>
