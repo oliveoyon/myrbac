@@ -374,6 +374,41 @@
         font-weight: 600;
     }
 
+    .user-management-loader {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        background: rgba(248, 250, 252, .82);
+        backdrop-filter: blur(2px);
+    }
+
+    .user-management-loader-box {
+        width: min(360px, calc(100vw - 32px));
+        padding: 22px;
+        border: 1px solid #d8e5df;
+        border-radius: 8px;
+        background: #fff;
+        text-align: center;
+        box-shadow: 0 18px 45px rgba(16, 24, 40, .14);
+    }
+
+    .user-management-loader-spinner {
+        width: 44px;
+        height: 44px;
+        margin: 0 auto 12px;
+        border: 4px solid #e8f5ee;
+        border-top-color: #c30f08;
+        border-radius: 999px;
+        animation: userManagementSpin .8s linear infinite;
+    }
+
+    @keyframes userManagementSpin {
+        to { transform: rotate(360deg); }
+    }
+
     /* Custom Styling for the Edit Permissions Form */
     .edit-permission-header {
         font-size: 22px;
@@ -794,6 +829,13 @@
                                 </div>
 
                                 <div class="mb-3 col-md-6">
+                                    <label class="form-label" for="add_password">Initial Password</label>
+                                    <input type="password" class="form-control" name="password" id="add_password" placeholder="Leave blank to use default password">
+                                    <small class="text-muted">If set, user must still change password after first login.</small>
+                                    <span class="text-danger error-text password_error"></span>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
                                     <label class="form-label scoped-location-label" for="district_id">District</label>
                                     <select class="form-control user-district-select" name="district_id" id="district_id">
                                         <option value="">Select District</option>
@@ -966,8 +1008,8 @@
                                 @can('Change User Password')
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label" for="password">Reset Password</label>
-                                        <input type="password" class="form-control" name="password" id="password" placeholder="Leave blank to keep current password">
+                                        <label class="form-label" for="edit_password">Reset Password</label>
+                                        <input type="password" class="form-control" name="password" id="edit_password" placeholder="Leave blank to keep current password">
                                         <small class="text-muted">If changed, user must change password after login.</small>
                                         <span class="text-danger error-text password_error"></span>
                                     </div>
@@ -1036,6 +1078,13 @@
 </div>
 
 
+<div class="user-management-loader" id="userManagementLoader">
+    <div class="user-management-loader-box">
+        <div class="user-management-loader-spinner"></div>
+        <strong>Processing request</strong>
+        <div class="text-muted small mt-1">Please keep this page open.</div>
+    </div>
+</div>
 
 
 
@@ -1059,6 +1108,18 @@
     $(document).ready(function() {
         const scopedLocationRoles = ['Paralegal', 'DPO'];
         const multiScopeRoles = ['M&EO', 'PNGO Focal'];
+
+        function showUserManagementLoader(message) {
+            const loader = $('#userManagementLoader');
+            if (message) {
+                loader.find('strong').text(message);
+            }
+            loader.css('display', 'flex');
+        }
+
+        function hideUserManagementLoader() {
+            $('#userManagementLoader').hide();
+        }
 
         function selectedRolesRequireLocation(form) {
             const selectedRoles = form.find('select[name="role_name[]"]').val() || [];
@@ -1175,6 +1236,9 @@
                 url: '/mne/users/' + userId +
                     '/permissions', // Make the AJAX request to fetch user permissions
                 method: 'GET',
+                beforeSend: function() {
+                    showUserManagementLoader('Loading permissions');
+                },
                 success: function(response) {
                     var permissionsList =
                         ''; // Initialize an empty string for the permissions
@@ -1228,6 +1292,9 @@
                 },
                 error: function() {
                     alert('Error loading permissions.');
+                },
+                complete: function() {
+                    hideUserManagementLoader();
                 }
             });
         });
@@ -1239,8 +1306,7 @@
             // Disable the submit button to prevent double-clicking
             $(this).find(':submit').prop('disabled', true);
 
-            // Show the loader overlay (if any)
-            $('#loader-overlay').show();
+            showUserManagementLoader('Creating user');
 
             var form = this;
 
@@ -1300,7 +1366,7 @@
                 complete: function() {
                     // Enable the submit button and hide the loader overlay
                     $(form).find(':submit').prop('disabled', false);
-                    $('#loader-overlay').hide();
+                    hideUserManagementLoader();
                 }
             });
         });
@@ -1309,6 +1375,7 @@
             var user_id = $(this).data('id');
             $('.editUser').find('form')[0].reset();
             $('.editUser').find('span.error-text').text('');
+            showUserManagementLoader('Loading user details');
 
             $.post("{{ route('getUserDetails') }}", {
                 user_id: user_id
@@ -1333,7 +1400,9 @@
                 syncLocationRequirement(modal.find('form'));
 
                 modal.modal('show');
-            }, 'json');
+            }, 'json').always(function() {
+                hideUserManagementLoader();
+            });
         });
 
 
@@ -1346,8 +1415,7 @@
             // Disable the submit button to prevent double-clicking
             $(form).find(':submit').prop('disabled', true);
 
-            // Show the loader overlay
-            $('#loader-overlay').show();
+            showUserManagementLoader('Updating user');
 
             $.ajax({
                 url: $(form).attr('action'),
@@ -1389,7 +1457,7 @@
                 complete: function() {
                     // Enable the submit button and hide the loader overlay
                     $(form).find(':submit').prop('disabled', false);
-                    $('#loader-overlay').hide();
+                    hideUserManagementLoader();
                 },
                 error: function(xhr, status, error) {
                     // Show error notification using SweetAlert2 if the AJAX request fails
@@ -1416,6 +1484,9 @@
             $.ajax({
                 url: '/mne/users/' + userId + '/edit-permissions',
                 method: 'GET',
+                beforeSend: function() {
+                    showUserManagementLoader('Loading permission editor');
+                },
                 success: function(response) {
                     if (response && response.user && response.allPermissions) {
                         var editForm = '<form id="editUserPermissionsForm" class="permission-view-shell">';
@@ -1493,6 +1564,9 @@
                 },
                 error: function() {
                     alert('Error fetching user permissions.');
+                },
+                complete: function() {
+                    hideUserManagementLoader();
                 }
             });
         });
@@ -1509,6 +1583,10 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
+                beforeSend: function() {
+                    $('#saveUserPermissions').prop('disabled', true);
+                    showUserManagementLoader('Saving permissions');
+                },
                 success: function() {
                     Swal.fire({
                         title: 'Permissions Updated!',
@@ -1523,6 +1601,10 @@
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
                     alert('Error updating permissions: ' + error);
+                },
+                complete: function() {
+                    $('#saveUserPermissions').prop('disabled', false);
+                    hideUserManagementLoader();
                 }
             });
         });

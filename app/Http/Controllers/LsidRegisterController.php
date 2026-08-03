@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\District;
 use App\Models\LsidRegister;
 use App\Models\Pngo;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Mpdf\Config\ConfigVariables;
 use Mpdf\Config\FontVariables;
 use Mpdf\Mpdf;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class LsidRegisterController extends Controller
 {
@@ -94,7 +99,16 @@ class LsidRegisterController extends Controller
         ]);
 
         $validated = $this->applyUserScopeToData($validated);
+
+        if (empty($validated['district_id']) || empty($validated['pngo_id'])) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(['district_id' => 'District and PNGO are required for LSID register entries.']);
+        }
+
         $validated['created_by'] = Auth::id();
+        $validated['lsid_id'] = $this->generateLsidId((int) $validated['district_id']);
 
         LsidRegister::create($validated);
 
@@ -173,7 +187,16 @@ class LsidRegisterController extends Controller
             'service_type_other' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $lsidRegister->update($this->applyUserScopeToData($validated));
+        $validated = $this->applyUserScopeToData($validated);
+
+        if (empty($validated['district_id']) || empty($validated['pngo_id'])) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(['district_id' => 'District and PNGO are required for LSID register entries.']);
+        }
+
+        $lsidRegister->update($validated);
 
         return redirect()
             ->route('lsid-register.manage', $request->only(['district_id', 'pngo_id', 'sex', 'from_date', 'to_date', 'intervention']))
@@ -201,6 +224,78 @@ class LsidRegisterController extends Controller
         return redirect()
             ->route('lsid-register.manage')
             ->with('success', 'LSID register entry deleted successfully.');
+    }
+
+    public function importView()
+    {
+        return view('dashboard.admin.lsid-import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:51200'],
+        ]);
+
+        $rows = $this->readLsidImportRows($request->file('file')->getRealPath());
+        $preparedRows = [];
+        $importErrors = [];
+
+        foreach ($rows as $row) {
+            $rowNumber = $row['__row_number'];
+
+            if ($this->isEmptyLsidImportRow($row)) {
+                continue;
+            }
+
+            $prepared = $this->prepareLsidImportRow($row, $rowNumber);
+
+            if (! empty($prepared['errors'])) {
+                $importErrors = array_merge($importErrors, $prepared['errors']);
+                continue;
+            }
+
+            $preparedRows[] = $prepared['data'];
+        }
+
+        if (! empty($importErrors)) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('import_errors', $importErrors);
+        }
+
+        if (empty($preparedRows)) {
+            return redirect()->back()->with('error', 'No importable LSID rows found in the uploaded file.');
+        }
+
+        try {
+            DB::transaction(function () use ($preparedRows) {
+                $districtCounters = [];
+
+                foreach ($preparedRows as $row) {
+                    $districtId = (int) $row['district_id'];
+                    $districtCounters[$districtId] ??= $this->lastLsidNumberForDistrict($districtId);
+                    $districtCounters[$districtId]++;
+
+                    $row['lsid_id'] = $this->buildLsidId($districtId, $districtCounters[$districtId]);
+                    $row['created_by'] = Auth::id();
+
+                    LsidRegister::create($row);
+                }
+            });
+        } catch (\Throwable $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('import_errors', [
+                    'Import stopped before completion. No LSID rows from this upload were kept. ' . $e->getMessage(),
+                ]);
+        }
+
+        return redirect()
+            ->back()
+            ->with('success', count($preparedRows) . ' LSID register row(s) imported successfully.');
     }
 
     public function report(Request $request)
@@ -353,6 +448,404 @@ class LsidRegisterController extends Controller
         }
 
         return $data;
+    }
+
+    private function generateLsidId(int $districtId): string
+    {
+        return $this->buildLsidId($districtId, $this->lastLsidNumberForDistrict($districtId) + 1);
+    }
+
+    private function buildLsidId(int $districtId, int $number): string
+    {
+        $districtName = District::whereKey($districtId)->value('name') ?: 'LSI';
+
+        return strtoupper(substr($districtName, 0, 3)) . '-LSID-' . $number;
+    }
+
+    private function lastLsidNumberForDistrict(int $districtId): int
+    {
+        return LsidRegister::where('district_id', $districtId)
+            ->pluck('lsid_id')
+            ->reduce(function ($highest, $lsidId) {
+                preg_match('/(\d+)$/', (string) $lsidId, $matches);
+
+                return isset($matches[1]) ? max($highest, (int) $matches[1]) : $highest;
+            }, 0);
+    }
+
+    private function readLsidImportRows(string $path): array
+    {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
+
+        $reader = IOFactory::createReaderForFile($path);
+        $reader->setReadDataOnly(true);
+
+        if (method_exists($reader, 'setLoadSheetsOnly')) {
+            $reader->setLoadSheetsOnly(['Data_Sheet']);
+        }
+
+        if (method_exists($reader, 'setReadFilter')) {
+            $reader->setReadFilter(new class implements IReadFilter {
+                public function readCell($columnAddress, $row, $worksheetName = ''): bool
+                {
+                    return $row >= 1
+                        && $row <= 30000
+                        && in_array($columnAddress, ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'], true)
+                        && ($worksheetName === '' || $worksheetName === 'Data_Sheet');
+                }
+            });
+        }
+
+        $spreadsheet = $reader->load($path);
+        $sheet = $spreadsheet->getSheetByName('Data_Sheet') ?: $spreadsheet->getActiveSheet();
+        $rows = [];
+        $emptyRowStreak = 0;
+        $foundData = false;
+        $startRow = $this->detectLsidImportStartRow($sheet);
+
+        for ($rowNumber = $startRow; $rowNumber <= $sheet->getHighestDataRow(); $rowNumber++) {
+            $row = [
+                '__row_number' => $rowNumber,
+                'district' => $this->cellValue($sheet, 'A', $rowNumber),
+                'service_date' => $sheet->getCell('C' . $rowNumber)->getValue(),
+                'sex' => $this->cellValue($sheet, 'D', $rowNumber),
+                'under_18' => $this->cellValue($sheet, 'E', $rowNumber),
+                'pwd' => $this->cellValue($sheet, 'F', $rowNumber),
+                'receiver_type' => $this->cellValue($sheet, 'G', $rowNumber),
+                'receiver_type_other' => $this->cellValue($sheet, 'H', $rowNumber),
+                'intervention' => $this->cellValue($sheet, 'I', $rowNumber),
+                'service_type' => $this->cellValue($sheet, 'J', $rowNumber),
+                'service_type_other' => $this->cellValue($sheet, 'K', $rowNumber),
+                'remarks' => $this->cellValue($sheet, 'L', $rowNumber),
+            ];
+
+            if ($this->isEmptyLsidImportRow($row)) {
+                if ($foundData) {
+                    $emptyRowStreak++;
+
+                    if ($emptyRowStreak >= 250) {
+                        break;
+                    }
+                }
+
+                continue;
+            }
+
+            $foundData = true;
+            $emptyRowStreak = 0;
+            $rows[] = $row;
+        }
+
+        $spreadsheet->disconnectWorksheets();
+
+        return $rows;
+    }
+
+    private function detectLsidImportStartRow($sheet): int
+    {
+        for ($rowNumber = 1; $rowNumber <= min(10, $sheet->getHighestDataRow()); $rowNumber++) {
+            $district = $this->cellValue($sheet, 'A', $rowNumber);
+            $date = $sheet->getCell('C' . $rowNumber)->getValue();
+            $sex = $this->cellValue($sheet, 'D', $rowNumber);
+            $receiverType = $this->cellValue($sheet, 'G', $rowNumber);
+            $intervention = $this->cellValue($sheet, 'I', $rowNumber);
+            $serviceType = $this->cellValue($sheet, 'J', $rowNumber);
+
+            if (
+                $this->findDistrictByName($district)
+                && $this->parseLsidImportDate($date)
+                && $this->normalizeLsidSex($sex)
+                && ! empty($this->normalizeLsidReceiverTypes($receiverType))
+                && ! empty($this->normalizeLsidInterventions($intervention))
+                && filled($serviceType)
+            ) {
+                return $rowNumber;
+            }
+        }
+
+        return 6;
+    }
+
+    private function cellValue($sheet, string $column, int $row): ?string
+    {
+        $value = $sheet->getCell($column . $row)->getValue();
+
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim(str_replace(["\r", "\n"], ' ', (string) $value));
+
+        return $value === '' ? null : $value;
+    }
+
+    private function isEmptyLsidImportRow(array $row): bool
+    {
+        foreach (['district', 'service_date', 'sex', 'under_18', 'pwd', 'receiver_type', 'receiver_type_other', 'intervention', 'service_type', 'service_type_other', 'remarks'] as $key) {
+            if (filled($row[$key] ?? null)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function prepareLsidImportRow(array $row, int $rowNumber): array
+    {
+        $errors = [];
+        $district = $this->findDistrictByName($row['district'] ?? null);
+        $pngo = $district ? $this->findSinglePngoForDistrict($district) : null;
+        $serviceDate = $this->parseLsidImportDate($row['service_date'] ?? null);
+        $sex = $this->normalizeLsidSex($row['sex'] ?? null);
+        $otherInformation = $this->normalizeLsidOtherInformation($row['under_18'] ?? null, $row['pwd'] ?? null);
+        $receiverTypes = $this->normalizeLsidReceiverTypes($row['receiver_type'] ?? null);
+        $interventions = $this->normalizeLsidInterventions($row['intervention'] ?? null);
+        $serviceTypes = $this->normalizeLsidServiceTypes($row['service_type'] ?? null);
+        $serviceTypeOther = $row['service_type_other'] ?? null;
+
+        if (empty($serviceTypes) && filled($row['service_type'] ?? null)) {
+            $serviceTypes = ['Other'];
+            $serviceTypeOther = trim(implode(' - ', array_filter([
+                $serviceTypeOther,
+                $row['service_type'],
+            ])));
+        }
+
+        if (! $district) {
+            $errors[] = "Row {$rowNumber}: District was not found.";
+        }
+
+        if ($district && ! $pngo) {
+            $errors[] = "Row {$rowNumber}: Could not determine one PNGO for district {$district->name}.";
+        }
+
+        if ($district && $pngo && ! Auth::user()->canAccessDistrictPngo($district->id, $pngo->id)) {
+            $errors[] = "Row {$rowNumber}: District-PNGO pair is outside your access scope.";
+        }
+
+        if (! $serviceDate) {
+            $errors[] = "Row {$rowNumber}: Date is required or invalid.";
+        }
+
+        if (! $sex) {
+            $errors[] = "Row {$rowNumber}: Sex is required or invalid.";
+        }
+
+        if (empty($receiverTypes)) {
+            $errors[] = "Row {$rowNumber}: Type of information/service receiver is required or invalid.";
+        }
+
+        if (empty($interventions)) {
+            $errors[] = "Row {$rowNumber}: Intervention taken is required or invalid.";
+        }
+
+        if (empty($serviceTypes)) {
+            $errors[] = "Row {$rowNumber}: Type of information/service provided is required or invalid.";
+        }
+
+        if (! empty($errors)) {
+            return ['errors' => $errors, 'data' => []];
+        }
+
+        return [
+            'errors' => [],
+            'data' => [
+                'district_id' => $district->id,
+                'pngo_id' => $pngo->id,
+                'service_date' => $serviceDate,
+                'receiver_name' => null,
+                'mobile_number' => null,
+                'sex' => $sex,
+                'other_information' => $otherInformation,
+                'receiver_types' => $receiverTypes,
+                'interventions_taken' => $interventions,
+                'service_types' => $serviceTypes,
+                'receiver_type_other' => $row['receiver_type_other'] ?? null,
+                'service_type_other' => $serviceTypeOther,
+                'remarks' => $row['remarks'] ?? null,
+            ],
+        ];
+    }
+
+    private function findDistrictByName(?string $name): ?District
+    {
+        if (blank($name)) {
+            return null;
+        }
+
+        $normalized = $this->normalizeImportText($name);
+
+        return District::all()->first(fn ($district) => $this->normalizeImportText($district->name) === $normalized);
+    }
+
+    private function findSinglePngoForDistrict(District $district): ?Pngo
+    {
+        $pngos = Pngo::where('district_id', $district->id)->get();
+
+        return $pngos->count() === 1 ? $pngos->first() : null;
+    }
+
+    private function parseLsidImportDate($value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return Carbon::instance($value)->format('Y-m-d');
+        }
+
+        if (is_numeric($value)) {
+            try {
+                return Carbon::instance(ExcelDate::excelToDateTimeObject($value))->format('Y-m-d');
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+
+        $value = trim((string) $value);
+        $formats = ['Y-m-d', 'm/d/Y', 'm/d/y', 'n/j/Y', 'n/j/y', 'd/m/Y', 'd/m/y', 'd-M-y', 'd-M-Y', 'j M Y', 'j M, Y'];
+
+        foreach ($formats as $format) {
+            try {
+                $date = Carbon::createFromFormat($format, $value);
+                $errors = Carbon::getLastErrors();
+
+                if ($date !== false && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))) {
+                    return $date->format('Y-m-d');
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        try {
+            return Carbon::parse($value)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    private function normalizeLsidSex(?string $value): ?string
+    {
+        return $this->matchImportOption($value, [
+            'male' => 'Male',
+            'female' => 'Female',
+            'woman' => 'Female',
+            'women' => 'Female',
+            'transgender' => 'Transgender Person',
+            'transgender person' => 'Transgender Person',
+            'third gender' => 'Transgender Person',
+        ]);
+    }
+
+    private function normalizeLsidOtherInformation(?string $under18, ?string $pwd): array
+    {
+        $values = [];
+
+        if ($this->isImportYes($under18)) {
+            $values[] = 'Under 18';
+        }
+
+        if ($this->isImportYes($pwd)) {
+            $values[] = 'Person with Disability';
+        }
+
+        return $values;
+    }
+
+    private function normalizeLsidReceiverTypes(?string $value): array
+    {
+        return $this->normalizeLsidMultiValue($value, [
+            'plaintiff/plaintiff family' => 'Plaintiff/Plaintiff Family',
+            'plaintiff/plaintiffs family' => 'Plaintiff/Plaintiff Family',
+            'plaintiff plaintiff family' => 'Plaintiff/Plaintiff Family',
+            'defendant/defendant family' => 'Defendant/Defendant Family',
+            'defendant/defendants family' => 'Defendant/Defendant Family',
+            'defendant defendant family' => 'Defendant/Defendant Family',
+            'lawyer' => 'Lawyer',
+            'witness general' => 'Witness-General',
+            'witness doctor' => 'Witness-Doctor',
+            'witness police' => 'Witness-Police',
+            'police' => 'Police',
+            'other persons' => 'Other People',
+            'other people' => 'Other People',
+            'others' => 'Other People',
+            'other' => 'Other People',
+        ]);
+    }
+
+    private function normalizeLsidInterventions(?string $value): array
+    {
+        if (filled($value)) {
+            $value = preg_replace('/\s+and\s+/i', ' & ', (string) $value);
+        }
+
+        return $this->normalizeLsidMultiValue($value, [
+            'information' => 'Information',
+            'service' => 'Service',
+        ]);
+    }
+
+    private function normalizeLsidServiceTypes(?string $value): array
+    {
+        return $this->normalizeLsidMultiValue($value, [
+            'district legal aid office' => 'District Legal Aid Office',
+            'location of courts ajlas' => 'Location of Courts Ajlas',
+            'location of court ajlas' => 'Location of Courts Ajlas',
+            'location of courts offices' => 'Location of Court Offices',
+            'location of court offices' => 'Location of Court Offices',
+            'go and ngo victim support center service' => 'GO and NGO Victim Support Center Service',
+            'victim support center service' => 'GO and NGO Victim Support Center Service',
+            'basic law information' => 'Basic Law Information',
+            'basic law' => 'Basic Law Information',
+            'paralegal advisory service' => 'Paralegal Advisory Service',
+            'other' => 'Other',
+            'others' => 'Other',
+        ]);
+    }
+
+    private function normalizeLsidMultiValue(?string $value, array $map): array
+    {
+        if (blank($value)) {
+            return [];
+        }
+
+        $parts = preg_split('/\s*(?:,|;|&|\+)\s*/i', (string) $value);
+        $normalized = [];
+
+        foreach ($parts as $part) {
+            $matched = $this->matchImportOption($part, $map);
+
+            if ($matched && ! in_array($matched, $normalized, true)) {
+                $normalized[] = $matched;
+            }
+        }
+
+        return $normalized;
+    }
+
+    private function matchImportOption(?string $value, array $map): ?string
+    {
+        $key = $this->normalizeImportText($value);
+
+        return $map[$key] ?? null;
+    }
+
+    private function normalizeImportText(?string $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace(["’", "'", '.', '-', '_'], ['', '', '', ' ', ' '], $value);
+        $value = preg_replace('/\s*\/\s*/', '/', $value);
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        return trim($value);
+    }
+
+    private function isImportYes(?string $value): bool
+    {
+        return in_array($this->normalizeImportText($value), ['yes', 'y', '1', 'true'], true);
     }
 
     private function appliedFilters(Request $request): array

@@ -55,6 +55,41 @@
             top: -6px;
             right: -6px;
         }
+
+        .dashboard-search-loader {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            background: rgba(248, 250, 252, .82);
+            backdrop-filter: blur(2px);
+        }
+
+        .dashboard-search-loader-box {
+            width: min(360px, calc(100vw - 32px));
+            padding: 22px;
+            border: 1px solid #d8e5df;
+            border-radius: 8px;
+            background: #fff;
+            text-align: center;
+            box-shadow: 0 18px 45px rgba(16, 24, 40, .14);
+        }
+
+        .dashboard-search-loader-spinner {
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 12px;
+            border: 4px solid #e8f5ee;
+            border-top-color: #c30f08;
+            border-radius: 999px;
+            animation: dashboardSearchSpin .8s linear infinite;
+        }
+
+        @keyframes dashboardSearchSpin {
+            to { transform: rotate(360deg); }
+        }
     </style>
     @stack('styles')
 
@@ -70,7 +105,7 @@
             <img class="sidebar-brand-logo" src="{{ asset('logo/giz-logo.png') }}" alt="GIZ">
         </div>
         @can('Search Dashboard Reports')
-        <form action="{{ route('dashboard.search') }}" method="POST" class="search-form">
+        <form action="{{ route('dashboard.search') }}" method="POST" class="search-form" id="dashboardSearchForm">
             @csrf
             <input type="text" name="query" placeholder="Central ID..." required>
             <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
@@ -79,6 +114,7 @@
         <ul class="sidebar-nav">
             @can('Admin Dashboard')
             <li><a class="nav-link" href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i><span class="nav-text">Dashboard</span></a></li>
+            <li><a class="nav-link" href="{{ route('dashboard.two') }}"><i class="fas fa-chart-pie"></i><span class="nav-text">Dashboard 2</span></a></li>
             @endcan
             @can('View ToDo List')
             <li><a class="nav-link" href="{{ route('todos.index') }}"><i class="fas fa-list-check"></i><span class="nav-text">ToDo List</span></a></li>
@@ -134,7 +170,7 @@
             </li>
             @endcanany
 
-            @canany(['View Formal Cases Form', 'View LSID Register', 'View LSID Management', 'View Formal Case Import Page'])
+            @canany(['View Formal Cases Form', 'View LSID Register', 'View LSID Management', 'View Formal Case Import Page', 'View LSID Import Page'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">Manage Central ID</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
@@ -150,11 +186,14 @@
                     @can('View Formal Case Import Page')
                     <li><a class="nav-link nav-sublink" href="{{ route('import.view') }}"><i class="fas fa-database"></i><span class="nav-text">Bulk Central ID</span></a></li>
                     @endcan
+                    @can('View LSID Import Page')
+                    <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.import.view') }}"><i class="fas fa-file-import"></i><span class="nav-text">Bulk LSID Register</span></a></li>
+                    @endcan
                 </ul>
             </li>
             @endcanany
 
-            @canany(['View Case List Report', 'View Intervention Report Page', 'View LSID Report', 'View District Summary Report', 'View PNGO Summary Report', 'View Institution Wise Report', 'View Project Achievement Report', 'Export Formal Cases'])
+            @canany(['View Case List Report', 'View Intervention Report Page', 'View LSID Report', 'View District Summary Report', 'View PNGO Summary Report', 'View Institution Wise Report', 'View District Institution Report', 'View Project Achievement Report', 'Export Formal Cases'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-file-alt"></i><span class="nav-text">Reports & Analytics</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
@@ -175,6 +214,9 @@
                     @endcan
                     @can('View Institution Wise Report')
                     <li><a class="nav-link nav-sublink" href="{{ route('institution.wise.report') }}"><i class="fas fa-building"></i><span class="nav-text">Institution Wise Report</span></a></li>
+                    @endcan
+                    @can('View District Institution Report')
+                    <li><a class="nav-link nav-sublink" href="{{ route('district.institution.report') }}"><i class="fas fa-table-cells-large"></i><span class="nav-text">District Institution Report</span></a></li>
                     @endcan
                     @can('View Project Achievement Report')
                     <li><a class="nav-link nav-sublink" href="{{ route('project.achievement.report') }}"><i class="fas fa-file-signature"></i><span class="nav-text">Achievement Report</span></a></li>
@@ -255,6 +297,14 @@
             <div id="loader"></div>
         </div>
 
+        <div class="dashboard-search-loader" id="dashboardSearchLoader">
+            <div class="dashboard-search-loader-box">
+                <div class="dashboard-search-loader-spinner"></div>
+                <strong>Searching case records</strong>
+                <div class="text-muted small mt-1">Please keep this page open.</div>
+            </div>
+        </div>
+
     </main>
     <!-- Bootstrap JS & jQuery (optional) -->
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap Bundle --> --}}
@@ -265,6 +315,14 @@
     <script src="{{ asset('dashboard/js/custom.js') }}"></script> <!-- Your custom JS file -->
 
     @stack('scripts')
+    <script>
+        document.getElementById('dashboardSearchForm')?.addEventListener('submit', function () {
+            const loader = document.getElementById('dashboardSearchLoader');
+            if (loader) {
+                loader.style.display = 'flex';
+            }
+        });
+    </script>
     <script>
         // Pie Chart
         const pieCtx = document.getElementById('pieChart').getContext('2d');

@@ -118,6 +118,7 @@
             <tr>
                 <th class="sl">SL</th>
                 <th>Date</th>
+                <th>LSID ID</th>
                 <th>Service Given By</th>
                 <th>Name</th>
                 <th>Mobile</th>
@@ -133,6 +134,7 @@
                 <tr>
                     <td class="sl">{{ $loop->iteration }}</td>
                     <td>{{ optional($register->service_date)->format('j M, Y') }}</td>
+                    <td><strong>{{ $register->lsid_id ?: '-' }}</strong></td>
                     <td>{{ $register->creator->name ?? '-' }}</td>
                     <td>{{ $register->receiver_name }}</td>
                     <td>{{ $register->mobile_number ?: '-' }}</td>

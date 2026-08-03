@@ -10,6 +10,7 @@ class LsidRegister extends Model
     use HasFactory;
 
     protected $fillable = [
+        'lsid_id',
         'service_date',
         'district_id',
         'pngo_id',
@@ -22,6 +23,7 @@ class LsidRegister extends Model
         'service_types',
         'receiver_type_other',
         'service_type_other',
+        'remarks',
         'created_by',
     ];
 

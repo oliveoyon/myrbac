@@ -32,6 +32,7 @@ Route::get('privacy-policy', function () {
 Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('permission:Admin Dashboard');
+    Route::get('/dashboard-2', [DashboardController::class, 'dashboardTwo'])->name('dashboard.two')->middleware('permission:Admin Dashboard');
     Route::get('/todos', [TodoController::class, 'index'])->name('todos.index')->middleware('permission:View ToDo List');
     Route::post('/todos', [TodoController::class, 'store'])->name('todos.store')->middleware('permission:Create ToDo Task');
     Route::patch('/todos/{todo}/status', [TodoController::class, 'updateStatus'])->name('todos.status')->middleware('permission:Update ToDo Task');
@@ -105,6 +106,8 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('/lsid-management/{lsidRegister}/edit', [LsidRegisterController::class, 'edit'])->name('lsid-register.edit')->middleware('permission:Edit LSID Register');
     Route::put('/lsid-management/{lsidRegister}', [LsidRegisterController::class, 'update'])->name('lsid-register.update')->middleware('permission:Edit LSID Register');
     Route::delete('/lsid-management/{lsidRegister}', [LsidRegisterController::class, 'destroy'])->name('lsid-register.destroy')->middleware('permission:Delete LSID Register');
+    Route::get('/import-lsid-registers', [LsidRegisterController::class, 'importView'])->name('lsid-register.import.view')->middleware('permission:View LSID Import Page');
+    Route::post('/import-lsid-registers', [LsidRegisterController::class, 'import'])->name('lsid-register.import.store')->middleware('permission:Import LSID Registers');
     Route::get('/lsid-report', [LsidRegisterController::class, 'report'])->name('lsid-register.report')->middleware('permission:View LSID Report');
     Route::get('/lsid-report/print', [LsidRegisterController::class, 'reportPdf'])->name('lsid-register.report.print')->middleware('permission:Generate LSID Report');
     Route::post('/lsid-report/pdf', [ReportController::class, 'generatePdf'])->name('lsid-register.report.pdf')->middleware('permission:Generate LSID Report');
@@ -134,6 +137,8 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('/pngo-summery/print', [ReportController::class, 'pngoSummeryPdf'])->name('pngo.summery.print')->middleware('permission:View PNGO Summary Report');
     Route::get('/institution-wise-report', [ReportController::class, 'institutionWiseReport'])->name('institution.wise.report')->middleware('permission:View Institution Wise Report');
     Route::get('/institution-wise-report/print', [ReportController::class, 'institutionWiseReportPdf'])->name('institution.wise.report.print')->middleware('permission:View Institution Wise Report');
+    Route::get('/district-institution-report', [ReportController::class, 'districtInstitutionReport'])->name('district.institution.report')->middleware('permission:View District Institution Report');
+    Route::get('/district-institution-report/print', [ReportController::class, 'districtInstitutionReportPdf'])->name('district.institution.report.print')->middleware('permission:View District Institution Report');
     Route::get('/project-achievement-report', [ReportController::class, 'projectAchievementReport'])->name('project.achievement.report')->middleware('permission:View Project Achievement Report');
     Route::get('/project-achievement-report/print', [ReportController::class, 'projectAchievementReportPdf'])->name('project.achievement.report.print')->middleware('permission:View Project Achievement Report');
     

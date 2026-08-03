@@ -390,6 +390,41 @@ class CommonService
             ->values();
     }
 
+    public function showCaseAssistanceDistrictInstitutionWise(array $filters = [])
+    {
+        $condition = $this->buildCondition();
+
+        $query = FormalCase::select(
+            'district_id',
+            DB::raw("SUM(CASE WHEN institute = 'Court' AND ({$condition}) THEN 1 ELSE 0 END) as court"),
+            DB::raw("SUM(CASE WHEN institute = 'Police Station' AND ({$condition}) THEN 1 ELSE 0 END) as police_station"),
+            DB::raw("SUM(CASE WHEN institute = 'Prison' AND ({$condition}) THEN 1 ELSE 0 END) as prison"),
+            DB::raw("SUM(CASE WHEN institute IN ('Court', 'Police Station', 'Prison') AND ({$condition}) THEN 1 ELSE 0 END) as total")
+        )
+            ->where('status', '>', 1)
+            ->whereIn('institute', ['Court', 'Police Station', 'Prison'])
+            ->when(! empty($filters['district_id']), fn($query) => $query->where('district_id', $filters['district_id']))
+            ->when(! empty($filters['pngo_id']), fn($query) => $query->where('pngo_id', $filters['pngo_id']))
+            ->groupBy('district_id');
+
+        $this->applyDateRange($query, $filters['from_date'] ?? null, $filters['to_date'] ?? null);
+
+        $data = Auth::user()->applyDistrictPngoScope($query)->get();
+        $districts = District::whereIn('id', $data->pluck('district_id')->filter()->unique())->get()->keyBy('id');
+
+        return $data
+            ->map(fn($row) => [
+                'district_name' => $districts[$row->district_id]->name ?? 'Unknown',
+                'court' => (int) $row->court,
+                'police_station' => (int) $row->police_station,
+                'prison' => (int) $row->prison,
+                'total' => (int) $row->total,
+            ])
+            ->filter(fn($row) => $row['total'] > 0)
+            ->sortByDesc('total')
+            ->values();
+    }
+
     public function projectAchievementFormalCounts(array $filters = []): array
     {
         $officialDate = $this->earliestInterventionDateExpression();

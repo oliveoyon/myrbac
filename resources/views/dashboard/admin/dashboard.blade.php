@@ -97,7 +97,7 @@
 
     .dash-stat-grid {
         display: grid;
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 12px;
     }
 
@@ -186,6 +186,12 @@
         --accent: #6f7bc8;
         --accent-soft: #f0f2ff;
         --accent-dark: #48549f;
+    }
+
+    .dash-stat-card.lsid {
+        --accent: #2aa6a1;
+        --accent-soft: #e8f8f7;
+        --accent-dark: #14726e;
     }
 
     .dash-panel {
@@ -542,6 +548,15 @@
             </div>
             <div class="dash-stat-icon"><i class="fas fa-wheelchair"></i></div>
         </div>
+        @canany(['View LSID Register', 'View LSID Management', 'View LSID Report'])
+        <div class="dash-stat-card lsid">
+            <div>
+                <span>LSID Register</span>
+                <strong>{{ $lsidTotal }}</strong>
+            </div>
+            <div class="dash-stat-icon"><i class="fas fa-info-circle"></i></div>
+        </div>
+        @endcanany
     </div>
 
     @can('View ToDo List')

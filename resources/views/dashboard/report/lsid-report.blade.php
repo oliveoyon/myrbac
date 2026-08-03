@@ -103,6 +103,41 @@
         min-width: 980px;
     }
 
+    .lsid-report-loader {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        background: rgba(248, 250, 252, .82);
+        backdrop-filter: blur(2px);
+    }
+
+    .lsid-report-loader-box {
+        width: min(360px, calc(100vw - 32px));
+        padding: 22px;
+        border: 1px solid #d8e5df;
+        border-radius: 8px;
+        background: #fff;
+        text-align: center;
+        box-shadow: 0 18px 45px rgba(16, 24, 40, .14);
+    }
+
+    .lsid-report-loader-spinner {
+        width: 44px;
+        height: 44px;
+        margin: 0 auto 12px;
+        border: 4px solid #e8f5ee;
+        border-top-color: #c30f08;
+        border-radius: 999px;
+        animation: lsidReportSpin .8s linear infinite;
+    }
+
+    @keyframes lsidReportSpin {
+        to { transform: rotate(360deg); }
+    }
+
     @media (max-width: 992px) {
         .lsid-filter-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -218,7 +253,7 @@
             </div>
         </div>
         <div class="lsid-report-body">
-            <form method="GET" action="{{ route('lsid-register.report') }}" class="lsid-filter-grid">
+            <form method="GET" action="{{ route('lsid-register.report') }}" class="lsid-filter-grid" id="lsidReportFilterForm">
                 @if (!auth()->user()->district_id)
                     <div>
                         <label class="form-label">District</label>
@@ -321,6 +356,7 @@
                         <tr>
                             <th style="width: 36px;">SL</th>
                             <th>Date</th>
+                            <th>LSID ID</th>
                             <th>Service Given By</th>
                             <th>Name</th>
                             <th>Mobile</th>
@@ -336,6 +372,7 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ optional($register->service_date)->format('j M, Y') }}</td>
+                                <td><strong>{{ $register->lsid_id ?: '-' }}</strong></td>
                                 <td>{{ $register->creator->name ?? '-' }}</td>
                                 <td>{{ $register->receiver_name }}</td>
                                 <td>{{ $register->mobile_number ?: '-' }}</td>
@@ -377,7 +414,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center text-muted py-4">No LSID register entries found.</td>
+                                <td colspan="11" class="text-center text-muted py-4">No LSID register entries found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -400,6 +437,14 @@
                 <iframe name="pdfFrame" id="pdfFrame" style="width: 100%; height: 86vh; border: 0;"></iframe>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="lsid-report-loader" id="lsidReportLoader">
+    <div class="lsid-report-loader-box">
+        <div class="lsid-report-loader-spinner"></div>
+        <strong>Preparing LSID report</strong>
+        <div class="text-muted small mt-1">Large reports may take a little time. Please keep this page open.</div>
     </div>
 </div>
 @endsection
@@ -448,11 +493,39 @@
         syncLsidPngoDropdown(form);
     });
 
+    function showLsidReportLoader(message) {
+        const loader = document.getElementById('lsidReportLoader');
+        if (!loader) {
+            return;
+        }
+
+        if (message) {
+            loader.querySelector('strong').textContent = message;
+        }
+
+        loader.style.display = 'flex';
+    }
+
+    function hideLsidReportLoader() {
+        const loader = document.getElementById('lsidReportLoader');
+        if (loader) {
+            loader.style.display = 'none';
+        }
+    }
+
+    document.getElementById('lsidReportFilterForm')?.addEventListener('submit', function () {
+        showLsidReportLoader('Loading LSID report');
+    });
+
     $('#printButton').on('click', function(event) {
         event.preventDefault();
+        showLsidReportLoader('Preparing PDF report');
         var modal = new bootstrap.Modal(document.getElementById('pdfModal'));
         modal.show();
         document.getElementById('pdfFrame').src = '{{ route('lsid-register.report.print', [], false) }}' + window.location.search;
     });
+
+    document.getElementById('pdfFrame')?.addEventListener('load', hideLsidReportLoader);
+    document.getElementById('pdfModal')?.addEventListener('hidden.bs.modal', hideLsidReportLoader);
 </script>
 @endpush

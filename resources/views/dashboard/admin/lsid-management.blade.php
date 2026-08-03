@@ -122,6 +122,34 @@
         display: block;
     }
 
+    .lsid-pagination-wrap {
+        display: flex;
+        justify-content: center;
+        margin-top: 12px;
+    }
+
+    .lsid-pagination-wrap .pagination {
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 0;
+    }
+
+    .lsid-pagination-wrap .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        min-height: 32px;
+        padding: 4px 9px;
+        font-size: 13px;
+        line-height: 1.2;
+    }
+
+    .lsid-pagination-wrap svg {
+        width: 14px;
+        height: 14px;
+    }
+
     @media (max-width: 992px) {
         .lsid-filter-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -384,6 +412,7 @@
                 <thead>
                     <tr>
                         <th>Date</th>
+                        <th>LSID ID</th>
                         <th>District</th>
                         <th>PNGO</th>
                         <th>Name</th>
@@ -398,6 +427,7 @@
                     @forelse ($registers as $register)
                         <tr>
                             <td data-label="Date">{{ optional($register->service_date)->format('j M, Y') }}</td>
+                            <td data-label="LSID ID"><strong>{{ $register->lsid_id ?: '-' }}</strong></td>
                             <td data-label="District">{{ $register->district->name ?? '-' }}</td>
                             <td data-label="PNGO">{{ $register->pngo->name ?? '-' }}</td>
                             <td data-label="Name">{{ $register->receiver_name }}</td>
@@ -437,13 +467,15 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-4">No LSID register entries found.</td>
+                            <td colspan="10" class="text-center text-muted py-4">No LSID register entries found.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
 
-            {{ $registers->links() }}
+            <div class="lsid-pagination-wrap">
+                {{ $registers->links('pagination::bootstrap-5') }}
+            </div>
             @endif
         </div>
     </div>

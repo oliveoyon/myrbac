@@ -212,7 +212,20 @@ class ReportController extends Controller
         ];
 
         $whr = array_filter($whr);
-        $cases = FormalCase::with(['district:id,name', 'pngo:id,name', 'creator:id,name,full_name'])
+        $cases = FormalCase::select([
+                'id',
+                'central_id',
+                'institute',
+                'full_name',
+                'phone_number',
+                'interview_date',
+                'user_id',
+                'district_id',
+                'pngo_id',
+                'status',
+                'deleted_at',
+            ])
+            ->with(['district:id,name', 'pngo:id,name', 'creator:id,name,full_name'])
             ->withCount([
                 'fileUploads',
                 'messageThreads as case_message_threads_count',
@@ -575,6 +588,42 @@ class ReportController extends Controller
         return $this->inlinePdfResponse($mpdf, 'institution-wise-report.pdf');
     }
 
+    public function districtInstitutionReport(Request $request)
+    {
+        $filters = $this->districtInstitutionFilters($request);
+        [$districts, $pngos] = $this->allowedDistrictsAndPngos();
+        $monthOptions = $this->projectAchievementMonthOptions();
+        $rows = (new CommonService())->showCaseAssistanceDistrictInstitutionWise($filters);
+        $appliedFilters = $this->projectAchievementAppliedFilters($filters);
+
+        return view('dashboard.report.district-institution-report', compact(
+            'rows',
+            'filters',
+            'districts',
+            'pngos',
+            'monthOptions',
+            'appliedFilters'
+        ));
+    }
+
+    public function districtInstitutionReportPdf(Request $request)
+    {
+        $filters = $this->districtInstitutionFilters($request);
+        $rows = (new CommonService())->showCaseAssistanceDistrictInstitutionWise($filters);
+        $appliedFilters = $this->projectAchievementAppliedFilters($filters);
+
+        $mpdf = $this->reportMpdf('P');
+        $html = view('dashboard.report.district-institution-report-pdf', [
+            'title' => 'District and Institution Wise Report',
+            'rows' => $rows,
+            'appliedFilters' => $appliedFilters,
+        ])->render();
+
+        $mpdf->WriteHTML($html);
+
+        return $this->inlinePdfResponse($mpdf, 'district-institution-wise-report.pdf');
+    }
+
     public function projectAchievementReport(Request $request)
     {
         $filters = $this->projectAchievementFilters($request);
@@ -750,6 +799,54 @@ class ReportController extends Controller
         }
 
         return $applied;
+    }
+
+    private function districtInstitutionFilters(Request $request): array
+    {
+        $validated = $request->validate([
+            'district_id' => 'nullable|integer|exists:districts,id',
+            'pngo_id' => 'nullable|integer|exists:pngos,id',
+            'month' => 'nullable|date_format:Y-m',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date|after_or_equal:from_date',
+        ]);
+
+        if (! empty($validated['pngo_id'])) {
+            $pngo = Pngo::find($validated['pngo_id']);
+
+            if (! empty($validated['district_id']) && $pngo && (int) $pngo->district_id !== (int) $validated['district_id']) {
+                abort(403);
+            }
+        }
+
+        $districtIds = Auth::user()->accessibleDistrictIds();
+        $pngoIds = Auth::user()->accessiblePngoIds();
+
+        if (! empty($validated['district_id']) && is_array($districtIds)) {
+            abort_if(! in_array((int) $validated['district_id'], array_map('intval', $districtIds), true), 403);
+        }
+
+        if (! empty($validated['pngo_id']) && is_array($pngoIds)) {
+            abort_if(! in_array((int) $validated['pngo_id'], array_map('intval', $pngoIds), true), 403);
+        }
+
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
+        $month = $validated['month'] ?? null;
+
+        if (! empty($month)) {
+            $monthDate = \Carbon\Carbon::createFromFormat('Y-m', $month);
+            $fromDate = $monthDate->copy()->startOfMonth()->toDateString();
+            $toDate = $monthDate->copy()->endOfMonth()->toDateString();
+        }
+
+        return [
+            'district_id' => $validated['district_id'] ?? null,
+            'pngo_id' => $validated['pngo_id'] ?? null,
+            'month' => $month,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
+        ];
     }
 
     private function institutionOptions(): array

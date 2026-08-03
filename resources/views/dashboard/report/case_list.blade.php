@@ -116,6 +116,41 @@
         white-space: pre-wrap;
     }
 
+    .case-list-loader {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        background: rgba(248, 250, 252, .82);
+        backdrop-filter: blur(2px);
+    }
+
+    .case-list-loader-box {
+        width: min(360px, calc(100vw - 32px));
+        padding: 22px;
+        border: 1px solid #d8e5df;
+        border-radius: 8px;
+        background: #fff;
+        text-align: center;
+        box-shadow: 0 18px 45px rgba(16, 24, 40, .14);
+    }
+
+    .case-list-loader-spinner {
+        width: 44px;
+        height: 44px;
+        margin: 0 auto 12px;
+        border: 4px solid #e8f5ee;
+        border-top-color: #c30f08;
+        border-radius: 999px;
+        animation: caseListSpin .8s linear infinite;
+    }
+
+    @keyframes caseListSpin {
+        to { transform: rotate(360deg); }
+    }
+
     @media (max-width: 576px) {
         .case-message-offcanvas {
             width: 100vw !important;
@@ -301,9 +336,11 @@
                                         <th style="width: 10px">#</th>
                                         <th>Central ID</th>
                                         <th>Institute</th>
+                                        {{--
                                         <th>Name</th>
                                         <th>Phone</th>
                                         <th>Date of Interview</th>
+                                        --}}
                                         <th>Creator</th>
                                         <th>District</th>
                                         <th>PNGO</th>
@@ -387,6 +424,14 @@
     </div>
 </div>
 
+<div class="case-list-loader" id="caseListLoader">
+    <div class="case-list-loader-box">
+        <div class="case-list-loader-spinner"></div>
+        <strong>Loading case list</strong>
+        <div class="text-muted small mt-1">Large filters may take a little time. Please keep this page open.</div>
+    </div>
+</div>
+
 
 
 
@@ -450,8 +495,8 @@
             // Disable the submit button to prevent double-clicking
             $(this).find(':submit').prop('disabled', true);
 
-            // Show the loader overlay
-            $('#loader-overlay').show();
+            // Show the case list loader overlay
+            $('#caseListLoader').css('display', 'flex');
 
             var form = this;
 
@@ -468,17 +513,20 @@
                     if (response && response.cases && Array.isArray(response.cases) &&
                         response.cases.length > 0) {
                         let serialNumber = 1;
+                        let rowsHtml = [];
                         response.cases.forEach(function(caseData) {
                             const isDeleted = Boolean(caseData.deleted_at);
                             var row = `<tr>
                             <td>${serialNumber}</td>
                             <td>${caseData.central_id || 'N/A'}</td>
                             <td>${caseData.institute || 'N/A'}</td>
+                            {{--
                             <td>${caseData.full_name || 'N/A'}</td>
                             <td>${caseData.phone_number || 'N/A'}</td>
                             <td>${caseData.interview_date 
                                 ? new Date(caseData.interview_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) 
                                 : 'N/A'}</td>
+                            --}}
                             <td>${caseData.creator?.full_name || caseData.creator?.name || 'N/A'}</td>
                             <td>${caseData.district?.name || 'N/A'}</td>
                             <td>${caseData.pngo?.name || 'N/A'}</td>
@@ -546,27 +594,31 @@
                             </td>
                         </tr>`;
 
-                            tableBody.append(row);
+                            rowsHtml.push(row);
                             serialNumber++;
                         });
 
+                        tableBody.html(rowsHtml.join(''));
                         $('.contents').removeClass('d-none'); // Show results section
                         $('#errorAlert').hide(); // Hide error alert if successful
                     } else {
                         console.warn("No cases found in response:", response);
+                        $('.contents').removeClass('d-none');
                         $('#errorAlert').show().text('No cases found.');
                     }
                 },
 
                 error: function(xhr, status, error) {
                     console.error("AJAX Error:", status, error);
-                    $('#errorAlert').show().text('An error occurred while fetching data.');
+                    $('.contents').removeClass('d-none');
+                    const message = xhr.responseJSON?.message || 'An error occurred while fetching data.';
+                    $('#errorAlert').show().text(message);
                 },
 
                 complete: function() {
                     // Enable the submit button and hide the loader overlay
                     $(form).find(':submit').prop('disabled', false);
-                    $('#loader-overlay').hide();
+                    $('#caseListLoader').hide();
                 }
             });
         });

@@ -156,7 +156,7 @@ class UserController extends Controller
             $user->full_name = $request->full_name;
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->password = Hash::make('12345678'); // Default password
+            $user->password = Hash::make($request->filled('password') ? $request->password : '12345678');
             $useSingleScope = ! $this->selectedRolesRequireMultiScope($request) || $this->selectedRolesRequireDistrictPngo($request);
             $user->district_id = $useSingleScope && $request->filled('district_id') ? $request->district_id : null;
             $user->pngo_id = $useSingleScope && $request->filled('pngo_id') ? $request->pngo_id : null;
@@ -258,6 +258,14 @@ class UserController extends Controller
             'role_name.*' => 'exists:roles,name',
             'scoped_pngos' => 'nullable|array',
             'scoped_pngos.*' => 'exists:pngos,id',
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^])[A-Za-z\d@$!%*#?&^]{8,}$/'
+            ],
+        ], [
+            'password.regex' => 'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.',
         ]);
 
         $validator->after(function ($validator) use ($request) {
