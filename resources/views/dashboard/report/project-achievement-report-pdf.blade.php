@@ -158,6 +158,18 @@
 
     @php
         $printRows = collect($rows)->filter(fn ($row) => (int) ($row['count'] ?? 0) > 0)->values();
+        $toBanglaNumber = fn ($value) => strtr((string) $value, [
+            '0' => '০',
+            '1' => '১',
+            '2' => '২',
+            '3' => '৩',
+            '4' => '৪',
+            '5' => '৫',
+            '6' => '৬',
+            '7' => '৭',
+            '8' => '৮',
+            '9' => '৯',
+        ]);
     @endphp
 
     <table class="report-table">
@@ -171,9 +183,9 @@
         <tbody>
             @forelse ($printRows as $row)
                 <tr>
-                    <td class="serial">{{ $loop->iteration }}</td>
+                    <td class="serial">{{ $toBanglaNumber($loop->iteration) }}</td>
                     <td>{{ $row['activity'] }}</td>
-                    <td class="count">{{ $row['count'] }} {{ $row['unit'] }}</td>
+                    <td class="count">{{ $toBanglaNumber($row['count']) }} {{ $row['unit'] }}</td>
                 </tr>
             @empty
                 <tr>
@@ -183,7 +195,7 @@
             @if ($printRows->isNotEmpty())
                 <tr class="total-row">
                     <td colspan="2">মোট</td>
-                    <td class="count">{{ $printRows->sum('count') }} জন</td>
+                    <td class="count">{{ $toBanglaNumber($printRows->sum('count')) }} জন</td>
                 </tr>
             @endif
         </tbody>
