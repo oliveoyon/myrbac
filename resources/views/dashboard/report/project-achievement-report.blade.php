@@ -230,6 +230,9 @@
             </div>
         </div>
         <div class="achievement-panel-body table-responsive">
+            @php
+                $displayRows = collect($rows)->filter(fn ($row) => (int) ($row['count'] ?? 0) > 0)->values();
+            @endphp
             <table class="table table-bordered table-striped table-sm achievement-table">
                 <thead>
                     <tr>
@@ -240,19 +243,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($rows as $row)
+                    @forelse ($displayRows as $row)
                         <tr>
                             <td class="achievement-serial">{{ $row['serial'] }}</td>
                             <td>{{ $row['activity'] }}</td>
                             <td class="achievement-count">{{ $row['count'] }}</td>
                             <td class="achievement-unit">{{ $row['unit'] }}</td>
                         </tr>
-                    @endforeach
-                    <tr class="achievement-total-row">
-                        <td colspan="2">Total</td>
-                        <td class="achievement-count">{{ $rows->sum('count') }}</td>
-                        <td class="achievement-unit">জন</td>
-                    </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No data found.</td>
+                        </tr>
+                    @endforelse
+                    @if ($displayRows->isNotEmpty())
+                        <tr class="achievement-total-row">
+                            <td colspan="2">Total</td>
+                            <td class="achievement-count">{{ $displayRows->sum('count') }}</td>
+                            <td class="achievement-unit">জন</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
         </div>
