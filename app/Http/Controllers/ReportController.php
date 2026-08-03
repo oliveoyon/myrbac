@@ -934,7 +934,7 @@ class ReportController extends Controller
         $districtName = $this->projectAchievementBanglaDistrictName($filters['district_id'] ?? null);
 
         $pngoName = ! empty($filters['pngo_id'])
-            ? Pngo::where('id', $filters['pngo_id'])->value('name')
+            ? $this->projectAchievementBanglaPngoName(Pngo::where('id', $filters['pngo_id'])->value('name'))
             : 'সকল বাস্তবায়নকারী সংস্থা';
 
         if (! empty($filters['month'])) {
@@ -973,6 +973,36 @@ class ReportController extends Controller
         return $districts[(int) $districtId]['name_bn']
             ?? District::where('id', $districtId)->value('name')
             ?? 'সকল জেলা';
+    }
+
+    private function projectAchievementBanglaPngoName(?string $pngoName): ?string
+    {
+        if (empty($pngoName)) {
+            return $pngoName;
+        }
+
+        $bangladeshNgos = [
+            'BLAST' => [
+                'english' => 'Bangladesh Legal Aid and Services Trust',
+                'bangla' => 'বাংলাদেশ লিগ্যাল এইড অ্যান্ড সার্ভিসেস ট্রাস্ট',
+            ],
+            'RDRS' => [
+                'english' => 'RDRS Bangladesh',
+                'bangla' => 'আরডিআরএস বাংলাদেশ',
+            ],
+            'IPDS' => [
+                'english' => 'Indigenous Peoples Development Service',
+                'bangla' => 'ইন্ডিজেনাস পিপলস ডেভেলপমেন্ট সার্ভিস',
+            ],
+        ];
+
+        foreach ($bangladeshNgos as $shortName => $ngo) {
+            if (strcasecmp(trim($pngoName), $shortName) === 0 || strcasecmp(trim($pngoName), $ngo['english']) === 0) {
+                return $ngo['bangla'];
+            }
+        }
+
+        return $pngoName;
     }
 
     private function projectAchievementBanglaMonthYear(string $month): string
