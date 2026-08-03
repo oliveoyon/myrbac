@@ -931,22 +931,20 @@ class ReportController extends Controller
 
     private function projectAchievementPdfMeta(array $filters): array
     {
-        $districtName = ! empty($filters['district_id'])
-            ? District::where('id', $filters['district_id'])->value('name')
-            : 'সকল জেলা';
+        $districtName = $this->projectAchievementBanglaDistrictName($filters['district_id'] ?? null);
 
         $pngoName = ! empty($filters['pngo_id'])
             ? Pngo::where('id', $filters['pngo_id'])->value('name')
             : 'সকল বাস্তবায়নকারী সংস্থা';
 
         if (! empty($filters['month'])) {
-            $month = \Carbon\Carbon::createFromFormat('Y-m', $filters['month'])->format('F Y');
+            $month = $this->projectAchievementBanglaMonthYear($filters['month']);
         } elseif (! empty($filters['from_date']) || ! empty($filters['to_date'])) {
-            $from = ! empty($filters['from_date']) ? \Carbon\Carbon::parse($filters['from_date'])->format('j M, Y') : 'শুরুর তারিখ নেই';
-            $to = ! empty($filters['to_date']) ? \Carbon\Carbon::parse($filters['to_date'])->format('j M, Y') : 'শেষ তারিখ নেই';
+            $from = ! empty($filters['from_date']) ? $this->projectAchievementBanglaDate($filters['from_date']) : 'শুরুর তারিখ নেই';
+            $to = ! empty($filters['to_date']) ? $this->projectAchievementBanglaDate($filters['to_date']) : 'শেষ তারিখ নেই';
             $month = $from . ' - ' . $to;
         } else {
-            $month = now()->format('F Y');
+            $month = $this->projectAchievementBanglaMonthYear(now()->format('Y-m'));
         }
 
         return [
@@ -954,6 +952,101 @@ class ReportController extends Controller
             'month' => $month,
             'pngo' => $pngoName ?: 'সকল বাস্তবায়নকারী সংস্থা',
         ];
+    }
+
+    private function projectAchievementBanglaDistrictName($districtId): string
+    {
+        $districts = [
+            1 => ['name_en' => 'Barishal', 'name_bn' => 'বরিশাল'],
+            2 => ['name_en' => 'Khulna', 'name_bn' => 'খুলনা'],
+            3 => ['name_en' => 'Narsingdi', 'name_bn' => 'নরসিংদী'],
+            4 => ['name_en' => 'Cumilla', 'name_bn' => 'কুমিল্লা'],
+            5 => ['name_en' => 'Rangpur', 'name_bn' => 'রংপুর'],
+            6 => ['name_en' => 'Moulvibazar', 'name_bn' => 'মৌলভীবাজার'],
+            7 => ['name_en' => 'Dhaka', 'name_bn' => 'ঢাকা'],
+        ];
+
+        if (empty($districtId)) {
+            return 'সকল জেলা';
+        }
+
+        return $districts[(int) $districtId]['name_bn']
+            ?? District::where('id', $districtId)->value('name')
+            ?? 'সকল জেলা';
+    }
+
+    private function projectAchievementBanglaMonthYear(string $month): string
+    {
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $month);
+
+        return $this->projectAchievementBanglaMonthName((int) $date->format('n'))
+            . ' '
+            . $this->projectAchievementBanglaYear((int) $date->format('Y'));
+    }
+
+    private function projectAchievementBanglaDate(string $date): string
+    {
+        $date = \Carbon\Carbon::parse($date);
+
+        return $this->projectAchievementBanglaNumber($date->format('j'))
+            . ' '
+            . $this->projectAchievementBanglaMonthName((int) $date->format('n'))
+            . ' '
+            . $this->projectAchievementBanglaYear((int) $date->format('Y'));
+    }
+
+    private function projectAchievementBanglaMonthName(int $month): string
+    {
+        $months = [
+            1 => ['name_en' => 'January', 'name_bn' => 'জানুয়ারি'],
+            2 => ['name_en' => 'February', 'name_bn' => 'ফেব্রুয়ারি'],
+            3 => ['name_en' => 'March', 'name_bn' => 'মার্চ'],
+            4 => ['name_en' => 'April', 'name_bn' => 'এপ্রিল'],
+            5 => ['name_en' => 'May', 'name_bn' => 'মে'],
+            6 => ['name_en' => 'June', 'name_bn' => 'জুন'],
+            7 => ['name_en' => 'July', 'name_bn' => 'জুলাই'],
+            8 => ['name_en' => 'August', 'name_bn' => 'আগস্ট'],
+            9 => ['name_en' => 'September', 'name_bn' => 'সেপ্টেম্বর'],
+            10 => ['name_en' => 'October', 'name_bn' => 'অক্টোবর'],
+            11 => ['name_en' => 'November', 'name_bn' => 'নভেম্বর'],
+            12 => ['name_en' => 'December', 'name_bn' => 'ডিসেম্বর'],
+        ];
+
+        return $months[$month]['name_bn'] ?? '';
+    }
+
+    private function projectAchievementBanglaYear(int $year): string
+    {
+        $years = [
+            2023 => '২০২৩',
+            2024 => '২০২৪',
+            2025 => '২০২৫',
+            2026 => '২০২৬',
+            2027 => '২০২৭',
+            2028 => '২০২৮',
+            2029 => '২০২৯',
+            2030 => '২০৩০',
+            2031 => '২০৩১',
+            2032 => '২০৩২',
+        ];
+
+        return $years[$year] ?? $this->projectAchievementBanglaNumber((string) $year);
+    }
+
+    private function projectAchievementBanglaNumber($value): string
+    {
+        return strtr((string) $value, [
+            '0' => '০',
+            '1' => '১',
+            '2' => '২',
+            '3' => '৩',
+            '4' => '৪',
+            '5' => '৫',
+            '6' => '৬',
+            '7' => '৭',
+            '8' => '৮',
+            '9' => '৯',
+        ]);
     }
 
     private function projectAchievementMonthOptions(): array
