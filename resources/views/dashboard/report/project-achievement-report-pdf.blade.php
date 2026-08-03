@@ -156,6 +156,10 @@
         </table>
     </div>
 
+    @php
+        $printRows = collect($rows)->filter(fn ($row) => (int) ($row['count'] ?? 0) > 0)->values();
+    @endphp
+
     <table class="report-table">
         <thead>
             <tr>
@@ -165,17 +169,23 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($rows as $row)
+            @forelse ($printRows as $row)
                 <tr>
                     <td class="serial">{{ $row['serial'] }}</td>
                     <td>{{ $row['activity'] }}</td>
                     <td class="count">{{ $row['count'] }} {{ $row['unit'] }}</td>
                 </tr>
-            @endforeach
-            <tr class="total-row">
-                <td colspan="2">মোট</td>
-                <td class="count">{{ $rows->sum('count') }} জন</td>
-            </tr>
+            @empty
+                <tr>
+                    <td colspan="3" style="text-align: center;">No data found.</td>
+                </tr>
+            @endforelse
+            @if ($printRows->isNotEmpty())
+                <tr class="total-row">
+                    <td colspan="2">মোট</td>
+                    <td class="count">{{ $printRows->sum('count') }} জন</td>
+                </tr>
+            @endif
         </tbody>
     </table>
 </body>
