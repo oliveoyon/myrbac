@@ -114,6 +114,8 @@
         <ul class="sidebar-nav">
             @can('Admin Dashboard')
             <li><a class="nav-link" href="{{ route('dashboard.index') }}"><i class="fas fa-tachometer-alt"></i><span class="nav-text">Dashboard</span></a></li>
+            @endcan
+            @can('View Dashboard 2')
             <li><a class="nav-link" href="{{ route('dashboard.two') }}"><i class="fas fa-chart-pie"></i><span class="nav-text">Dashboard 2</span></a></li>
             @endcan
             @can('View ToDo List')

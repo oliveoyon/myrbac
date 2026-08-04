@@ -32,7 +32,7 @@ Route::get('privacy-policy', function () {
 Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('permission:Admin Dashboard');
-    Route::get('/dashboard-2', [DashboardController::class, 'dashboardTwo'])->name('dashboard.two')->middleware('permission:Admin Dashboard');
+    Route::get('/dashboard-2', [DashboardController::class, 'dashboardTwo'])->name('dashboard.two')->middleware('permission:View Dashboard 2');
     Route::get('/todos', [TodoController::class, 'index'])->name('todos.index')->middleware('permission:View ToDo List');
     Route::post('/todos', [TodoController::class, 'store'])->name('todos.store')->middleware('permission:Create ToDo Task');
     Route::patch('/todos/{todo}/status', [TodoController::class, 'updateStatus'])->name('todos.status')->middleware('permission:Update ToDo Task');
