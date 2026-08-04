@@ -129,13 +129,20 @@ class DashboardController extends Controller
 
         $educationRows = Auth::user()->applyDistrictPngoScope(
             FormalCase::query()
-                ->selectRaw("COALESCE(NULLIF(TRIM(education_level), ''), 'Not Recorded') AS education_label, COUNT(*) AS total")
+                ->selectRaw("education_level, COUNT(*) AS total")
                 ->where('status', '>', 1)
                 ->whereRaw($commonService->interventionConditionSql())
-                ->groupByRaw("COALESCE(NULLIF(TRIM(education_level), ''), 'Not Recorded')")
+                ->groupBy('education_level')
                 ->orderByDesc('total')
-                ->limit(8)
-        )->get();
+        )->get()
+            ->groupBy(fn ($row) => blank($row->education_level) ? 'Not Recorded' : trim($row->education_level))
+            ->map(fn ($rows, $label) => (object) [
+                'education_label' => $label,
+                'total' => (int) $rows->sum('total'),
+            ])
+            ->sortByDesc('total')
+            ->take(8)
+            ->values();
 
         $incomeRows = Auth::user()->applyDistrictPngoScope(
             FormalCase::query()
