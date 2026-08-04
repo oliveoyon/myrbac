@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -96,3 +97,111 @@ Artisan::command('app:safe-clean-database
 
     return self::SUCCESS;
 })->purpose('Safely clean operational data while preserving roles, permissions, role-permission mappings, categories, districts, and PNGOs.');
+
+Artisan::command('app:delete-formal-cases-by-district
+    {district_id : District ID to clean}
+    {--dry-run : Show counts only}
+    {--force : Run without interactive confirmation}', function () {
+    /** @var ClosureCommand $this */
+    $districtId = (int) $this->argument('district_id');
+    $district = DB::table('districts')->where('id', $districtId)->first();
+
+    if (! $district) {
+        $this->error("District id {$districtId} was not found.");
+        return self::FAILURE;
+    }
+
+    $caseIds = DB::table('formal_cases')->where('district_id', $districtId)->pluck('id');
+
+    $this->warn("Target district: {$district->name} (ID: {$districtId})");
+    $this->line('Formal cases: '.$caseIds->count());
+
+    if ($caseIds->isEmpty()) {
+        $this->info('No formal cases found for this district.');
+        return self::SUCCESS;
+    }
+
+    $fileRows = DB::table('file_uploads')
+        ->whereIn('case_id', $caseIds)
+        ->get(['id', 'case_id', 'file_name', 'file_path']);
+
+    $counts = [
+        'file_uploads' => $fileRows->count(),
+        'follow_up_interventions' => DB::table('follow_up_interventions')->whereIn('central_id', $caseIds)->count(),
+        'case_messages' => Schema::hasTable('case_messages')
+            ? DB::table('case_messages')->whereIn('formal_case_id', $caseIds)->count()
+            : 0,
+        'case_message_threads' => Schema::hasTable('case_message_threads')
+            ? DB::table('case_message_threads')->whereIn('formal_case_id', $caseIds)->count()
+            : 0,
+    ];
+
+    foreach ($counts as $table => $count) {
+        $this->line(str_replace('_', ' ', ucfirst($table)).': '.$count);
+    }
+
+    if ($this->option('dry-run')) {
+        $this->info('Dry run complete. No data or files were deleted.');
+        return self::SUCCESS;
+    }
+
+    if (! $this->option('force') && ! $this->confirm('This will permanently delete these Rangpur formal cases and attachments. Continue?', false)) {
+        $this->info('Cleanup cancelled.');
+        return self::SUCCESS;
+    }
+
+    $filePaths = $fileRows
+        ->flatMap(function ($file) {
+            return array_filter([
+                $file->file_path,
+                $file->file_name ? 'uploads/formal_cases/'.$file->file_name : null,
+            ]);
+        })
+        ->unique()
+        ->values();
+
+    $driver = DB::getDriverName();
+
+    try {
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        } elseif ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = OFF');
+        }
+
+        DB::transaction(function () use ($caseIds) {
+            $caseIds->chunk(500)->each(function ($ids) {
+                if (Schema::hasTable('case_messages')) {
+                    DB::table('case_messages')->whereIn('formal_case_id', $ids)->delete();
+                }
+
+                if (Schema::hasTable('case_message_threads')) {
+                    DB::table('case_message_threads')->whereIn('formal_case_id', $ids)->delete();
+                }
+
+                DB::table('file_uploads')->whereIn('case_id', $ids)->delete();
+                DB::table('follow_up_interventions')->whereIn('central_id', $ids)->delete();
+                DB::table('formal_cases')->whereIn('id', $ids)->delete();
+            });
+        });
+    } finally {
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        } elseif ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = ON');
+        }
+    }
+
+    $deletedFiles = 0;
+    foreach ($filePaths as $path) {
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+            $deletedFiles++;
+        }
+    }
+
+    $this->info('Rangpur formal case cleanup completed.');
+    $this->line('Attachment files deleted: '.$deletedFiles);
+
+    return self::SUCCESS;
+})->purpose('Permanently delete formal cases and associated records for one district.');

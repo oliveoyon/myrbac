@@ -635,6 +635,34 @@
         <div class="monitor-panel span-4">
             <div class="monitor-panel-header">
                 <div>
+                    <h2>Education Profile</h2>
+                    <small>Recorded education levels among verified interventions</small>
+                </div>
+            </div>
+            <div class="monitor-panel-body">
+                <div class="monitor-chart compact">
+                    <canvas id="educationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="monitor-panel span-4">
+            <div class="monitor-panel-header">
+                <div>
+                    <h2>Income Profile</h2>
+                    <small>Monthly income bands among verified interventions</small>
+                </div>
+            </div>
+            <div class="monitor-panel-body">
+                <div class="monitor-chart compact">
+                    <canvas id="incomeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="monitor-panel span-4">
+            <div class="monitor-panel-header">
+                <div>
                     <h2>Disability Coverage</h2>
                     <small>Disability status among verified formal interventions</small>
                 </div>
@@ -1065,6 +1093,51 @@
                 label: 'Cases',
                 data: monitorData.age.values,
                 backgroundColor: [monitorPalette.gold, monitorPalette.teal, monitorPalette.green, monitorPalette.blue, monitorPalette.violet, monitorPalette.slate],
+                borderRadius: 6,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, ticks: { precision: 0 } },
+            },
+        },
+    });
+
+    makeChart('educationChart', {
+        type: 'bar',
+        data: {
+            labels: monitorData.education.labels,
+            datasets: [{
+                label: 'Cases',
+                data: monitorData.education.values,
+                backgroundColor: monitorPalette.teal,
+                borderRadius: 6,
+            }],
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, ticks: { precision: 0 } },
+                y: { grid: { display: false } },
+            },
+        },
+    });
+
+    makeChart('incomeChart', {
+        type: 'bar',
+        data: {
+            labels: monitorData.income.labels,
+            datasets: [{
+                label: 'Cases',
+                data: monitorData.income.values,
+                backgroundColor: [monitorPalette.slate, monitorPalette.gold, monitorPalette.green, monitorPalette.blue, monitorPalette.violet],
                 borderRadius: 6,
             }],
         },

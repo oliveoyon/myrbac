@@ -127,6 +127,29 @@ class DashboardController extends Controller
                 ->whereRaw($commonService->interventionConditionSql())
         )->first();
 
+        $educationRows = Auth::user()->applyDistrictPngoScope(
+            FormalCase::query()
+                ->selectRaw("COALESCE(NULLIF(TRIM(education_level), ''), 'Not Recorded') AS education_label, COUNT(*) AS total")
+                ->where('status', '>', 1)
+                ->whereRaw($commonService->interventionConditionSql())
+                ->groupByRaw("COALESCE(NULLIF(TRIM(education_level), ''), 'Not Recorded')")
+                ->orderByDesc('total')
+                ->limit(8)
+        )->get();
+
+        $incomeRows = Auth::user()->applyDistrictPngoScope(
+            FormalCase::query()
+                ->selectRaw("
+                    SUM(CASE WHEN monthly_income IS NULL OR monthly_income <= 0 THEN 1 ELSE 0 END) AS no_income,
+                    SUM(CASE WHEN monthly_income BETWEEN 1 AND 5000 THEN 1 ELSE 0 END) AS income_1_5000,
+                    SUM(CASE WHEN monthly_income BETWEEN 5001 AND 10000 THEN 1 ELSE 0 END) AS income_5001_10000,
+                    SUM(CASE WHEN monthly_income BETWEEN 10001 AND 20000 THEN 1 ELSE 0 END) AS income_10001_20000,
+                    SUM(CASE WHEN monthly_income > 20000 THEN 1 ELSE 0 END) AS income_20001_plus
+                ")
+                ->where('status', '>', 1)
+                ->whereRaw($commonService->interventionConditionSql())
+        )->first();
+
         $interventionSignals = $this->dashboardInterventionSignals($commonService);
         $lsidServiceTypes = $this->dashboardLsidServiceTypes();
         $dataQuality = $this->dashboardDataQuality($commonService);
@@ -188,6 +211,20 @@ class DashboardController extends Controller
                     (int) ($ageRows->age_35_44 ?? 0),
                     (int) ($ageRows->age_45_plus ?? 0),
                     (int) ($ageRows->unknown_age ?? 0),
+                ],
+            ],
+            'education' => [
+                'labels' => $educationRows->pluck('education_label')->values(),
+                'values' => $educationRows->pluck('total')->map(fn ($value) => (int) $value)->values(),
+            ],
+            'income' => [
+                'labels' => ['0 / Not Recorded', '1-5,000', '5,001-10,000', '10,001-20,000', '20,001+'],
+                'values' => [
+                    (int) ($incomeRows->no_income ?? 0),
+                    (int) ($incomeRows->income_1_5000 ?? 0),
+                    (int) ($incomeRows->income_5001_10000 ?? 0),
+                    (int) ($incomeRows->income_10001_20000 ?? 0),
+                    (int) ($incomeRows->income_20001_plus ?? 0),
                 ],
             ],
             'disability_share' => [

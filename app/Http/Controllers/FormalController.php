@@ -797,8 +797,16 @@ class FormalController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:51200',
+            'file' => 'required|file|max:51200',
         ]);
+
+        $extension = strtolower($request->file('file')->getClientOriginalExtension());
+
+        if (! in_array($extension, ['xlsx', 'xls', 'csv'], true)) {
+            return redirect()->back()->withErrors([
+                'file' => 'The file field must be a file of type: xlsx, xls, csv.',
+            ])->withInput();
+        }
 
         class_exists(\App\Exports\FormalCaseImportTemplateExport::class);
 
@@ -908,6 +916,8 @@ private function normalizeFormalCaseImportRow(array $row, array $templateFields)
     if (blank($normalized['disability'] ?? null)) {
         $normalized['disability'] = 'No';
     }
+
+    $normalized['family_informed'] = strcasecmp((string) ($normalized['family_informed'] ?? ''), 'Yes') === 0 ? 'Yes' : 'No';
 
     foreach ($this->formalCaseImportIntegerFields() as $field) {
         if (filled($normalized[$field] ?? null)) {
