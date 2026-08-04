@@ -172,28 +172,36 @@
             </li>
             @endcanany
 
-            @canany(['View Formal Cases Form', 'View LSID Register', 'View LSID Management', 'View Formal Case Import Page', 'View LSID Import Page'])
+            @php
+                $canShowCentralIdForm = auth()->user()->can('View Formal Cases Form') && auth()->user()->can('Create Formal Case');
+                $canShowLsidRegister = auth()->user()->can('View LSID Register') && auth()->user()->can('Create LSID Register');
+                $canShowLsidManagement = auth()->user()->can('View LSID Management');
+                $canShowFormalCaseImport = auth()->user()->can('View Formal Case Import Page') && auth()->user()->can('Import Formal Cases');
+                $canShowLsidImport = auth()->user()->can('View LSID Import Page') && auth()->user()->can('Import LSID Registers');
+                $canShowCentralIdMenu = $canShowCentralIdForm || $canShowLsidRegister || $canShowLsidManagement || $canShowFormalCaseImport || $canShowLsidImport;
+            @endphp
+            @if($canShowCentralIdMenu)
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">Manage Central ID</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
-                    @can('View Formal Cases Form')
+                    @if($canShowCentralIdForm)
                     <li><a class="nav-link nav-sublink" href="{{ route('form.index') }}"><i class="fas fa-database"></i><span class="nav-text">Central ID Form</span></a></li>
-                    @endcan
-                    @can('View LSID Register')
+                    @endif
+                    @if($canShowLsidRegister)
                     <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.index') }}"><i class="fas fa-info-circle"></i><span class="nav-text">LSID Register</span></a></li>
-                    @endcan
-                    @can('View LSID Management')
+                    @endif
+                    @if($canShowLsidManagement)
                     <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.manage') }}"><i class="fas fa-table-list"></i><span class="nav-text">LSID Management</span></a></li>
-                    @endcan
-                    @can('View Formal Case Import Page')
+                    @endif
+                    @if($canShowFormalCaseImport)
                     <li><a class="nav-link nav-sublink" href="{{ route('import.view') }}"><i class="fas fa-database"></i><span class="nav-text">Bulk Central ID</span></a></li>
-                    @endcan
-                    @can('View LSID Import Page')
+                    @endif
+                    @if($canShowLsidImport)
                     <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.import.view') }}"><i class="fas fa-file-import"></i><span class="nav-text">Bulk LSID Register</span></a></li>
-                    @endcan
+                    @endif
                 </ul>
             </li>
-            @endcanany
+            @endif
 
             @canany(['View Case List Report', 'View Intervention Report Page', 'View LSID Report', 'View District Summary Report', 'View PNGO Summary Report', 'View Institution Wise Report', 'View District Institution Report', 'View Project Achievement Report', 'Export Formal Cases'])
             <li class="has-submenu">
