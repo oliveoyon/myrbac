@@ -66,6 +66,8 @@ class FormalController extends Controller
             'convicted_length_details' => 'nullable|string',
             'convicted_sentence_expire_details' => 'nullable|string',
             'intervention_taken' => 'required|string|max:255',
+            'fileUpload' => 'nullable|array',
+            'fileUpload.*' => 'file',
         ];
 
         if ($formalCaseEntryScope['requires_selection']) {
@@ -265,6 +267,8 @@ class FormalController extends Controller
         $case->result_description = $request->result_description;
         $case->file_closure_date = $request->file_closure_date;
     
+        $storedUploadPaths = [];
+
         DB::beginTransaction();
 
         try {
@@ -291,38 +295,10 @@ class FormalController extends Controller
                 'followup_taken_on' => $followup->intervention_taken_date,
             ];
 
-            // Initialize an array to store file upload details
-            $uploadedFiles = [];
+            $uploadedFiles = $this->storeFormalCaseUploads($request, $case, $storedUploadPaths);
 
-            // Handle file uploads, if any
-            if ($request->hasFile('fileUpload')) {
-                $logData['file_count'] = count($request->file('fileUpload'));
-
-                foreach ($request->file('fileUpload') as $file) {
-                    $originalName = $file->getClientOriginalName();
-                    $extension = $file->getClientOriginalExtension();
-                    $baseName = pathinfo($originalName, PATHINFO_FILENAME);
-                    $newFileName = $case->id . '_' . Str::slug($baseName) . '_' . uniqid() . '.' . $extension;
-
-                    // Store the file
-                    $path = $file->storeAs('uploads/formal_cases', $newFileName, 'public');
-
-                    // Save the file upload record
-                    FileUpload::create([
-                        'case_id' => $case->id,
-                        'file_name' => $newFileName,
-                        'file_path' => $path,
-                        'uploaded_by' => auth()->id(),
-                    ]);
-
-                    // Add file details to the log
-                    $uploadedFiles[] = [
-                        'file_name' => $newFileName,
-                        'file_path' => $path,
-                    ];
-                }
-
-                // Add uploaded files details to the log
+            if (! empty($uploadedFiles)) {
+                $logData['file_count'] = count($uploadedFiles);
                 $logData['uploaded_files'] = $uploadedFiles;
             }
 
@@ -333,8 +309,11 @@ class FormalController extends Controller
             DB::commit();
 
             return redirect()->route('form.index')->with('success', 'Case has been successfully created.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            $this->deleteStoredFormalCaseUploads($storedUploadPaths);
+            $this->restoreFormSubmissionToken($request, 'formal_case_create_tokens');
+
             return redirect()->back()->withInput()->with('error', 'An error occurred: ' . $e->getMessage());
         }
 
@@ -366,6 +345,8 @@ class FormalController extends Controller
             'convicted_length_details' => 'nullable|string',
             'convicted_sentence_expire_details' => 'nullable|string',
             'intervention_taken' => 'required|string|max:255',
+            'fileUpload' => 'nullable|array',
+            'fileUpload.*' => 'file',
         ], [
             'institute.required' => 'Institute is required. Please enter your name.',
             'institute.string' => 'Institute must be a valid text.',
@@ -530,6 +511,8 @@ class FormalController extends Controller
         $case->result_description = $request->result_description;
         $case->file_closure_date = $request->file_closure_date;
 
+        $storedUploadPaths = [];
+
         DB::beginTransaction();
 
         try {
@@ -555,37 +538,10 @@ class FormalController extends Controller
                 'followup_taken_on' => $followup->intervention_taken_date,
             ];
 
-            // Initialize an array to store file upload details
-            $uploadedFiles = [];
+            $uploadedFiles = $this->storeFormalCaseUploads($request, $case, $storedUploadPaths);
 
-            // Handle file uploads, if any
-            if ($request->hasFile('fileUpload')) {
-                $logData['file_count'] = count($request->file('fileUpload'));
-
-                foreach ($request->file('fileUpload') as $file) {
-                    $originalName = $file->getClientOriginalName();
-                    $extension = $file->getClientOriginalExtension();
-                    $newFileName = $case->id . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $extension;
-
-                    // Store the file
-                    $path = $file->storeAs('uploads/formal_cases', $newFileName, 'public');
-
-                    // Save the file upload record
-                    FileUpload::create([
-                        'case_id' => $case->id,
-                        'file_name' => $newFileName,
-                        'file_path' => $path, // optional if your table has this column
-                        'uploaded_by' => auth()->id(),
-                    ]);
-
-                    // Add file details to the log
-                    $uploadedFiles[] = [
-                        'file_name' => $newFileName,
-                        'file_path' => $path,
-                    ];
-                }
-
-                // Add uploaded files details to the log
+            if (! empty($uploadedFiles)) {
+                $logData['file_count'] = count($uploadedFiles);
                 $logData['uploaded_files'] = $uploadedFiles;
             }
 
@@ -596,8 +552,11 @@ class FormalController extends Controller
             DB::commit();
 
             return redirect()->route('form.index')->with('success', 'Case has been successfully edited.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            $this->deleteStoredFormalCaseUploads($storedUploadPaths);
+            $this->restoreFormSubmissionToken($request, 'formal_case_edit_tokens');
+
             return redirect()->back()->withInput()->with('error', 'An error occurred: ' . $e->getMessage());
         }
 
@@ -636,6 +595,13 @@ class FormalController extends Controller
         $case = FormalCase::findOrFail($request->file_id);
         $this->authorizeFormalCaseScope($case);
 
+        if (! $this->availableCaseFiles($case->id)->isNotEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No available attachment was found for this case.',
+            ], 404);
+        }
+
         Session::put('file_id', $request->file_id);
         return response()->json(['success' => true, 'redirect_url' => route('edit-file.get')]);
     }
@@ -651,9 +617,82 @@ class FormalController extends Controller
         $case = FormalCase::findOrFail($caseId);
         $this->authorizeFormalCaseScope($case);
 
-        $caseFiles = FileUpload::where('case_id', $caseId)->orderBy('id', 'asc')->get();
+        $caseFiles = $this->availableCaseFiles($caseId);
+
+        if ($caseFiles->isEmpty()) {
+            return redirect()->route('case_list')->with('error', 'No available attachment was found for this case.');
+        }
 
         return view('dashboard.admin.get-file', compact('caseFiles'));
+    }
+
+    private function availableCaseFiles($caseId)
+    {
+        return FileUpload::where('case_id', $caseId)
+            ->orderBy('id', 'asc')
+            ->get()
+            ->filter(fn ($upload) => $this->caseFileExists($upload))
+            ->values();
+    }
+
+    private function caseFileExists(FileUpload $upload): bool
+    {
+        $paths = array_filter([
+            $upload->file_path,
+            $upload->file_name ? 'uploads/formal_cases/' . $upload->file_name : null,
+        ]);
+
+        foreach (array_unique($paths) as $path) {
+            if (Storage::disk('public')->exists($path)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function storeFormalCaseUploads(Request $request, FormalCase $case, array &$storedUploadPaths): array
+    {
+        if (! $request->hasFile('fileUpload')) {
+            return [];
+        }
+
+        $uploadedFiles = [];
+
+        foreach ($request->file('fileUpload') as $file) {
+            $originalName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+            $newFileName = $case->id . '_' . Str::slug($baseName) . '_' . uniqid() . '.' . $extension;
+            $path = $file->storeAs('uploads/formal_cases', $newFileName, 'public');
+
+            if (! $path) {
+                throw new \RuntimeException('The selected attachment could not be uploaded. Please try again.');
+            }
+
+            $storedUploadPaths[] = $path;
+
+            FileUpload::create([
+                'case_id' => $case->id,
+                'file_name' => $newFileName,
+                'file_path' => $path,
+                'uploaded_by' => auth()->id(),
+            ]);
+
+            $uploadedFiles[] = [
+                'file_name' => $newFileName,
+                'file_path' => $path,
+            ];
+        }
+
+        return $uploadedFiles;
+    }
+
+    private function deleteStoredFormalCaseUploads(array $paths): void
+    {
+        foreach (array_unique(array_filter($paths)) as $path) {
+            Storage::disk('public')->delete($path);
+        }
     }
 
     public function deleteCaseFile(FileUpload $fileUpload)
@@ -1176,6 +1215,20 @@ private function consumeFormSubmissionToken(Request $request, string $sessionKey
     session([$sessionKey => array_values($tokens)]);
 
     return true;
+}
+
+private function restoreFormSubmissionToken(Request $request, string $sessionKey): void
+{
+    $token = $request->input('_form_submission_token');
+
+    if (! $token) {
+        return;
+    }
+
+    $tokens = session($sessionKey, []);
+    $tokens[] = $token;
+
+    session([$sessionKey => array_slice(array_values(array_unique($tokens)), -20)]);
 }
 
 

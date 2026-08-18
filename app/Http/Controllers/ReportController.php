@@ -16,6 +16,7 @@ use App\Services\CommonService;
 use App\Exports\FormalCaseImportTemplateExport;
 use App\Exports\FormalCaseImportTemplateFields;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Services\LogService;
 use ZipArchive;
 
@@ -250,7 +251,45 @@ class ReportController extends Controller
         (new CommonService())->applyInterventionDateRange($cases, $request->from_date, $request->to_date);
 
         $cases1 = $cases->latest('id')->get();
+        $this->applyAvailableFileUploadCounts($cases1);
+
         return response()->json(['cases' => $cases1]);
+    }
+
+    private function applyAvailableFileUploadCounts($cases): void
+    {
+        $caseIds = $cases->pluck('id')->filter()->values();
+
+        if ($caseIds->isEmpty()) {
+            return;
+        }
+
+        $availableCounts = DB::table('file_uploads')
+            ->whereIn('case_id', $caseIds)
+            ->get(['case_id', 'file_name', 'file_path'])
+            ->filter(fn ($file) => $this->storedFormalCaseFileExists($file))
+            ->groupBy('case_id')
+            ->map(fn ($files) => $files->count());
+
+        $cases->each(function ($case) use ($availableCounts) {
+            $case->file_uploads_count = (int) ($availableCounts[$case->id] ?? 0);
+        });
+    }
+
+    private function storedFormalCaseFileExists($file): bool
+    {
+        $paths = array_filter([
+            $file->file_path ?? null,
+            ! empty($file->file_name) ? 'uploads/formal_cases/' . $file->file_name : null,
+        ]);
+
+        foreach (array_unique($paths) as $path) {
+            if (Storage::disk('public')->exists($path)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function generateForm(Request $request)
