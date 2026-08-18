@@ -835,13 +835,10 @@
             success: function(response) {
                 if (response.success) {
                     window.location.href = response.redirect_url; // Redirect to edit form
-                } else {
-                    Swal.fire('No attachment', response.message || 'No available attachment was found for this case.', 'info');
                 }
             },
             error: function(xhr) {
                 console.error("AJAX request failed", xhr);
-                Swal.fire('No attachment', xhr.responseJSON?.message || 'No available attachment was found for this case.', 'info');
             }
         });
     });
@@ -861,10 +858,14 @@
             success: function(response) {
                 if (response.success) {
                     window.location.href = response.redirect_url; // Redirect to edit form
+                    return;
                 }
+
+                Swal.fire('No attachment', response.message || 'No available attachment was found for this case.', 'info');
             },
             error: function(xhr) {
                 console.error("AJAX request failed", xhr);
+                Swal.fire('No attachment', xhr.responseJSON?.message || 'No available attachment was found for this case.', 'info');
             }
         });
     });

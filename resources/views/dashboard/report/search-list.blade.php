@@ -107,9 +107,11 @@
                                             <a href="javascript:void(0);" class="edit-link" data-edit-id="{{ $caseData->id }}">
                                                 <i class="fa fa-edit"></i>
                                             </a>
-                                            <a href="javascript:void(0);" class="file-link" data-file-id="{{ $caseData->id }}">
+                                            @if((int) ($caseData->file_uploads_count ?? 0) > 0)
+                                            <a href="javascript:void(0);" class="file-link" data-file-id="{{ $caseData->id }}" title="View attachment">
                                                 <i class="fa fa-paperclip"></i>
                                             </a>
+                                            @endif
                                         </td>
                                     </tr>
                                     @endforeach
@@ -398,10 +400,14 @@
             success: function(response) {
                 if (response.success) {
                     window.location.href = response.redirect_url; // Redirect to edit form
+                    return;
                 }
+
+                Swal.fire('No attachment', response.message || 'No available attachment was found for this case.', 'info');
             },
             error: function(xhr) {
                 console.error("AJAX request failed", xhr);
+                Swal.fire('No attachment', xhr.responseJSON?.message || 'No available attachment was found for this case.', 'info');
             }
         });
     });

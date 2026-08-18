@@ -1146,6 +1146,8 @@ class ReportController extends Controller
             });
 
         $cases = Auth::user()->applyDistrictPngoScope($cases)->get();
+        $this->applyAvailableFileUploadCounts($cases);
+
         return view('dashboard.report.search-list', compact('cases'));
         // return response()->json(['cases' => $cases1]);
     }
