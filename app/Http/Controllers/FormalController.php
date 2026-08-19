@@ -66,8 +66,8 @@ class FormalController extends Controller
             'convicted_length_details' => 'nullable|string',
             'convicted_sentence_expire_details' => 'nullable|string',
             'intervention_taken' => 'required|string|max:255',
-            'fileUpload' => 'nullable|array',
-            'fileUpload.*' => 'file',
+            'fileUpload' => 'nullable|array|max:20',
+            'fileUpload.*' => 'file|max:2048|mimes:pdf,jpg,jpeg,png,doc,docx',
         ];
 
         if ($formalCaseEntryScope['requires_selection']) {
@@ -96,6 +96,11 @@ class FormalController extends Controller
             'intervention_taken.required' => 'Please specify the intervention taken.',
             'intervention_taken.string' => 'Intervention details must be in text format.',
             'intervention_taken.max' => 'Intervention details should not exceed 255 characters.',
+            'fileUpload.array' => 'Please upload valid attachment files.',
+            'fileUpload.max' => 'You can upload a maximum of 20 attachment files at a time.',
+            'fileUpload.*.file' => 'Each attachment must be a valid file.',
+            'fileUpload.*.max' => 'Each attachment must not be larger than 2 MB.',
+            'fileUpload.*.mimes' => 'Attachments must be PDF, JPG, JPEG, PNG, DOC, or DOCX files only.',
         ]);
     
         // Check if the validation fails
@@ -345,8 +350,8 @@ class FormalController extends Controller
             'convicted_length_details' => 'nullable|string',
             'convicted_sentence_expire_details' => 'nullable|string',
             'intervention_taken' => 'required|string|max:255',
-            'fileUpload' => 'nullable|array',
-            'fileUpload.*' => 'file',
+            'fileUpload' => 'nullable|array|max:20',
+            'fileUpload.*' => 'file|max:2048|mimes:pdf,jpg,jpeg,png,doc,docx',
         ], [
             'institute.required' => 'Institute is required. Please enter your name.',
             'institute.string' => 'Institute must be a valid text.',
@@ -366,6 +371,11 @@ class FormalController extends Controller
             'intervention_taken.required' => 'Please specify the intervention taken.',
             'intervention_taken.string' => 'Intervention details must be in text format.',
             'intervention_taken.max' => 'Intervention details should not exceed 255 characters.',
+            'fileUpload.array' => 'Please upload valid attachment files.',
+            'fileUpload.max' => 'You can upload a maximum of 20 attachment files at a time.',
+            'fileUpload.*.file' => 'Each attachment must be a valid file.',
+            'fileUpload.*.max' => 'Each attachment must not be larger than 2 MB.',
+            'fileUpload.*.mimes' => 'Attachments must be PDF, JPG, JPEG, PNG, DOC, or DOCX files only.',
         ]);
 
         // Check if the validation fails

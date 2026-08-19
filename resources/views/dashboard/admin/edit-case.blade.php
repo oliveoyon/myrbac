@@ -1784,7 +1784,8 @@
                                     <div class="col-md-6">
                                         <label for="fileUpload" class="form-label">Upload Files (Multiple)</label>
                                         <input type="file" class="form-control" id="fileUpload"
-                                            name="fileUpload[]" multiple>
+                                            name="fileUpload[]" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
+                                        <small class="text-muted">Allowed: PDF, JPG, JPEG, PNG, DOC, DOCX. Maximum 2 MB per file, up to 20 files.</small>
                                     </div>
                                 </div>
                             </div>
