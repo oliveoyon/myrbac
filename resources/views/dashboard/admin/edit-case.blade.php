@@ -2025,15 +2025,29 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        function resetSubmitButtons() {
+            document.querySelectorAll('[data-single-submit-form] [type="submit"]').forEach(function(button) {
+                button.disabled = false;
+                button.textContent = button.dataset.originalText || button.dataset.submitLabel || 'Submit';
+            });
+        }
+
+        resetSubmitButtons();
+        window.addEventListener('pageshow', resetSubmitButtons);
+
         document.querySelectorAll('[data-single-submit-form]').forEach(function(form) {
-            form.addEventListener('submit', function() {
+            form.addEventListener('submit', function(event) {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
                 const submitButton = form.querySelector('[type="submit"]');
 
                 if (!submitButton || submitButton.disabled) {
                     return;
                 }
 
-                submitButton.dataset.originalText = submitButton.textContent.trim();
+                submitButton.dataset.originalText = submitButton.dataset.originalText || submitButton.textContent.trim();
                 submitButton.disabled = true;
                 submitButton.textContent = 'Submitting...';
             });

@@ -671,9 +671,15 @@
                         <div class="accordion-body">
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label for="interview_date" class="form-label">Date of Interview</label>
-                                    <input type="date" class="form-control" id="interview_date"
+                                    <label for="interview_date" class="form-label">Date of Interview <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control @error('interview_date') is-invalid @enderror" id="interview_date"
                                         name="interview_date">
+                                    <small class="text-muted">Current month data is allowed. Previous month data is allowed until the configured cutoff day of this month.</small>
+                                    @error('interview_date')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
                                 </div>
                                 <div class="col-md-4">
                                     <label for="interview_time" class="form-label">Time of Interview</label>
@@ -1787,6 +1793,105 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const lockConfig = @json($interviewDateEntryLock ?? ['enabled' => true, 'cutoffDay' => 5, 'today' => now(config('app.timezone'))->toDateString()]);
+        const interviewDateInput = document.getElementById('interview_date');
+        const caseForm = interviewDateInput ? interviewDateInput.closest('form') : null;
+
+        if (!interviewDateInput || !lockConfig.enabled) {
+            return;
+        }
+
+        const today = parseDate(lockConfig.today);
+        const cutoffDay = Math.min(28, Math.max(1, parseInt(lockConfig.cutoffDay, 10) || 5));
+
+        function parseDate(value) {
+            const parts = String(value || '').split('-').map(Number);
+
+            if (parts.length !== 3 || parts.some(isNaN)) {
+                return null;
+            }
+
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+
+        function formatMonthYear(date) {
+            return date.toLocaleDateString('en-GB', {
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function showDateLockMessage(message) {
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Interview date not allowed',
+                    text: message,
+                    confirmButtonColor: '#2f7d62'
+                });
+            } else {
+                alert(message);
+            }
+        }
+
+        function validateInterviewDate(showMessage = true) {
+            if (!interviewDateInput.value) {
+                return true;
+            }
+
+            const selectedDate = parseDate(interviewDateInput.value);
+
+            if (!selectedDate || !today) {
+                return true;
+            }
+
+            if (selectedDate > today) {
+                if (showMessage) {
+                    showDateLockMessage('Date of Interview cannot be later than today.');
+                }
+                return false;
+            }
+
+            const deadline = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, cutoffDay);
+
+            if (today > deadline) {
+                if (showMessage) {
+                    showDateLockMessage(formatMonthYear(selectedDate) + ' interview data could be entered until ' + formatDate(deadline) + '.');
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        interviewDateInput.addEventListener('change', function() {
+            if (!validateInterviewDate(true)) {
+                interviewDateInput.value = '';
+                interviewDateInput.focus();
+            }
+        });
+
+        if (caseForm) {
+            caseForm.addEventListener('submit', function(event) {
+                if (!validateInterviewDate(true)) {
+                    event.preventDefault();
+                    interviewDateInput.value = '';
+                    interviewDateInput.focus();
+                }
+            });
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
         const districtSelect = document.getElementById('district_id');
         const pngoSelect = document.getElementById('pngo_id');
 
@@ -2288,15 +2393,29 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        function resetSubmitButtons() {
+            document.querySelectorAll('[data-single-submit-form] [type="submit"]').forEach(function(button) {
+                button.disabled = false;
+                button.textContent = button.dataset.originalText || button.dataset.submitLabel || 'Submit';
+            });
+        }
+
+        resetSubmitButtons();
+        window.addEventListener('pageshow', resetSubmitButtons);
+
         document.querySelectorAll('[data-single-submit-form]').forEach(function(form) {
-            form.addEventListener('submit', function() {
+            form.addEventListener('submit', function(event) {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
                 const submitButton = form.querySelector('[type="submit"]');
 
                 if (!submitButton || submitButton.disabled) {
                     return;
                 }
 
-                submitButton.dataset.originalText = submitButton.textContent.trim();
+                submitButton.dataset.originalText = submitButton.dataset.originalText || submitButton.textContent.trim();
                 submitButton.disabled = true;
                 submitButton.textContent = 'Submitting...';
             });

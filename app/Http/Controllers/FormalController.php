@@ -16,6 +16,7 @@ use App\Exports\FormalCaseImportTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
+use App\Services\CaseInterviewDatePolicy;
 use App\Services\CommonService;
 use Illuminate\Support\Facades\DB;
 use App\Services\LogService;
@@ -26,6 +27,7 @@ class FormalController extends Controller
     public function index()
     {
         $formalCaseEntryScope = $this->formalCaseEntryScope();
+        $interviewDateEntryLock = app(CaseInterviewDatePolicy::class)->frontendConfig(Auth::user());
 
         if ($formalCaseEntryScope['error']) {
             return redirect()->route('dashboard.index')->with('error', $formalCaseEntryScope['error']);
@@ -33,7 +35,7 @@ class FormalController extends Controller
 
         $submissionToken = $this->createFormSubmissionToken('formal_case_create_tokens');
 
-        return view('dashboard.admin.formal1', compact('submissionToken', 'formalCaseEntryScope'));
+        return view('dashboard.admin.formal1', compact('submissionToken', 'formalCaseEntryScope', 'interviewDateEntryLock'));
     }
 
     public function courtPolicePrison(Request $request)
@@ -65,6 +67,7 @@ class FormalController extends Controller
             'ministerial_communication_details' => 'nullable|string',
             'convicted_length_details' => 'nullable|string',
             'convicted_sentence_expire_details' => 'nullable|string',
+            'interview_date' => 'required|date',
             'intervention_taken' => 'required|string|max:255',
             'fileUpload' => 'nullable|array|max:20',
             'fileUpload.*' => 'file|max:2048|mimes:pdf,jpg,jpeg,png,doc,docx',
@@ -92,6 +95,8 @@ class FormalController extends Controller
             'age.min' => 'Age cannot be negative.',
             'age.max' => 'Age should not exceed 150.',
             'family_informed.required' => 'Please specify whether family or relatives have been informed.',
+            'interview_date.required' => 'Date of Interview is required.',
+            'interview_date.date' => 'Date of Interview must be a valid date.',
             
             'intervention_taken.required' => 'Please specify the intervention taken.',
             'intervention_taken.string' => 'Intervention details must be in text format.',
@@ -102,6 +107,14 @@ class FormalController extends Controller
             'fileUpload.*.max' => 'Each attachment must not be larger than 2 MB.',
             'fileUpload.*.mimes' => 'Attachments must be PDF, JPG, JPEG, PNG, DOC, or DOCX files only.',
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $dateCheck = app(CaseInterviewDatePolicy::class)->validate($request->interview_date, Auth::user());
+
+            if (! $dateCheck['allowed']) {
+                $validator->errors()->add('interview_date', $dateCheck['message']);
+            }
+        });
     
         // Check if the validation fails
         if ($validator->fails()) {
@@ -1011,10 +1024,16 @@ private function validateFormalCaseImportRow(array $row, int $rowNumber, array $
         $errors[] = "Row {$rowNumber}: {$message}";
     }
 
-    foreach (['institute', 'central_id', 'district_id', 'pngo_id', 'status', 'full_name', 'sex', 'age', 'family_informed'] as $field) {
+    foreach (['institute', 'central_id', 'district_id', 'pngo_id', 'status', 'full_name', 'sex', 'age', 'family_informed', 'interview_date'] as $field) {
         if (blank($row[$field] ?? null)) {
             $errors[] = "Row {$rowNumber}: {$field} is required.";
         }
+    }
+
+    $dateCheck = app(CaseInterviewDatePolicy::class)->validate($row['interview_date'] ?? null, Auth::user());
+
+    if (! $dateCheck['allowed']) {
+        $errors[] = "Row {$rowNumber}: {$dateCheck['message']}";
     }
 
     if (filled($row['institute'] ?? null) && ! in_array($row['institute'], ['Court', 'Police Station', 'Prison'], true)) {
