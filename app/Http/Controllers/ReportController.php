@@ -1138,7 +1138,29 @@ class ReportController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $cases = FormalCase::with(['district:id,name', 'pngo:id,name'])
+        $cases = FormalCase::select([
+                'id',
+                'central_id',
+                'institute',
+                'full_name',
+                'phone_number',
+                'interview_date',
+                'user_id',
+                'district_id',
+                'pngo_id',
+                'status',
+                'deleted_at',
+            ])
+            ->with(['district:id,name', 'pngo:id,name', 'creator:id,name,full_name'])
+            ->withCount([
+                'fileUploads',
+                'messageThreads as case_message_threads_count',
+                'caseMessages as unread_case_messages_count' => function ($query) {
+                    $query
+                        ->where('receiver_id', Auth::id())
+                        ->whereNull('read_at');
+                },
+            ])
             ->where(function ($q) use ($query) {
                 $q->where('central_id', 'like', "%{$query}%")
                     ->orWhere('full_name', 'like', "%{$query}%")

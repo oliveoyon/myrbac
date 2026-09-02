@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FormalCase;
 use App\Models\FollowUpIntervention;
 use App\Models\Todo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class TodoController extends Controller
 {
@@ -101,6 +101,19 @@ class TodoController extends Controller
         $followUpIntervention->task_completed_at = $validated['status'] === Todo::STATUS_DONE ? now() : null;
         $followUpIntervention->save();
 
+        if ($validated['status'] !== Todo::STATUS_PENDING) {
+            $case = $this->formalCaseForFollowUp($followUpIntervention);
+            $user = Auth::user();
+
+            if ($case && $user->can('View Edit Formal Case Form') && $user->can('Edit Formal Case')) {
+                session(['edit_id' => $case->id]);
+
+                return redirect()
+                    ->route('edit-case.get')
+                    ->with('success', 'Follow-up task status updated. Please record the actual intervention and follow-up details.');
+            }
+        }
+
         return redirect()
             ->route('todos.index', ['task_date' => optional($followUpIntervention->to_be_taken_date)->format('Y-m-d')])
             ->with('success', 'Follow-up task status updated.');
@@ -126,20 +139,24 @@ class TodoController extends Controller
 
     private function authorizeFollowUpScope(FollowUpIntervention $followUpIntervention): void
     {
-        $case = DB::table('formal_cases')
-            ->where(function ($query) use ($followUpIntervention) {
-                $query
-                    ->where('id', $followUpIntervention->central_id)
-                    ->orWhere('central_id', $followUpIntervention->central_id);
-            })
-            ->whereNull('deleted_at')
-            ->first();
+        $case = $this->formalCaseForFollowUp($followUpIntervention);
 
         abort_if(! $case, 404);
 
         $user = Auth::user();
 
         abort_if(! $user->canAccessDistrictPngo($case->district_id, $case->pngo_id), 403);
+    }
+
+    private function formalCaseForFollowUp(FollowUpIntervention $followUpIntervention): ?FormalCase
+    {
+        return FormalCase::query()
+            ->where(function ($query) use ($followUpIntervention) {
+                $query
+                    ->where('id', $followUpIntervention->central_id)
+                    ->orWhere('central_id', $followUpIntervention->central_id);
+            })
+            ->first();
     }
 
     private function calendarDays(): array
