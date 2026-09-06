@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('label');
             $table->text('description')->nullable();
             $table->string('group')->nullable();
-            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedBigInteger('updated_by')->nullable()->index();
             $table->timestamps();
         });
 
