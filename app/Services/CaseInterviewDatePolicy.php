@@ -9,7 +9,7 @@ class CaseInterviewDatePolicy
 {
     public function cutoffDay(): int
     {
-        return min(28, max(1, (int) config('a2j.case_entry.interview_date_cutoff_day', 5)));
+        return app(AppSettings::class)->integer('case_entry_interview_date_cutoff_day', (int) config('a2j.case_entry.interview_date_cutoff_day', 5));
     }
 
     public function canOverride(?Authenticatable $user): bool

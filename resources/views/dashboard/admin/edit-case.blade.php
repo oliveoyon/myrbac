@@ -1784,8 +1784,8 @@
                                     <div class="col-md-6">
                                         <label for="fileUpload" class="form-label">Upload Files (Multiple)</label>
                                         <input type="file" class="form-control" id="fileUpload"
-                                            name="fileUpload[]" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
-                                        <small class="text-muted">Allowed: PDF, JPG, JPEG, PNG, DOC, DOCX. Maximum 2 MB per file, up to 20 files.</small>
+                                            name="fileUpload[]" accept="{{ $uploadSettings['accept'] ?? '.pdf,.jpg,.jpeg,.png,.doc,.docx' }}" multiple>
+                                        <small class="text-muted">Allowed: {{ $uploadSettings['allowed_extensions_label'] ?? 'PDF, JPG, JPEG, PNG, DOC, DOCX' }}. Maximum {{ $uploadSettings['max_size_mb'] ?? 2 }} MB per file, up to {{ $uploadSettings['max_files'] ?? 20 }} files.</small>
                                     </div>
                                 </div>
                             </div>

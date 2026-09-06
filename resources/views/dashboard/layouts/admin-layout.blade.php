@@ -135,7 +135,7 @@
             </li>
             @endcan
         
-            @canany(['View Districts', 'View PNGOs'])
+            @canany(['View Districts', 'View PNGOs', 'View System Settings'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">General Settings</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
@@ -144,6 +144,9 @@
                     @endcan
                     @can('View PNGOs')
                     <li><a class="nav-link nav-sublink" href="{{ route('dashboard.pngos') }}"><i class="fas fa-handshake"></i><span class="nav-text">PNGOs Management</span></a></li>
+                    @endcan
+                    @can('View System Settings')
+                    <li><a class="nav-link nav-sublink" href="{{ route('system-settings.index') }}"><i class="fas fa-sliders-h"></i><span class="nav-text">System Settings</span></a></li>
                     @endcan
                 </ul>
             </li>

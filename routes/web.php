@@ -14,6 +14,7 @@ use App\Http\Controllers\PDFController;
 use App\Http\Controllers\LsidRegisterController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\CaseMessageController;
+use App\Http\Controllers\SystemSettingController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -56,6 +57,8 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::post('pngos', [DashboardController::class, 'pngoAdd'])->name('pngos.add')->middleware('permission:Add PNGO');  
     Route::put('pngos/{pngo}', [DashboardController::class, 'pngoUpdate'])->name('pngos.update')->middleware('permission:Edit PNGO');  
     Route::delete('pngos/{pngo}', [DashboardController::class, 'pngoDelete'])->name('pngos.delete')->middleware('permission:Delete PNGO');  
+    Route::get('system-settings', [SystemSettingController::class, 'index'])->name('system-settings.index')->middleware('permission:View System Settings');
+    Route::put('system-settings', [SystemSettingController::class, 'update'])->name('system-settings.update')->middleware('permission:Update System Settings');
 
     Route::get('/user-management', [UserController::class, 'index'])->name('users.index')->middleware('permission:View Users');  
     Route::post('addUser', [UserController::class, 'addUser'])->name('addUser')->middleware('permission:Add User');  

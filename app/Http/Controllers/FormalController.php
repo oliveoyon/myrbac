@@ -16,6 +16,7 @@ use App\Exports\FormalCaseImportTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
+use App\Services\AppSettings;
 use App\Services\CaseInterviewDatePolicy;
 use App\Services\CommonService;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +29,7 @@ class FormalController extends Controller
     {
         $formalCaseEntryScope = $this->formalCaseEntryScope();
         $interviewDateEntryLock = app(CaseInterviewDatePolicy::class)->frontendConfig(Auth::user());
+        $uploadSettings = $this->formalCaseUploadSettings();
 
         if ($formalCaseEntryScope['error']) {
             return redirect()->route('dashboard.index')->with('error', $formalCaseEntryScope['error']);
@@ -35,7 +37,7 @@ class FormalController extends Controller
 
         $submissionToken = $this->createFormSubmissionToken('formal_case_create_tokens');
 
-        return view('dashboard.admin.formal1', compact('submissionToken', 'formalCaseEntryScope', 'interviewDateEntryLock'));
+        return view('dashboard.admin.formal1', compact('submissionToken', 'formalCaseEntryScope', 'interviewDateEntryLock', 'uploadSettings'));
     }
 
     public function courtPolicePrison(Request $request)
@@ -45,6 +47,8 @@ class FormalController extends Controller
         if ($formalCaseEntryScope['error']) {
             return redirect()->back()->withInput()->with('error', $formalCaseEntryScope['error']);
         }
+
+        $uploadSettings = $this->formalCaseUploadSettings();
 
         $rules = [
             'institute' => 'required|string|max:255',
@@ -69,8 +73,8 @@ class FormalController extends Controller
             'convicted_sentence_expire_details' => 'nullable|string',
             'interview_date' => 'required|date',
             'intervention_taken' => 'required|string|max:255',
-            'fileUpload' => 'nullable|array|max:20',
-            'fileUpload.*' => 'file|max:2048|mimes:pdf,jpg,jpeg,png,doc,docx',
+            'fileUpload' => 'nullable|array|max:' . $uploadSettings['max_files'],
+            'fileUpload.*' => 'file|max:' . $uploadSettings['max_size_kb'] . '|mimes:' . implode(',', $uploadSettings['allowed_extensions']),
         ];
 
         if ($formalCaseEntryScope['requires_selection']) {
@@ -102,9 +106,9 @@ class FormalController extends Controller
             'intervention_taken.string' => 'Intervention details must be in text format.',
             'intervention_taken.max' => 'Intervention details should not exceed 255 characters.',
             'fileUpload.array' => 'Please upload valid attachment files.',
-            'fileUpload.max' => 'You can upload a maximum of 20 attachment files at a time.',
+            'fileUpload.max' => 'You can upload a maximum of ' . $uploadSettings['max_files'] . ' attachment files at a time.',
             'fileUpload.*.file' => 'Each attachment must be a valid file.',
-            'fileUpload.*.max' => 'Each attachment must not be larger than 2 MB.',
+            'fileUpload.*.max' => 'Each attachment must not be larger than ' . $uploadSettings['max_size_mb'] . ' MB.',
             'fileUpload.*.mimes' => 'Attachments must be PDF, JPG, JPEG, PNG, DOC, or DOCX files only.',
         ]);
 
@@ -341,6 +345,8 @@ class FormalController extends Controller
     
     public function editCourtPolicePrison(Request $request)
     {
+        $uploadSettings = $this->formalCaseUploadSettings();
+
         $validator = Validator::make($request->all(), [
             'institute' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
@@ -363,8 +369,8 @@ class FormalController extends Controller
             'convicted_length_details' => 'nullable|string',
             'convicted_sentence_expire_details' => 'nullable|string',
             'intervention_taken' => 'required|string|max:255',
-            'fileUpload' => 'nullable|array|max:20',
-            'fileUpload.*' => 'file|max:2048|mimes:pdf,jpg,jpeg,png,doc,docx',
+            'fileUpload' => 'nullable|array|max:' . $uploadSettings['max_files'],
+            'fileUpload.*' => 'file|max:' . $uploadSettings['max_size_kb'] . '|mimes:' . implode(',', $uploadSettings['allowed_extensions']),
         ], [
             'institute.required' => 'Institute is required. Please enter your name.',
             'institute.string' => 'Institute must be a valid text.',
@@ -385,9 +391,9 @@ class FormalController extends Controller
             'intervention_taken.string' => 'Intervention details must be in text format.',
             'intervention_taken.max' => 'Intervention details should not exceed 255 characters.',
             'fileUpload.array' => 'Please upload valid attachment files.',
-            'fileUpload.max' => 'You can upload a maximum of 20 attachment files at a time.',
+            'fileUpload.max' => 'You can upload a maximum of ' . $uploadSettings['max_files'] . ' attachment files at a time.',
             'fileUpload.*.file' => 'Each attachment must be a valid file.',
-            'fileUpload.*.max' => 'Each attachment must not be larger than 2 MB.',
+            'fileUpload.*.max' => 'Each attachment must not be larger than ' . $uploadSettings['max_size_mb'] . ' MB.',
             'fileUpload.*.mimes' => 'Attachments must be PDF, JPG, JPEG, PNG, DOC, or DOCX files only.',
         ]);
 
@@ -609,8 +615,9 @@ class FormalController extends Controller
         ];
 
         $submissionToken = $this->createFormSubmissionToken('formal_case_edit_tokens');
+        $uploadSettings = $this->formalCaseUploadSettings();
 
-        return view('dashboard.admin.edit-case', compact('caseData', 'submissionToken', 'dateInputValues'));
+        return view('dashboard.admin.edit-case', compact('caseData', 'submissionToken', 'dateInputValues', 'uploadSettings'));
     }
 
     public function fileCase(Request $request)
@@ -1176,6 +1183,23 @@ private function formalCaseImportDateFields(): array
         'prison_case_resolved_date',
         'date_of_reliefe',
         'file_closure_date',
+    ];
+}
+
+private function formalCaseUploadSettings(): array
+{
+    $settings = app(AppSettings::class);
+    $maxFiles = $settings->integer('formal_case_upload_max_files', (int) config('a2j.formal_case_upload.max_files', 20));
+    $maxSizeMb = $settings->integer('formal_case_upload_max_size_mb', (int) config('a2j.formal_case_upload.max_size_mb', 2));
+    $allowedExtensions = config('a2j.formal_case_upload.allowed_extensions', ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx']);
+
+    return [
+        'max_files' => $maxFiles,
+        'max_size_mb' => $maxSizeMb,
+        'max_size_kb' => $maxSizeMb * 1024,
+        'allowed_extensions' => $allowedExtensions,
+        'allowed_extensions_label' => collect($allowedExtensions)->map(fn ($extension) => strtoupper($extension))->implode(', '),
+        'accept' => collect($allowedExtensions)->map(fn ($extension) => '.' . $extension)->implode(','),
     ];
 }
 
