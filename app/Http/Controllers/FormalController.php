@@ -330,7 +330,7 @@ class FormalController extends Controller
             // Commit the transaction
             DB::commit();
 
-            return redirect()->route('form.index')->with('success', 'Case has been successfully created.');
+            return redirect()->route('form.index')->with('success', "Case has been successfully created. Central ID: {$centralId}");
         } catch (\Throwable $e) {
             DB::rollBack();
             $this->deleteStoredFormalCaseUploads($storedUploadPaths);
@@ -689,12 +689,19 @@ class FormalController extends Controller
 
         $uploadedFiles = [];
 
-        foreach ($request->file('fileUpload') as $file) {
-            $originalName = $file->getClientOriginalName();
-            $extension = $file->getClientOriginalExtension();
-            $baseName = pathinfo($originalName, PATHINFO_FILENAME);
-            $newFileName = $case->id . '_' . Str::slug($baseName) . '_' . uniqid() . '.' . $extension;
-            $path = $file->storeAs('uploads/formal_cases', $newFileName, 'public');
+        $timestamp = now(config('app.timezone'))->format('YmdHis');
+        $caseFilePrefix = Str::of($case->central_id ?: ('case-' . $case->id))
+            ->replaceMatches('/[^A-Za-z0-9_-]+/', '-')
+            ->trim('-')
+            ->upper()
+            ->toString();
+        $uploadDirectory = "uploads/formal_cases/{$caseFilePrefix}";
+
+        foreach ($request->file('fileUpload') as $index => $file) {
+            $extension = strtolower($file->getClientOriginalExtension());
+            $sequence = str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT);
+            $newFileName = "{$caseFilePrefix}_{$timestamp}_{$sequence}_" . Str::lower(Str::random(6)) . ".{$extension}";
+            $path = $file->storeAs($uploadDirectory, $newFileName, 'public');
 
             if (! $path) {
                 throw new \RuntimeException('The selected attachment could not be uploaded. Please try again.');
