@@ -158,7 +158,8 @@
                         <div class="card shadow-sm">
                             <div class="card-body text-center">
                                 @php
-                                    $filePath = asset('storage/uploads/formal_cases/' . $upload->file_name);
+                                    $storedPath = $upload->file_path ?: 'uploads/formal_cases/' . $upload->file_name;
+                                    $filePath = asset('storage/' . ltrim($storedPath, '/'));
                                     $extension = strtolower(pathinfo($upload->file_name, PATHINFO_EXTENSION));
                                 @endphp
             
