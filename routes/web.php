@@ -15,6 +15,7 @@ use App\Http\Controllers\LsidRegisterController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\CaseMessageController;
 use App\Http\Controllers\SystemSettingController;
+use App\Http\Controllers\ActController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -57,6 +58,15 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::post('pngos', [DashboardController::class, 'pngoAdd'])->name('pngos.add')->middleware('permission:Add PNGO');  
     Route::put('pngos/{pngo}', [DashboardController::class, 'pngoUpdate'])->name('pngos.update')->middleware('permission:Edit PNGO');  
     Route::delete('pngos/{pngo}', [DashboardController::class, 'pngoDelete'])->name('pngos.delete')->middleware('permission:Delete PNGO');  
+    Route::get('court-management', [DashboardController::class, 'courts'])->name('dashboard.courts')->middleware('permission:View Courts');
+    Route::post('courts', [DashboardController::class, 'courtAdd'])->name('courts.add')->middleware('permission:Add Court');
+    Route::put('courts/{court}', [DashboardController::class, 'courtUpdate'])->name('courts.update')->middleware('permission:Edit Court');
+    Route::delete('courts/{court}', [DashboardController::class, 'courtDelete'])->name('courts.delete')->middleware('permission:Delete Court');
+    Route::get('act-management', [ActController::class, 'index'])->name('acts.index')->middleware('permission:View Acts');
+    Route::get('acts/create', [ActController::class, 'create'])->name('acts.create')->middleware('permission:Add Act');
+    Route::post('acts', [ActController::class, 'store'])->name('acts.store')->middleware('permission:Add Act');
+    Route::get('acts/{act}/edit', [ActController::class, 'edit'])->name('acts.edit')->middleware('permission:Edit Act');
+    Route::put('acts/{act}', [ActController::class, 'update'])->name('acts.update')->middleware('permission:Edit Act');
     Route::get('system-settings', [SystemSettingController::class, 'index'])->name('system-settings.index')->middleware('permission:View System Settings');
     Route::put('system-settings', [SystemSettingController::class, 'update'])->name('system-settings.update')->middleware('permission:Update System Settings');
 
@@ -86,6 +96,19 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::post('role/update-permissions/{roleId}', [RolePermissionController::class, 'updatePermissions'])->middleware('permission:Update Role Permissions');  
 
     Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index')->middleware('permission:View Formal Cases Form');
+    Route::get('case-summary', function () {
+        $districts = \App\Models\District::orderBy('name')->get();
+        $courts = \App\Models\Court::with('district:id,name')->orderBy('district_id')->orderBy('name')->get();
+
+        $acts = \App\Models\Act::orderBy('title')->get(['id', 'title', 'act_number', 'year']);
+
+        return view('dashboard.admin.case-summary-demo', compact('districts', 'courts', 'acts'));
+    })->name('case-summary.demo')->middleware('permission:View Formal Cases Form');
+    Route::get('plc', function () {
+        $districts = \App\Models\District::orderBy('name')->get();
+
+        return view('dashboard.admin.plc', compact('districts'));
+    })->name('plc.form')->middleware('permission:View Formal Cases Form');
     Route::post('formAction', [FormalController::class, 'courtPolicePrison'])->name('formaction')->middleware('permission:Create Formal Case');
     Route::get('/edit-case', [FormalController::class, 'editCaseForm'])->name('edit-case.get')->middleware('permission:View Edit Formal Case Form');
     Route::post('/edit-case', [FormalController::class, 'editCase'])->name('edit-case.post')->middleware('permission:Edit Formal Case');

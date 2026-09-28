@@ -1347,7 +1347,7 @@
                                         <label for="prison_legal_representation" class="form-label">Referred for legal representation</label>
                                         <select class="form-select" id="prison_legal_representation" name="prison_legal_representation">
                                             <option value="">Select</option>
-                                            <option value="District Legal Aid Offic" {{ old('prison_legal_representation', $caseData->prison_legal_representation) == 'District Legal Aid Offic' ? 'selected' : '' }}>District Legal Aid Office</option>
+                                            <option value="District Legal Aid Office" {{ in_array(old('prison_legal_representation', $caseData->prison_legal_representation), ['District Legal Aid Office', 'District Legal Aid Offic'], true) ? 'selected' : '' }}>District Legal Aid Office</option>
                                             <option value="District Project Officer" {{ old('prison_legal_representation', $caseData->prison_legal_representation) == 'District Project Officer' ? 'selected' : '' }}>District Project Officer</option>
                                             <option value="NGO Panel Lawyer" {{ old('prison_legal_representation', $caseData->prison_legal_representation) == 'NGO Panel Lawyer' ? 'selected' : '' }}>NGO Panel Lawyer</option>
                                             <option value="Other" {{ old('prison_legal_representation', $caseData->prison_legal_representation) == 'Other' ? 'selected' : '' }}>Other</option>

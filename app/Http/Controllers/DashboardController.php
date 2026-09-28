@@ -4,6 +4,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\FormalCase;
+use App\Models\Court;
 use App\Models\District;
 use App\Models\FollowUpIntervention;
 use App\Models\LsidRegister;
@@ -728,6 +729,106 @@ class DashboardController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'PNGO deleted successfully!',
+        ]);
+    }
+
+    public function courts()
+    {
+        $courts = Court::with('district:id,name')
+            ->orderBy('district_id')
+            ->orderBy('name')
+            ->get();
+        $districts = District::orderBy('name')->get();
+
+        return view('dashboard.admin.court', compact('courts', 'districts'));
+    }
+
+    public function courtAdd(Request $request)
+    {
+        $request->validate([
+            'district_id' => 'required|exists:districts,id',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('courts', 'name')->where(fn ($query) => $query->where('district_id', $request->district_id)),
+            ],
+        ], [
+            'name.unique' => 'This court already exists in the selected district.',
+        ]);
+
+        $court = Court::create([
+            'name' => $request->name,
+            'district_id' => $request->district_id,
+        ]);
+
+        LogService::logAction('Court Added', [
+            'court_id' => $court->id,
+            'name' => $court->name,
+            'district_id' => $court->district_id,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Court added successfully!',
+            'court' => $court->load('district:id,name'),
+        ]);
+    }
+
+    public function courtUpdate(Request $request, $courtId)
+    {
+        $request->validate([
+            'district_id' => 'required|exists:districts,id',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('courts', 'name')
+                    ->where(fn ($query) => $query->where('district_id', $request->district_id))
+                    ->ignore($courtId),
+            ],
+        ], [
+            'name.unique' => 'This court already exists in the selected district.',
+        ]);
+
+        $court = Court::findOrFail($courtId);
+        $oldName = $court->name;
+        $oldDistrictId = $court->district_id;
+
+        $court->update([
+            'name' => $request->name,
+            'district_id' => $request->district_id,
+        ]);
+
+        LogService::logAction('Court Updated', [
+            'court_id' => $court->id,
+            'changed_fields' => [
+                'name' => ['from' => $oldName, 'to' => $court->name],
+                'district_id' => ['from' => $oldDistrictId, 'to' => $court->district_id],
+            ],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Court updated successfully!',
+            'court' => $court->load('district:id,name'),
+        ]);
+    }
+
+    public function courtDelete($courtId)
+    {
+        $court = Court::findOrFail($courtId);
+        $courtName = $court->name;
+        $court->delete();
+
+        LogService::logAction('Court Deleted', [
+            'court_id' => $courtId,
+            'deleted_name' => $courtName,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Court deleted successfully!',
         ]);
     }
 

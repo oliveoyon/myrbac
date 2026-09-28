@@ -135,7 +135,7 @@
             </li>
             @endcan
         
-            @canany(['View Districts', 'View PNGOs', 'View System Settings'])
+            @canany(['View Districts', 'View PNGOs', 'View Courts', 'View Acts', 'View System Settings'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-cogs"></i><span class="nav-text">General Settings</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
@@ -144,6 +144,12 @@
                     @endcan
                     @can('View PNGOs')
                     <li><a class="nav-link nav-sublink" href="{{ route('dashboard.pngos') }}"><i class="fas fa-handshake"></i><span class="nav-text">PNGOs Management</span></a></li>
+                    @endcan
+                    @can('View Acts')
+                    <li><a class="nav-link nav-sublink" href="{{ route('acts.index') }}"><i class="fas fa-book"></i><span class="nav-text">Act Management</span></a></li>
+                    @endcan
+                    @can('View Courts')
+                    <li><a class="nav-link nav-sublink" href="{{ route('dashboard.courts') }}"><i class="fas fa-gavel"></i><span class="nav-text">Court Management</span></a></li>
                     @endcan
                     @can('View System Settings')
                     <li><a class="nav-link nav-sublink" href="{{ route('system-settings.index') }}"><i class="fas fa-sliders-h"></i><span class="nav-text">System Settings</span></a></li>
@@ -174,6 +180,16 @@
                 </ul>
             </li>
             @endcanany
+
+            @can('View Formal Cases Form')
+            <li class="has-submenu">
+                <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-folder-open"></i><span class="nav-text">Case Management</span><i class="fas fa-chevron-down menu-chevron"></i></a>
+                <ul class="submenu">
+                    <li><a class="nav-link nav-sublink" href="{{ route('case-summary.demo') }}"><i class="fas fa-file-alt"></i><span class="nav-text">Case Summary Form</span></a></li>
+                    <li><a class="nav-link nav-sublink" href="{{ route('plc.form') }}"><i class="fas fa-scale-balanced"></i><span class="nav-text">Paralegal Aid Clinic</span></a></li>
+                </ul>
+            </li>
+            @endcan
 
             @php
                 $canShowCentralIdForm = auth()->user()->can('View Formal Cases Form') && auth()->user()->can('Create Formal Case');

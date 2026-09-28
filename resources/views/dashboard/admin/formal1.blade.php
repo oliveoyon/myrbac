@@ -1364,7 +1364,7 @@
                                     <select class="form-select" id="prison_legal_representation"
                                         name="prison_legal_representation">
                                         <option value="">Select</option>
-                                        <option value="District Legal Aid Offic">District Legal Aid Office</option>
+                                        <option value="District Legal Aid Office">District Legal Aid Office</option>
                                         <option value="District Project Officer">District Project Officer</option>
                                         <option value="NGO Panel Lawyer">NGO Panel Lawyer</option>
                                         <option value="Other">Other</option>
