@@ -9,16 +9,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('courts', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
-            $table->id();
-            // Production has a legacy districts table whose engine/id definition
-            // cannot reliably support a new foreign key constraint.
-            $table->unsignedBigInteger('district_id')->index();
-            $table->string('name');
-            $table->timestamps();
-            $table->unique(['district_id', 'name']);
-        });
+        if (!Schema::hasTable('courts')) {
+            Schema::create('courts', function (Blueprint $table) {
+                $table->engine = 'InnoDB';
+                $table->id();
+                // Production has a legacy districts table whose engine/id definition
+                // cannot reliably support a new foreign key constraint.
+                $table->unsignedBigInteger('district_id')->index();
+                $table->string('name');
+                $table->timestamps();
+                $table->unique(['district_id', 'name']);
+            });
+        }
 
         $now = now();
         $categoryName = 'General Settings';
