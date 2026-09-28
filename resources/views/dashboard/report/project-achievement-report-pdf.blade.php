@@ -192,12 +192,6 @@
                     <td colspan="3" style="text-align: center;">No data found.</td>
                 </tr>
             @endforelse
-            @if ($printRows->isNotEmpty())
-                <tr class="total-row">
-                    <td colspan="2">মোট</td>
-                    <td class="count">{{ $toBanglaNumber($printRows->sum('count')) }} জন</td>
-                </tr>
-            @endif
         </tbody>
     </table>
 </body>

@@ -255,13 +255,6 @@
                             <td colspan="4" class="text-center text-muted py-4">No data found.</td>
                         </tr>
                     @endforelse
-                    @if ($displayRows->isNotEmpty())
-                        <tr class="achievement-total-row">
-                            <td colspan="2">Total</td>
-                            <td class="achievement-count">{{ $displayRows->sum('count') }}</td>
-                            <td class="achievement-unit">জন</td>
-                        </tr>
-                    @endif
                 </tbody>
             </table>
         </div>
