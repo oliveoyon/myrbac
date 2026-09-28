@@ -435,7 +435,7 @@ class CommonService
 
         $officialDateFilter = $this->dateFilterSql($officialDate, $filters);
         $dlaoGeneralDateFilter = $this->dateFilterSql($dlaoGeneralDate, $filters);
-        $prisonDlaoDateFilter = $this->dateFilterSql('prison_legal_representation_date', $filters);
+        $prisonDlaoDateFilter = $this->dateFilterSql($officialDate, $filters);
 
         $query = FormalCase::query()
             ->where('status', '>', 1)
@@ -460,9 +460,11 @@ class CommonService
                 AND ({$dlaoGeneralDate}) < '9999-12-31'
                 {$dlaoGeneralDateFilter['sql']}
                 THEN 1 ELSE 0 END) AS dlao_general_count,
-            SUM(CASE WHEN prison_legal_representation = 'District Legal Aid Office'
+            SUM(CASE WHEN institute = 'Prison'
+                AND prison_legal_representation = 'District Legal Aid Office'
                 AND prison_legal_representation_date IS NOT NULL
                 AND CAST(prison_legal_representation_date AS CHAR) <> ''
+                AND ({$officialDate}) < '9999-12-31'
                 {$prisonDlaoDateFilter['sql']}
                 THEN 1 ELSE 0 END) AS dlao_prison_count
         ";
