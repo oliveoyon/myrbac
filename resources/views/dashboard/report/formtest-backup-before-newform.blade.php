@@ -98,7 +98,7 @@
         <div class="font">
             <div class="report-header">
                 <img src="{{ public_path('reportHeader.png') }}" alt="Report Header">
-                <p class="report-header-title">Access to Justice for Women</p>
+                <p class="report-header-title">এক্সেস টু জাস্টিস ফর উইম্যান: স্ট্রেথেনিং কমিউনিটি ডিসপ্যুট রিজিউলুসন এন্ড ইম্প্রুভিং কেস ম্যানেজমেন্ট</p>
                 <p class="report-header-subtitle">(A Project Implemented jointly by Law and Justice Division, Ministry of Law, Justice and Parliamentary Affairs and GIZ Bangladesh)</p>
             </div>
             <p style="margin-top:0pt; margin-bottom:0pt; text-align:center; line-height:108%; font-size:14pt;"><strong><span style="font-family:Arial;">&nbsp;&nbsp;&nbsp;&nbsp;</span></strong></p>
