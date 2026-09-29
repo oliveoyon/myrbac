@@ -455,7 +455,8 @@ class CommonService
                 AND ({$officialDate}) < '9999-12-31'
                 {$officialDateFilter['sql']}
                 THEN 1 ELSE 0 END) AS police_station_count,
-            SUM(CASE WHEN (referral_service = 'District Legal Aid Office'
+            SUM(CASE WHEN institute IN ('Court', 'Police Station')
+                AND (referral_service = 'District Legal Aid Office'
                     OR legal_representation = 'District Legal Aid Office')
                 AND ({$dlaoGeneralDate}) < '9999-12-31'
                 {$dlaoGeneralDateFilter['sql']}
