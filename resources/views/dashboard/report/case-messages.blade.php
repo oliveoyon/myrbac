@@ -54,13 +54,29 @@
         }
 
         .case-message-pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 12px;
+            width: 100%;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .case-message-pagination nav,
+        .case-message-pagination nav > div {
+            width: 100%;
+        }
+
+        .case-message-pagination nav .d-sm-flex {
+            gap: 24px;
+        }
+
+        .case-message-pagination nav p {
+            margin: 0;
+            color: #64748b;
         }
 
         .case-message-pagination .pagination {
             flex-wrap: wrap;
+            justify-content: center;
             gap: 4px;
             margin-bottom: 0;
         }
@@ -83,6 +99,15 @@
         }
 
         @media (max-width: 576px) {
+            .case-message-pagination {
+                margin-top: 14px;
+                padding-top: 12px;
+            }
+
+            .case-message-pagination nav > div {
+                justify-content: center !important;
+            }
+
             .case-message-pagination .page-link {
                 min-width: 30px;
                 min-height: 30px;
