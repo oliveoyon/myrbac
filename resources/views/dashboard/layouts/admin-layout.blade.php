@@ -345,6 +345,15 @@
 
     @stack('scripts')
     <script>
+        function hideDashboardSearchLoader() {
+            const loader = document.getElementById('dashboardSearchLoader');
+            if (loader) {
+                loader.style.display = 'none';
+            }
+        }
+
+        window.addEventListener('pageshow', hideDashboardSearchLoader);
+
         document.getElementById('dashboardSearchForm')?.addEventListener('submit', function () {
             const loader = document.getElementById('dashboardSearchLoader');
             if (loader) {

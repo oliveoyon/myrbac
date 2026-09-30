@@ -44,6 +44,28 @@
             color: #1f2937;
         }
 
+        .case-message-case-link {
+            display: inline;
+            margin: 0;
+        }
+
+        .case-message-case-link button {
+            padding: 0;
+            border: 0;
+            color: #17643a;
+            background: transparent;
+            font: inherit;
+            font-weight: 800;
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 3px;
+        }
+
+        .case-message-case-link button:hover,
+        .case-message-case-link button:focus-visible {
+            color: #a72620;
+        }
+
         .case-message-empty {
             padding: 22px;
             color: #64748b;
@@ -149,7 +171,22 @@
                                     $lastMessage = $thread->latestMessage;
                                 @endphp
                                 <tr>
-                                    <td>{{ $thread->formalCase->central_id ?? '-' }}</td>
+                                    <td>
+                                        @if ($thread->formalCase?->central_id)
+                                            @can('Search Dashboard Reports')
+                                                <form action="{{ route('dashboard.search') }}" method="POST" class="case-message-case-link case-message-search-form">
+                                                    @csrf
+                                                    <button type="submit" name="query" value="{{ $thread->formalCase->central_id }}" title="Open {{ $thread->formalCase->central_id }}">
+                                                        {{ $thread->formalCase->central_id }}
+                                                    </button>
+                                                </form>
+                                            @else
+                                                {{ $thread->formalCase->central_id }}
+                                            @endcan
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                     <td>{{ $thread->formalCase->full_name ?? '-' }}</td>
                                     <td>{{ $thread->formalCase->district->name ?? '-' }}</td>
                                     <td>{{ $thread->formalCase->pngo->name ?? '-' }}</td>
@@ -185,3 +222,16 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        document.querySelectorAll('.case-message-search-form').forEach(function (form) {
+            form.addEventListener('submit', function () {
+                const loader = document.getElementById('dashboardSearchLoader');
+                if (loader) {
+                    loader.style.display = 'flex';
+                }
+            });
+        });
+    </script>
+@endpush
