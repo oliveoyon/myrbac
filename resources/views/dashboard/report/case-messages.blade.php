@@ -52,6 +52,44 @@
             border-radius: 8px;
             background: #fbfcfd;
         }
+
+        .case-message-pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .case-message-pagination .pagination {
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 0;
+        }
+
+        .case-message-pagination .page-link {
+            display: inline-flex;
+            min-width: 32px;
+            min-height: 32px;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 9px;
+            border-radius: 5px;
+            font-size: 13px;
+            line-height: 1.2;
+        }
+
+        .case-message-pagination svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        @media (max-width: 576px) {
+            .case-message-pagination .page-link {
+                min-width: 30px;
+                min-height: 30px;
+                padding: 3px 7px;
+                font-size: 12px;
+            }
+        }
     </style>
 @endpush
 
@@ -112,8 +150,8 @@
                             @endforeach
                         </tbody>
                     </table>
-                    <div class="mt-3">
-                        {{ $threads->links() }}
+                    <div class="case-message-pagination">
+                        {{ $threads->links('pagination::bootstrap-5') }}
                     </div>
                 @else
                     <div class="case-message-empty">No case messages found.</div>
