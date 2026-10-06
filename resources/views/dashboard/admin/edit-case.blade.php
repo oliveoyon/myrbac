@@ -650,9 +650,12 @@
                             <div class="accordion-body">
                                 <div class="row g-3">
                                     <div class="col-md-4">
-                                        <label for="interview_date" class="form-label">Date of Interview</label>
-                                        <input type="date" class="form-control" id="interview_date" name="interview_date"
-                                            value="{{ $caseData->interview_date ?? '' }}">
+                                        <label for="interview_date" class="form-label">Date of Interview <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control @error('interview_date') is-invalid @enderror" id="interview_date" name="interview_date"
+                                            value="{{ old('interview_date', $caseData->interview_date ?? '') }}" required>
+                                        @error('interview_date')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="col-md-4">
                                         <label for="interview_time" class="form-label">Time of Interview</label>
@@ -1373,8 +1376,8 @@
 
                                     <!-- Next Court Date -->
                                     <div class="col-md-4" id="prison_next_court_date_field">
-                                        <label for="next_court_date" class="form-label">Next Court Date</label>
-                                        <input type="date" class="form-control" id="next_court_date" name="next_court_date" value="{{ old('next_court_date', $caseData->next_court_date) }}">
+                                        <label for="prison_next_court_date" class="form-label">Next Court Date</label>
+                                        <input type="date" class="form-control" id="prison_next_court_date" name="prison_next_court_date" value="{{ old('prison_next_court_date', $caseData->prison_next_court_date) }}">
                                     </div>
 
                                     <!-- Collected case document -->
@@ -1805,6 +1808,7 @@
 
 @push('scripts')
     <script src="{{ asset('dashboard/js/court-police-prison-labels.js') }}"></script>
+    <script src="{{ asset('dashboard/js/formal-case-date-validation.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             window.applyCourtPolicePrisonManualLabels();

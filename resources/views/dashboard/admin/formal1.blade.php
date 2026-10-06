@@ -673,7 +673,7 @@
                                 <div class="col-md-4">
                                     <label for="interview_date" class="form-label">Date of Interview <span class="text-danger">*</span></label>
                                     <input type="date" class="form-control @error('interview_date') is-invalid @enderror" id="interview_date"
-                                        name="interview_date">
+                                        name="interview_date" required>
                                     <small class="text-muted">Current month data is allowed. Previous month data is allowed until the configured cutoff day of this month.</small>
                                     @error('interview_date')
                                     <span class="invalid-feedback" role="alert">
@@ -1786,6 +1786,7 @@
 
 @push('scripts')
 <script src="{{ asset('dashboard/js/court-police-prison-labels.js') }}"></script>
+<script src="{{ asset('dashboard/js/formal-case-date-validation.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         window.applyCourtPolicePrisonManualLabels();

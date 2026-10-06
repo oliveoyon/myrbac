@@ -77,12 +77,14 @@ class FormalController extends Controller
             'fileUpload.*' => 'file|max:' . $uploadSettings['max_size_kb'] . '|mimes:' . implode(',', $uploadSettings['allowed_extensions']),
         ];
 
+        $this->addInterviewDateSequenceRules($rules);
+
         if ($formalCaseEntryScope['requires_selection']) {
             $rules['district_id'] = 'required|integer|exists:districts,id';
             $rules['pngo_id'] = 'required|integer|exists:pngos,id';
         }
 
-        $validator = Validator::make($request->all(), $rules, [
+        $validator = Validator::make($request->all(), $rules, array_merge([
             'district_id.required' => 'Please select the district for this case.',
             'pngo_id.required' => 'Please select the PNGO for this case.',
             'institute.required' => 'Institute is required. Please enter your name.',
@@ -110,7 +112,7 @@ class FormalController extends Controller
             'fileUpload.*.file' => 'Each attachment must be a valid file.',
             'fileUpload.*.max' => 'Each attachment must not be larger than ' . $uploadSettings['max_size_mb'] . ' MB.',
             'fileUpload.*.mimes' => 'Attachments must be PDF, JPG, JPEG, PNG, DOC, or DOCX files only.',
-        ]);
+        ], $this->interviewDateSequenceMessages()));
 
         $validator->after(function ($validator) use ($request) {
             $dateCheck = app(CaseInterviewDatePolicy::class)->validate($request->interview_date, Auth::user());
@@ -347,7 +349,7 @@ class FormalController extends Controller
     {
         $uploadSettings = $this->formalCaseUploadSettings();
 
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'institute' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
             'sex' => 'required|string|max:255',
@@ -368,10 +370,15 @@ class FormalController extends Controller
             'ministerial_communication_details' => 'nullable|string',
             'convicted_length_details' => 'nullable|string',
             'convicted_sentence_expire_details' => 'nullable|string',
+            'interview_date' => 'required|date',
             'intervention_taken' => 'required|string|max:255',
             'fileUpload' => 'nullable|array|max:' . $uploadSettings['max_files'],
             'fileUpload.*' => 'file|max:' . $uploadSettings['max_size_kb'] . '|mimes:' . implode(',', $uploadSettings['allowed_extensions']),
-        ], [
+        ];
+
+        $this->addInterviewDateSequenceRules($rules);
+
+        $validator = Validator::make($request->all(), $rules, array_merge([
             'institute.required' => 'Institute is required. Please enter your name.',
             'institute.string' => 'Institute must be a valid text.',
             'institute.max' => 'Institute should not exceed 255 characters.',
@@ -386,6 +393,8 @@ class FormalController extends Controller
             'age.min' => 'Age cannot be negative.',
             'age.max' => 'Age should not exceed 150.',
             'family_informed.required' => 'Please specify whether family or relatives have been informed.',
+            'interview_date.required' => 'Date of Interview is required.',
+            'interview_date.date' => 'Date of Interview must be a valid date.',
             
             'intervention_taken.required' => 'Please specify the intervention taken.',
             'intervention_taken.string' => 'Intervention details must be in text format.',
@@ -395,7 +404,7 @@ class FormalController extends Controller
             'fileUpload.*.file' => 'Each attachment must be a valid file.',
             'fileUpload.*.max' => 'Each attachment must not be larger than ' . $uploadSettings['max_size_mb'] . ' MB.',
             'fileUpload.*.mimes' => 'Attachments must be PDF, JPG, JPEG, PNG, DOC, or DOCX files only.',
-        ]);
+        ], $this->interviewDateSequenceMessages()));
 
         // Check if the validation fails
         if ($validator->fails()) {
@@ -1501,6 +1510,73 @@ private function restoreFormSubmissionToken(Request $request, string $sessionKey
         $user = Auth::user();
 
         abort_if(! $user->canAccessDistrictPngo($case->district_id, $case->pngo_id), 403);
+    }
+
+    private function addInterviewDateSequenceRules(array &$rules): void
+    {
+        foreach (array_keys($this->interviewDateSequenceFields()) as $field) {
+            $rules[$field] = 'nullable|date|after_or_equal:interview_date';
+        }
+    }
+
+    private function interviewDateSequenceMessages(): array
+    {
+        $messages = [];
+
+        foreach ($this->interviewDateSequenceFields() as $field => $label) {
+            $messages[$field . '.date'] = $label . ' must be a valid date.';
+            $messages[$field . '.after_or_equal'] = $label . ' cannot be earlier than the Date of Interview.';
+        }
+
+        return $messages;
+    }
+
+    private function interviewDateSequenceFields(): array
+    {
+        return [
+            // Sections 8 and 9: Court/Police assistance and results.
+            'family_communication_date' => 'Family communication date',
+            'legal_representation_date' => 'Legal representation date',
+            'collected_vokalatnama_date' => 'Vokalatnama collection date',
+            'collected_case_doc' => 'Case document collection date',
+            'identify_sureties_date' => 'Surety identification date',
+            'witness_communication_date' => 'Witness communication date',
+            'medical_report_date' => 'Medical report date',
+            'legal_assistance_date' => 'Legal assistance date',
+            'assistance_under_custody_date' => 'Custody assistance date',
+            'referral_service_date' => 'Referral service date',
+            'resolved_dispute_date' => 'Dispute resolution date',
+            'case_resolved_date' => 'Case resolved date',
+            'appoint_lawyer_date' => 'Lawyer appointment date',
+            'release_status_date' => 'Release date',
+            'other_result_date' => 'Other result date',
+
+            // Sections 12 and 13: Prison assistance and results.
+            'prison_family_communication' => 'Prison family communication date',
+            'prison_legal_representation_date' => 'Prison legal representation date',
+            'next_court_collection_date' => 'Next court date collection date',
+            'prison_next_court_date' => 'Prison next court date',
+            'collected_case_doc_prison' => 'Prison case document collection date',
+            'identify_sureties_prison_date' => 'Prison surety identification date',
+            'witness_communication_prison' => 'Prison witness communication date',
+            'bail_bond_submission' => 'Bail bond submission date',
+            'court_order_communication' => 'Court order communication date',
+            'application_certified_copies' => 'Certified copy application date',
+            'appeal_assistance' => 'Appeal assistance date',
+            'ministerial_communication' => 'Ministerial communication date',
+            'other_legal_assistance_date' => 'Other legal assistance date',
+            'released_on_date' => 'Prison release date',
+            'send_to_date' => 'Referral date',
+            'convicted_sentence_expire' => 'Sentence expiry date',
+            'result_of_appeal_date' => 'Appeal result date',
+            'prison_case_resolved_date' => 'Prison case resolved date',
+            'date_of_reliefe' => 'Relief date',
+
+            // Section 14.1 and the follow-up section.
+            'application_mode_date' => 'Application date',
+            'intervention_taken_date' => 'Intervention taken date',
+            'to_be_taken_date' => 'Planned intervention date',
+        ];
     }
     
 

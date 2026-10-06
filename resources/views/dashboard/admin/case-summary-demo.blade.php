@@ -13,8 +13,11 @@
     .act-picker-option[hidden] { display: none; }
     .act-picker-option input { flex-shrink: 0; margin-top: 3px; }
     .act-picker-option:has(input:checked) { background: #fdf3f2; }
-    .act-selected { display: grid; gap: 5px; margin-top: 7px; }
-    .act-selected button { display: flex; justify-content: space-between; gap: 10px; text-align: left; border: 1px solid #e4c7c5; border-radius: 5px; padding: 6px 9px; background: #fdf3f2; font-size: 12px; color: #57302d; }
+    .act-selected { display: grid; gap: 6px; margin-top: 7px; }
+    .act-selected-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 7px 6px 10px; border: 1px solid #e4c7c5; border-radius: 6px; background: #fdf3f2; color: #57302d; font-size: 12px; }
+    .act-selected-item span { min-width: 0; overflow-wrap: anywhere; }
+    .act-selected-remove { flex: 0 0 auto; min-height: 32px; padding: 5px 10px; border: 1px solid #d8a7a3; border-radius: 5px; background: #fff; color: #9d0c06; font-size: 12px; font-weight: 700; }
+    .act-selected-remove:hover { border-color: #c30f08; background: #fff7f6; }
     .case-summary-page {
         display: grid;
         gap: 16px;
@@ -249,6 +252,17 @@
         font-weight: 600;
     }
 
+    .party-section { display: grid; gap: 10px; }
+    .party-section + .party-section { margin-top: 18px; padding-top: 18px; border-top: 1px solid #e3e8ee; }
+    .party-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .party-section-head .section-note { flex: 1 1 auto; margin: 0; }
+    .party-add-row { flex: 0 0 auto; white-space: nowrap; }
+    .party-rows { display: grid; gap: 10px; }
+    .party-entry { padding: 12px; border: 1px solid #e1e6ec; border-radius: 8px; background: #fbfcfd; }
+    .party-entry-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .party-entry-title { color: #374151; font-size: 13px; font-weight: 800; }
+    .party-remove-row { min-height: 32px; padding: 5px 10px; }
+
     .decision-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -353,19 +367,65 @@
         letter-spacing: .02em;
     }
 
-    .solution-grid {
+    .solution-checklist {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        overflow: hidden;
+        border: 1px solid #dfe5eb;
+        border-radius: 8px;
+        background: #fff;
     }
 
-    .solution-grid .decision-item {
-        border-color: #dfe7e4;
+    .solution-check-row {
+        min-width: 0;
+        padding: 11px 12px;
+        border-bottom: 1px solid #edf0f3;
     }
 
-    .solution-grid .decision-item.is-active {
-        border-color: #b9d6ca;
-        background: #fbfefc;
+    .solution-check-row:nth-child(odd) {
+        border-right: 1px solid #edf0f3;
+    }
+
+    .solution-checkbox {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin: 0;
+        color: #27313d;
+        cursor: pointer;
+    }
+
+    .solution-checkbox input {
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
+        accent-color: #2f7d62;
+        flex: 0 0 auto;
+    }
+
+    .solution-check-copy {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .solution-check-copy strong {
+        color: #26313b;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .solution-check-copy small {
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .solution-check-row:has(.solution-checkbox input:checked) {
+        background: #f3faf6;
+    }
+
+    .solution-check-row .decision-detail {
+        margin-top: 10px;
     }
 
     .dependent-field {
@@ -633,8 +693,12 @@
         }
 
         .decision-grid,
-        .solution-grid {
+        .solution-checklist {
             grid-template-columns: 1fr;
+        }
+
+        .solution-check-row:nth-child(odd) {
+            border-right: 0;
         }
 
         .decision-head {
@@ -823,7 +887,43 @@
                                 <input type="text" id="case_number" name="case_number" class="form-control">
                             </div>
                             <div class="col-md-4">
-                                <label class="field-label" id="act-label">1.3 Act <small>আইন</small></label>
+                                <label class="field-label" for="case_section_type">1.3 Case Section <small>মামলার ধারা</small></label>
+                                <select id="case_section_type" name="case_section_type" class="form-select">
+                                    <option value="">Select section type</option>
+                                    <option value="Compoundable">Compoundable (আপসযোগ্য)</option>
+                                    <option value="Non-Compoundable">Non-Compoundable (আপস অযোগ্য)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 dependent-field" id="compoundable_section_wrap">
+                                <label class="field-label" for="compoundable_case_section">1.3 Compoundable Section <small>আপসযোগ্য ধারা</small></label>
+                                <select id="compoundable_case_section" name="compoundable_case_section[]" class="form-select" data-other-target="compoundable_section_other_wrap" multiple size="4">
+                                    <option value="Demo Compoundable Section 1">Demo Compoundable Section 1</option>
+                                    <option value="Demo Compoundable Section 2">Demo Compoundable Section 2</option>
+                                    <option value="Other">অন্যান্য, উল্লেখ্ করুন (Other, please specify)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 dependent-field" id="non_compoundable_section_wrap">
+                                <label class="field-label" for="non_compoundable_case_section">1.3 Non-Compoundable Section <small>আপস অযোগ্য ধারা</small></label>
+                                <select id="non_compoundable_case_section" name="non_compoundable_case_section[]" class="form-select" data-other-target="non_compoundable_section_other_wrap" multiple size="4">
+                                    <option value="Demo Non-Compoundable Section 1">Demo Non-Compoundable Section 1</option>
+                                    <option value="Demo Non-Compoundable Section 2">Demo Non-Compoundable Section 2</option>
+                                    <option value="Other">অন্যান্য, উল্লেখ্ করুন (Other, please specify)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 dependent-field" id="case_section_comments_wrap">
+                                <label class="field-label" for="case_section_comments">1.3 Comments <small>মন্তব্য</small></label>
+                                <textarea id="case_section_comments" name="case_section_comments" class="form-control" rows="2" placeholder="Add comments, if any"></textarea>
+                            </div>
+                            <div class="col-md-4 dependent-field" id="compoundable_section_other_wrap">
+                                <label class="field-label" for="compoundable_section_other">1.3 Other Compoundable Section <small>অন্যান্য আপসযোগ্য ধারা</small></label>
+                                <input type="text" id="compoundable_section_other" name="compoundable_section_other" class="form-control" placeholder="Specify the compoundable section" data-required-when-visible>
+                            </div>
+                            <div class="col-md-4 dependent-field" id="non_compoundable_section_other_wrap">
+                                <label class="field-label" for="non_compoundable_section_other">1.3 Other Non-Compoundable Section <small>অন্যান্য আপস অযোগ্য ধারা</small></label>
+                                <input type="text" id="non_compoundable_section_other" name="non_compoundable_section_other" class="form-control" placeholder="Specify the non-compoundable section" data-required-when-visible>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="field-label" id="act-label">1.4 Act <small>আইন</small></label>
                                 <details class="act-picker" id="act-picker">
                                     <summary id="act" aria-labelledby="act-label act-summary"><span id="act-summary">Select acts</span></summary>
                                     <div class="act-picker-panel">
@@ -842,27 +942,6 @@
                                 </details>
                                 <div class="act-selected" id="act-selected" aria-label="Selected acts"></div>
                                 <small class="text-muted">Select one or more acts. Search or browse the full list.</small>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="field-label" for="case_section">1.4 Case Section <small>মামলার ধারা</small></label>
-                                <select id="case_section" name="case_section" class="form-select" data-other-target="case_section_other_wrap">
-                                    <option value="">Select case section</option>
-                                    <option value="NOS 11 (C)">NOS ১১(গ) [NOS 11 (C)]</option>
-                                    <option value="s. 345 of CrPC">s. 345 of CrPC</option>
-                                    <option value="Other">অন্যান্য, উল্লেখ্ করুন (Other, please specify)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 dependent-field" id="case_section_other_wrap">
-                                <label class="field-label" for="case_section_other">1.4 Other Case Section <small>অন্যান্য ধারা, উল্লেখ করুন</small></label>
-                                <input type="text" id="case_section_other" name="case_section_other" class="form-control" placeholder="Please specify the case section" data-required-when-visible>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="field-label" for="case_type">1.6 Case Type <small>মামলার ধরন</small></label>
-                                <select id="case_type" name="case_type" class="form-select">
-                                    <option value="">Select case type</option>
-                                    <option>Civil Case</option>
-                                    <option>Criminal Case</option>
-                                </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="field-label" for="case_filing_date">1.7 Date of Case Filing <small>মামলা দায়েরের তারিখ</small></label>
@@ -890,57 +969,51 @@
                                 <label class="field-label" for="current_case_status">2.3 Current Case Status <small>মামলার বর্তমান অবস্থা</small></label>
                                 <select id="current_case_status" name="current_case_status" class="form-select" data-other-target="current_case_status_other_wrap">
                                     <option value="">Select status</option>
-                                    <option>Police Report</option>
-                                    <option>NBWW</option>
-                                    <option>Witness Examination</option>
-                                    <option>Defense Witness Examination</option>
-                                    <option value="accused_submitted_petition_for_discharge">Accused submitted petition for discharge</option>
-                                    <option value="appeal">Appeal</option>
-                                    <option value="appeal_hearing_completed">Appeal hearing completed</option>
-                                    <option value="appeal_transferred">Appeal transferred</option>
-                                    <option value="argument">Argument</option>
-                                    <option value="case_dismissed">Case Dismissed</option>
-                                    <option value="case_is_stayed">Case is stayed</option>
-                                    <option value="case_withdrawal">Case Withdrawal</option>
-                                    <option value="charge_framed">Charge framed</option>
-                                    <option value="charge_not_framed">Charge not framed</option>
-                                    <option value="cognizance_not_taken_and_ordered">Cognizance not taken and ordered</option>
-                                    <option value="cognizance_taken_and_issued">Cognizance taken and issued</option>
-                                    <option value="complainant_change">Complainant Change</option>
-                                    <option value="court_issued_warrant">Court issued warrant</option>
-                                    <option value="court_issued_warrant_of_proclamation_and_attachment_wpa">Court issued warrant of Proclamation and Attachment (WP&amp;A)</option>
-                                    <option value="court_not_held">Court not held</option>
-                                    <option value="court_ordered">Court ordered</option>
-                                    <option value="cross_examination">Cross examination</option>
-                                    <option value="examination_in_chief">Examination in chief</option>
-                                    <option value="examination_of_accused_342">Examination of accused (342)</option>
-                                    <option value="fir_lodged_by_informant">FIR Lodged by Informant</option>
-                                    <option value="hazira_given">Hazira given</option>
-                                    <option value="hearing">Hearing</option>
-                                    <option value="judgment">Judgment</option>
-                                    <option value="naraji_petition">Naraji petition</option>
-                                    <option value="order_pending">Order pending</option>
-                                    <option value="paper_notification">Paper Notification</option>
-                                    <option value="recall_witness">Recall witness</option>
-                                    <option value="remain">Remain</option>
-                                    <option value="report">Report</option>
-                                    <option value="revision">Revision</option>
-                                    <option value="revision_filed">Revision filed</option>
-                                    <option value="revision_hearing">Revision hearing</option>
-                                    <option value="service_return">Service Return</option>
-                                    <option value="settling_date_for_ph">Settling Date for PH</option>
-                                    <option value="summon_issue">Summon Issue</option>
-                                    <option value="time_petition_by_accused">Time Petition by Accused</option>
-                                    <option value="time_petition_by_complainant">Time Petition by Complainant</option>
-                                    <option value="transfer_to_the_court">Transfer to the court</option>
-                                    <option value="update_by_divisional_lawyer">Update by Divisional Lawyer</option>
-                                    <option value="update_from_ho">Update from HO</option>
-                                    <option value="update_from_lc_lawyer">Update from LC Lawyer</option>
-                                    <option value="upload_case_document">Upload Case Document</option>
-                                    <option value="witness">Witness</option>
-                                    <option>Pending for Judgment</option>
-                                    <option>Stayed</option>
-                                    <option>Other</option>
+                                    <option value="accused_submitted_petition_for_discharge">আসামি অব্যাহতির আবেদন দাখিল করেছে (Accused submitted petition for discharge)</option>
+                                    <option value="appeal">আপিল (Appeal)</option>
+                                    <option value="appeal_hearing_completed">আপিলের শুনানি সম্পন্ন (Appeal hearing completed)</option>
+                                    <option value="appeal_transferred">আপিল স্থানান্তরিত (Appeal transferred)</option>
+                                    <option value="argument">যুক্তিতর্ক (Argument)</option>
+                                    <option value="case_dismissed">মামলা খারিজ (Case Dismissed)</option>
+                                    <option value="case_is_stayed">মামলা স্থগিত (Case is stayed)</option>
+                                    <option value="case_withdrawal">মামলা প্রত্যাহার (Case Withdrawal)</option>
+                                    <option value="charge_framed">অভিযোগ গঠন (Charge framed)</option>
+                                    <option value="charge_not_framed">অভিযোগ গঠন করা হয়নি (Charge not framed)</option>
+                                    <option value="cognizance_not_taken_and_ordered">আমলে গ্রহণ করা হয়নি এবং আদেশ প্রদান করা হয়েছে (Cognizance not taken and ordered)</option>
+                                    <option value="cognizance_taken_and_issued">আমলে গ্রহণ করা হয়েছে এবং সমন জারি করা হয়েছে (Cognizance taken and issued)</option>
+                                    <option value="complainant_change">বাদী পরিবর্তন (Complainant Change)</option>
+                                    <option value="court_issued_warrant">আদালত গ্রেপ্তারি পরোয়ানা জারি করেছে (Court issued warrant)</option>
+                                    <option value="court_issued_warrant_of_proclamation_and_attachment_wpa">আদালত বিজ্ঞপ্তি ও ক্রোকের পরোয়ানা জারি করেছে (Court issued warrant of Proclamation and Attachment (WP&amp;A))</option>
+                                    <option value="court_not_held">আদালত বসেনি (Court not held)</option>
+                                    <option value="court_ordered">আদালতের আদেশ (Court ordered)</option>
+                                    <option value="cross_examination">জেরা (Cross examination)</option>
+                                    <option value="examination_in_chief">জবানবন্দি গ্রহণ (Examination in chief)</option>
+                                    <option value="examination_of_accused_342">আসামির পরীক্ষা (৩৪২ ধারা) (Examination of accused (342))</option>
+                                    <option value="fir_lodged_by_informant">তথ্যদাতা কর্তৃক এফআইআর দায়ের (FIR Lodged by Informant)</option>
+                                    <option value="hazira_given">হাজিরা প্রদান (Hazira given)</option>
+                                    <option value="hearing">শুনানি (Hearing)</option>
+                                    <option value="judgment">রায় (Judgment)</option>
+                                    <option value="naraji_petition">নারাজি আবেদন (Naraji petition)</option>
+                                    <option value="order_pending">আদেশ অপেক্ষমাণ (Order pending)</option>
+                                    <option value="paper_notification">পত্রিকায় বিজ্ঞপ্তি (Paper Notification)</option>
+                                    <option value="recall_witness">সাক্ষী পুনরায় তলব (Recall witness)</option>
+                                    <option value="remain">মুলতবি (Remain)</option>
+                                    <option value="report">প্রতিবেদন (Report)</option>
+                                    <option value="revision">রিভিশন (Revision)</option>
+                                    <option value="revision_filed">রিভিশন দাখিল (Revision filed)</option>
+                                    <option value="revision_hearing">রিভিশনের শুনানি (Revision hearing)</option>
+                                    <option value="service_return">জারি ফেরত (Service Return)</option>
+                                    <option value="settling_date_for_ph">পিএইচ-এর তারিখ নির্ধারণ (Settling Date for PH)</option>
+                                    <option value="summon_issue">সমন জারি (Summon Issue)</option>
+                                    <option value="time_petition_by_accused">আসামির সময়ের আবেদন (Time Petition by Accused)</option>
+                                    <option value="time_petition_by_complainant">বাদীর সময়ের আবেদন (Time Petition by Complainant)</option>
+                                    <option value="transfer_to_the_court">আদালতে স্থানান্তর (Transfer to the court)</option>
+                                    <option value="update_by_divisional_lawyer">বিভাগীয় আইনজীবী কর্তৃক হালনাগাদ (Update by Divisional Lawyer)</option>
+                                    <option value="update_from_ho">প্রধান কার্যালয় থেকে হালনাগাদ (Update from HO)</option>
+                                    <option value="update_from_lc_lawyer">এলসি আইনজীবীর কাছ থেকে হালনাগাদ (Update from LC Lawyer)</option>
+                                    <option value="upload_case_document">মামলার নথি আপলোড (Upload Case Document)</option>
+                                    <option value="witness">সাক্ষী (Witness)</option>
+                                    <option value="Other">অন্যান্য, উল্লেখ্ করুন (Other, please specify)</option>
                                 </select>
                             </div>
                             <div class="col-md-6 dependent-field" id="current_case_status_other_wrap">
@@ -965,8 +1038,8 @@
                                     <option value="">Select status</option>
                                     <option value="Custody - Prison">Custody - Prison</option>
                                     <option value="Custody - Court">Custody - Court</option>
-                                    <option value="Fugitive">Fugitive</option>
-                                    <option value="CDC">CDC</option>
+                                    <option value="Custody - Fugitive">Custody - Fugitive</option>
+                                    <option value="Custody - CDC">Custody - CDC</option>
                                     <option value="On bail">On bail</option>
                                     <option value="Deceased">Deceased</option>
                                     <option value="Other">Others</option>
@@ -975,6 +1048,14 @@
                             <div class="col-md-8 dependent-field" id="accused_status_other_wrap">
                                 <label class="field-label" for="accused_status_other">2.7 Other Status of Accused <small>অন্যান্য অবস্থা, উল্লেখ করুন</small></label>
                                 <input type="text" id="accused_status_other" name="accused_status_other" class="form-control" placeholder="Please specify the status of accused" data-required-when-visible>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="field-label" for="number_of_witnesses">2.8 Number of Witnesses <small>সাক্ষীর সংখ্যা</small></label>
+                                <input type="text" id="number_of_witnesses" name="number_of_witnesses" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="field-label" for="witnesses_examined">2.9 Witnesses Examined <small>পরীক্ষিত সাক্ষী</small></label>
+                                <input type="text" id="witnesses_examined" name="witnesses_examined" class="form-control">
                             </div>
                         </div>
                     </div>
@@ -989,75 +1070,75 @@
                 </h2>
                 <div id="summaryThree" class="accordion-collapse collapse" aria-labelledby="summaryHeaderThree" data-bs-parent="#caseSummaryAccordion">
                     <div class="accordion-body">
-                        <div class="row g-3">
-                            @foreach ([
-                                'complainant' => ['3.1', 'Complainant / Plaintiff', 'অভিযোগকারী/বাদীর তথ্য', 'অভিযোগকারী/বাদীর নাম', 'অভিযোগকারী/বাদীর ফোন নম্বর'],
-                                'defendant' => ['3.2', 'Defendant / Respondent', 'প্রতিপক্ষ/বিবাদীর তথ্য', 'প্রতিপক্ষ/বিবাদীর নাম', 'প্রতিপক্ষ/বিবাদীর ফোন নম্বর'],
-                            ] as $prefix => $party)
-                                <div class="col-12">
+                        @foreach ([
+                            'complainant' => ['3.1', 'Complainant / Plaintiff', 'অভিযোগকারী/বাদীর তথ্য', 'অভিযোগকারী/বাদীর নাম', 'অভিযোগকারী/বাদীর ফোন নম্বর'],
+                            'defendant' => ['3.2', 'Accused / Respondent', 'প্রতিপক্ষ/বিবাদীর তথ্য', 'প্রতিপক্ষ/বিবাদীর নাম', 'প্রতিপক্ষ/বিবাদীর ফোন নম্বর'],
+                        ] as $prefix => $party)
+                            <section class="party-section" data-party-prefix="{{ $prefix }}" data-party-label="{{ $party[1] }}">
+                                <div class="party-section-head">
                                     <div class="section-note"><strong>{{ $party[0] }} {{ $party[2] }}</strong> - {{ $party[1] }}</div>
+                                    <button type="button" class="btn btn-outline-success btn-sm party-add-row">
+                                        <i class="fas fa-plus" aria-hidden="true"></i> Add Row
+                                    </button>
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="field-label" for="{{ $prefix }}_name">{{ $party[0] }}.1 Name <small>{{ $party[3] }}</small></label>
-                                    <input type="text" id="{{ $prefix }}_name" name="{{ $prefix }}_name" class="form-control">
+                                <div class="party-rows">
+                                    <div class="party-entry" data-party-index="0">
+                                        <div class="party-entry-head">
+                                            <span class="party-entry-title">{{ $party[1] }} 1</span>
+                                            <button type="button" class="btn btn-outline-danger btn-sm party-remove-row" hidden>
+                                                <i class="fas fa-trash-can" aria-hidden="true"></i> Delete
+                                            </button>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="field-label" for="{{ $prefix }}_0_name">{{ $party[0] }}.1 Name <small>{{ $party[3] }}</small></label>
+                                                <input type="text" id="{{ $prefix }}_0_name" name="{{ $prefix }}[0][name]" class="form-control" data-party-field="name">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="field-label" for="{{ $prefix }}_0_sex">{{ $party[0] }}.2 Sex <small>লিঙ্গ</small></label>
+                                                <select id="{{ $prefix }}_0_sex" name="{{ $prefix }}[0][sex]" class="form-select" data-party-field="sex">
+                                                    <option value="">Select sex</option><option>Male</option><option>Female</option><option>Transgender Person</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="field-label" for="{{ $prefix }}_0_age">{{ $party[0] }}.3 Age <small>বয়স</small></label>
+                                                <input type="number" min="0" max="150" id="{{ $prefix }}_0_age" name="{{ $prefix }}[0][age]" class="form-control" data-party-field="age">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="field-label" for="{{ $prefix }}_0_disability">{{ $party[0] }}.4 Disability <small>প্রতিবন্ধিতা</small></label>
+                                                <select id="{{ $prefix }}_0_disability" name="{{ $prefix }}[0][disability]" class="form-select" data-party-field="disability">
+                                                    <option value="">Select</option><option>Yes</option><option>No</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="field-label" for="{{ $prefix }}_0_income">{{ $party[0] }}.5 Approximate Monthly Income <small>আনুমানিক মাসিক আয়</small></label>
+                                                <select id="{{ $prefix }}_0_income" name="{{ $prefix }}[0][income]" class="form-select" data-party-field="income">
+                                                    <option value="">Select income range</option><option>None</option><option>Up to 5000</option><option>5,001 to 10,000</option><option>10,001 to 25,000</option><option>25,001 to 50,000</option><option>More than 50,000</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="field-label" for="{{ $prefix }}_0_phone">{{ $party[0] }}.6 Phone Number <small>{{ $party[4] }}</small></label>
+                                                <input type="text" id="{{ $prefix }}_0_phone" name="{{ $prefix }}[0][phone]" class="form-control" data-party-field="phone">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="field-label" for="{{ $prefix }}_0_representation">{{ $party[0] }}.7 Representation <small>প্রতিনিধিত্ব</small></label>
+                                                <select id="{{ $prefix }}_0_representation" name="{{ $prefix }}[0][representation]" class="form-select" data-party-field="representation" data-lawyer-target="{{ $prefix }}_lawyer_fields_0">
+                                                    <option value="">Select representation</option><option>Self</option><option>Lawyer</option><option>NGO</option><option>Legal Aid Office</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 dependent-field" data-lawyer-field="{{ $prefix }}_lawyer_fields_0">
+                                                <label class="field-label" for="{{ $prefix }}_0_lawyer_name">{{ $party[0] }}.8 Lawyer Name <small>মামলায় নিযুক্ত আইনজীবীর নাম</small></label>
+                                                <input type="text" id="{{ $prefix }}_0_lawyer_name" name="{{ $prefix }}[0][lawyer_name]" class="form-control" data-party-field="lawyer_name">
+                                            </div>
+                                            <div class="col-md-4 dependent-field" data-lawyer-field="{{ $prefix }}_lawyer_fields_0">
+                                                <label class="field-label" for="{{ $prefix }}_0_lawyer_phone">{{ $party[0] }}.9 Lawyer Phone <small>মামলায় নিযুক্ত আইনজীবীর ফোন নম্বর</small></label>
+                                                <input type="text" id="{{ $prefix }}_0_lawyer_phone" name="{{ $prefix }}[0][lawyer_phone]" class="form-control" data-party-field="lawyer_phone">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="field-label" for="{{ $prefix }}_sex">{{ $party[0] }}.2 Sex <small>লিঙ্গ</small></label>
-                                    <select id="{{ $prefix }}_sex" name="{{ $prefix }}_sex" class="form-select">
-                                        <option value="">Select sex</option>
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                        <option>Transgender Person</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="field-label" for="{{ $prefix }}_age">{{ $party[0] }}.3 Age <small>বয়স</small></label>
-                                    <input type="number" min="0" max="150" id="{{ $prefix }}_age" name="{{ $prefix }}_age" class="form-control">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="field-label" for="{{ $prefix }}_disability">{{ $party[0] }}.4 Disability <small>প্রতিবন্ধিতা</small></label>
-                                    <select id="{{ $prefix }}_disability" name="{{ $prefix }}_disability" class="form-select">
-                                        <option value="">Select</option>
-                                        <option>Yes</option>
-                                        <option>No</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="field-label" for="{{ $prefix }}_income">{{ $party[0] }}.5 Approximate Monthly Income <small>আনুমানিক মাসিক আয়</small></label>
-                                    <select id="{{ $prefix }}_income" name="{{ $prefix }}_income" class="form-select">
-                                        <option value="">Select income range</option>
-                                        <option>None</option>
-                                        <option>Up to 5000</option>
-                                        <option>5,001 to 10,000</option>
-                                        <option>10,001 to 25,000</option>
-                                        <option>25,001 to 50,000</option>
-                                        <option>More than 50,000</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="field-label" for="{{ $prefix }}_phone">{{ $party[0] }}.6 Phone Number <small>{{ $party[4] }}</small></label>
-                                    <input type="text" id="{{ $prefix }}_phone" name="{{ $prefix }}_phone" class="form-control">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="field-label" for="{{ $prefix }}_representation">{{ $party[0] }}.7 Representation <small>প্রতিনিধিত্ব</small></label>
-                                    <select id="{{ $prefix }}_representation" name="{{ $prefix }}_representation" class="form-select" data-lawyer-target="{{ $prefix }}_lawyer_fields">
-                                        <option value="">Select representation</option>
-                                        <option>Self</option>
-                                        <option>Lawyer</option>
-                                        <option>NGO</option>
-                                        <option>Legal Aid Office</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 dependent-field" data-lawyer-field="{{ $prefix }}_lawyer_fields">
-                                    <label class="field-label" for="{{ $prefix }}_lawyer_name">{{ $party[0] }}.8 Lawyer Name <small>মামলায় নিযুক্ত আইনজীবীর নাম</small></label>
-                                    <input type="text" id="{{ $prefix }}_lawyer_name" name="{{ $prefix }}_lawyer_name" class="form-control">
-                                </div>
-                                <div class="col-md-4 dependent-field" data-lawyer-field="{{ $prefix }}_lawyer_fields">
-                                    <label class="field-label" for="{{ $prefix }}_lawyer_phone">{{ $party[0] }}.9 Lawyer Phone <small>মামলায় নিযুক্ত আইনজীবীর ফোন নম্বর</small></label>
-                                    <input type="text" id="{{ $prefix }}_lawyer_phone" name="{{ $prefix }}_lawyer_phone" class="form-control">
-                                </div>
-                            @endforeach
-                        </div>
+                            </section>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -1075,14 +1156,19 @@
                         </div>
                         <div class="decision-grid">
                             @foreach ([
-                                ['4.1', 'missing_documents', 'Missing Documents', ['Summon', 'Notice', 'Report', 'Other'], 'নথিপত্র হারিয়ে যাওয়া'],
-                                ['4.2', 'absent_witnesses', 'Absent Witnesses', ['Defense Witness', 'IO', 'MO', 'Other'], 'সাক্ষীর অনুপস্থিতি'],
-                                ['4.3', 'procedural_delays', 'Procedural Delays', ['Record Transfer', 'Scheduling', 'Other'], 'পদ্ধতিগত বিলম্ব'],
-                                ['4.4', 'adjournments', 'Adjournments by Parties / Court', [], 'পক্ষগণ বা আদালত কর্তৃক সময় নেয়া'],
-                                ['4.5', 'lawyer_absence', 'Lack of Lawyer / Prosecutor Presence', [], 'আইনজীবী ও প্রসিকিউটরের উপস্থিতির অভাব'],
-                                ['4.6', 'administrative_issues', 'Other Administrative Issues', [], 'অন্যান্য প্রশাসনিক বিষয়'],
-                                ['4.7', 'evidence_notes', 'Notes / Evidence Supporting Observation', [], 'নোট/সাক্ষ্য সমর্থিত পর্যবেক্ষণ'],
-                                ['4.8', 'other_barrier', 'Other, please specify', [], 'অন্যান্য, উল্লেখ করুন'],
+                                ['4.1', 'absent_witnesses', 'Absence of Witness', ['Government Witness', 'IO', 'MO', 'Others', 'General Witness (Please specify)'], 'সাক্ষীর অনুপস্থিতি', ['Others', 'General Witness (Please specify)']],
+                                ['4.2', 'procedural_delays', 'Procedural Delays', ['Judge not appointed', 'Judge in training', 'Judge on leave', 'Case transferred', 'Pending in higher court', 'LCR transferred', 'Other (Please specify)', 'Long dates / Delayed scheduling'], 'পদ্ধতিগত বিলম্ব', ['Other (Please specify)']],
+                                ['4.3', 'adjournment_by_parties', 'Adjournment by Parties (3+)', [], 'পক্ষগণ কর্তৃক মুলতবি (৩+)'],
+                                ['4.4', 'adjournment_by_court', 'Adjournment by Court (3+)', [], 'আদালত কর্তৃক মুলতবি (৩+)'],
+                                ['4.5', 'lack_of_lawyer', 'Lack of Lawyer', [], 'আইনজীবীর অনুপস্থিতি'],
+                                ['4.6', 'lack_of_prosecutor', 'Lack of Prosecutor', [], 'প্রসিকিউটরের অনুপস্থিতি'],
+                                ['4.7', 'administrative_issues', 'Other Administrative Issues (Please specify)', [], 'অন্যান্য প্রশাসনিক বিষয়'],
+                                ['4.8', 'settled_outside_court', 'Settled Outside Court and Not Reported', [], 'আদালতের বাইরে নিষ্পত্তি হয়েছে কিন্তু জানানো হয়নি'],
+                                ['4.9', 'death_of_accused', 'Death of Accused', [], 'আসামির মৃত্যু'],
+                                ['4.10', 'death_of_witness', 'Death of Witness', [], 'সাক্ষীর মৃত্যু'],
+                                ['4.11', 'pending_for_argument', 'Pending for Argument', [], 'যুক্তিতর্কের জন্য অপেক্ষমাণ'],
+                                ['4.12', 'pending_for_judgment', 'Pending for Judgment', [], 'রায়ের জন্য অপেক্ষমাণ'],
+                                ['4.13', 'dismissed_but_pending', 'Case Ordered to Be Dismissed but Still Pending', [], 'খারিজের আদেশ হলেও মামলা এখনও বিচারাধীন'],
                             ] as $barrier)
                                 <div class="decision-item">
                                     <div class="decision-head">
@@ -1107,7 +1193,7 @@
                                             @if (!empty($barrier[3]))
                                                 <div class="col-md-5">
                                                     <label class="field-label" for="{{ $barrier[1] }}_type">Type <small>ধরন</small></label>
-                                                    <select id="{{ $barrier[1] }}_type" name="{{ $barrier[1] }}_type" class="form-select" data-other-target="{{ $barrier[1] }}_other_wrap" data-required-when-active>
+                                                    <select id="{{ $barrier[1] }}_type" name="{{ $barrier[1] }}_type" class="form-select" data-other-target="{{ $barrier[1] }}_other_wrap" data-other-values="{{ implode('|', $barrier[5] ?? ['Other']) }}" data-required-when-active>
                                                         <option value="">Select type</option>
                                                         @foreach ($barrier[3] as $option)
                                                             <option>{{ $option }}</option>
@@ -1118,10 +1204,10 @@
                                                     <label class="field-label" for="{{ $barrier[1] }}_other">Please specify <small>উল্লেখ করুন</small></label>
                                                     <input type="text" id="{{ $barrier[1] }}_other" name="{{ $barrier[1] }}_other" class="form-control" data-required-when-visible>
                                                 </div>
-                                            @elseif ($barrier[1] === 'other_barrier')
+                                            @elseif ($barrier[1] === 'administrative_issues')
                                                 <div class="col-12">
-                                                    <label class="field-label" for="{{ $barrier[1] }}_specify">Other barrier <small>অন্যান্য প্রতিবন্ধকতা</small></label>
-                                                    <input type="text" id="{{ $barrier[1] }}_specify" name="{{ $barrier[1] }}_specify" class="form-control" placeholder="Other barrier, please specify" data-required-when-active>
+                                                    <label class="field-label" for="{{ $barrier[1] }}_specify">Administrative issue <small>প্রশাসনিক বিষয় উল্লেখ করুন</small></label>
+                                                    <input type="text" id="{{ $barrier[1] }}_specify" name="{{ $barrier[1] }}_specify" class="form-control" placeholder="Please specify the administrative issue" data-required-when-active>
                                                 </div>
                                             @endif
                                             <div class="col-12">
@@ -1146,52 +1232,43 @@
                 <div id="summaryFive" class="accordion-collapse collapse" aria-labelledby="summaryHeaderFive" data-bs-parent="#caseSummaryAccordion">
                     <div class="accordion-body">
                         <div class="section-guidance">
-                            Mark the proposed route for disposal or case movement. Reasons open only after selecting Yes.
+                            Mark the proposed route for disposal or case movement. Use the common remarks field for any relevant note.
                         </div>
-                        <div class="solution-grid">
+                        <div class="solution-checklist">
                             @foreach ([
-                                ['5.1', 'option_route', 'Alternative Option', 'বিকল্প'],
-                                ['5.2', 'priority_hearing', 'Priority Hearing', 'অগ্রাধিকার ভিত্তিক শুনানী'],
-                                ['5.3', 'mediation_settlement', 'Mediation / Settlement', 'মধ্যস্থতা/মীমাংসা'],
-                                ['5.4', 'diversion', 'Diversion', 'ডাইভারশন'],
-                                ['5.5', 'dismissal_withdrawal', 'Dismissal / Withdrawal', 'খারিজ/প্রত্যাহার'],
-                                ['5.6', 'administrative_followup', 'Administrative Follow-up', 'প্রশাসনিক ফলোআপ'],
+                                ['5.1', 'priority_hearing', 'Priority Hearing', 'অগ্রাধিকার ভিত্তিক শুনানী'],
+                                ['5.2', 'mediation_settlement', 'Referred to Mediation / Settlement', 'মধ্যস্থতা/মীমাংসার জন্য রেফার'],
+                                ['5.3', 'diversion_to_probation', 'Diversion to Probation', 'প্রবেশনে ডাইভারশন'],
+                                ['5.4', 'withdrawal', 'Withdrawal', 'প্রত্যাহার'],
+                                ['5.5', 'administrative_followup', 'Administrative Follow-up', 'প্রশাসনিক ফলোআপ'],
+                                ['5.6', 'case_scheduling', 'Scheduling of Cases', 'মামলার সময়সূচি নির্ধারণ'],
                                 ['5.7', 'other_solution', 'Other, please specify', 'অন্যান্য, উল্লেখ করুন'],
                             ] as $solution)
-                                <div class="decision-item">
-                                    <div class="decision-head">
-                                        <div class="decision-title">
-                                            <span class="field-no">{{ $solution[0] }}</span>
-                                            <span class="decision-title-text">
-                                                <span>{{ $solution[2] }}</span>
-                                                <small>{{ $solution[3] }}</small>
-                                            </span>
-                                        </div>
-                                        <div class="decision-control">
-                                            <label class="row-control-label" for="{{ $solution[1] }}_status">Proposed / প্রস্তাবিত</label>
-                                            <input type="hidden" name="{{ $solution[1] }}" value="No">
-                                            <label class="decision-check" for="{{ $solution[1] }}_status">
-                                                <span>Yes / হ্যাঁ</span>
-                                                <input id="{{ $solution[1] }}_status" type="checkbox" name="{{ $solution[1] }}" value="Yes" data-yes-target="{{ $solution[1] }}_reason_wrap">
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="dependent-field decision-detail" id="{{ $solution[1] }}_reason_wrap">
-                                        <div class="row g-2">
-                                            @if ($solution[1] === 'other_solution')
+                                <div class="solution-check-row">
+                                    <input type="hidden" name="{{ $solution[1] }}" value="No">
+                                    <label class="solution-checkbox" for="{{ $solution[1] }}_status">
+                                        <input id="{{ $solution[1] }}_status" type="checkbox" name="{{ $solution[1] }}" value="Yes" @if ($solution[1] === 'other_solution') data-yes-target="{{ $solution[1] }}_details" @endif>
+                                        <span class="solution-check-copy">
+                                            <strong>{{ $solution[0] }} {{ $solution[2] }}</strong>
+                                            <small>{{ $solution[3] }}</small>
+                                        </span>
+                                    </label>
+                                    @if ($solution[1] === 'other_solution')
+                                        <div class="dependent-field decision-detail" id="{{ $solution[1] }}_details">
+                                            <div class="row g-2">
                                                 <div class="col-12">
                                                     <label class="field-label" for="{{ $solution[1] }}_specify">Other route <small>অন্যান্য পথ</small></label>
                                                     <input type="text" id="{{ $solution[1] }}_specify" name="{{ $solution[1] }}_specify" class="form-control" placeholder="Other solution, please specify" data-required-when-active>
                                                 </div>
-                                            @endif
-                                            <div class="col-12">
-                                                <label class="field-label" for="{{ $solution[1] }}_reason">Reason / next action <small>কারণসমূহ / পরবর্তী পদক্ষেপ</small></label>
-                                                <textarea id="{{ $solution[1] }}_reason" name="{{ $solution[1] }}_reason" class="form-control" rows="2" placeholder="Why this route is proposed, and what should happen next" data-required-when-active></textarea>
                                             </div>
                                         </div>
-                                    </div>
+                                    @endif
                                 </div>
                             @endforeach
+                        </div>
+                        <div class="mt-3">
+                            <label class="field-label" for="solution_remarks">Remarks <small>মন্তব্য</small></label>
+                            <textarea id="solution_remarks" name="solution_remarks" class="form-control" rows="3" placeholder="Add remarks, if any"></textarea>
                         </div>
                     </div>
                 </div>
@@ -1363,32 +1440,6 @@
             </div>
 
             <div class="accordion-item case-summary-card">
-                <h2 class="accordion-header" id="summaryHeaderNine">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryNine" aria-expanded="false" aria-controls="summaryNine">
-                        <span class="case-summary-badge">9</span> পর্যালোচনা এবং অনুমোদন (Review and Endorsement)
-                    </button>
-                </h2>
-                <div id="summaryNine" class="accordion-collapse collapse" aria-labelledby="summaryHeaderNine" data-bs-parent="#caseSummaryAccordion">
-                    <div class="accordion-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="field-label" for="prepared_by">9.1 Paralegal Preparing Summary <small>সামারি প্রস্তুতকারী প্যারালিগ্যাল</small></label>
-                                <input type="text" id="prepared_by" name="prepared_by" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="field-label" for="court_official_reviewing">9.2 Peshkar / Court Official Reviewing <small>পর্যালোচনাকারী পেশকার / আদালত কর্মকর্তা</small></label>
-                                <input type="text" id="court_official_reviewing" name="court_official_reviewing" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="field-label" for="dpo_reviewed_by">9.3 Reviewed by the DPO <small>ডিপিও দ্বারা রিভিউকৃত</small></label>
-                                <input type="text" id="dpo_reviewed_by" name="dpo_reviewed_by" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item case-summary-card">
                 <h2 class="accordion-header" id="summaryHeaderTen">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryTen" aria-expanded="false" aria-controls="summaryTen">
                         <span class="case-summary-badge">10</span> মামলার অগ্রগতি (Case Progress / Follow-up)
@@ -1469,16 +1520,22 @@
             const chips = document.getElementById('act-selected');
             chips.replaceChildren();
             selected.forEach(option => {
+                const item = document.createElement('div');
+                item.className = 'act-selected-item';
+                const title = document.createElement('span');
+                title.textContent = option.title;
                 const button = document.createElement('button');
                 button.type = 'button';
-                button.textContent = option.title + ' ×';
+                button.className = 'act-selected-remove';
+                button.innerHTML = '<i class="fas fa-trash-can" aria-hidden="true"></i> Delete';
                 button.setAttribute('aria-label', 'Remove ' + option.title);
                 button.addEventListener('click', () => {
                     option.checkbox.checked = false;
                     option.checkbox.dispatchEvent(new Event('change', { bubbles: true }));
                     document.getElementById('act').focus();
                 });
-                chips.append(button);
+                item.append(title, button);
+                chips.append(item);
             });
         }
         actSearch.addEventListener('input', filterActs);
@@ -1605,7 +1662,7 @@
 
         function syncPendingDuration() {
             const filingInput = document.getElementById('case_filing_date');
-            const summaryDateInput = document.getElementById('summary_date');
+            const lastHearingInput = document.getElementById('last_hearing_date');
             const yearsOutput = document.getElementById('pending_years_display');
             const monthsOutput = document.getElementById('pending_months_display');
             const daysOutput = document.getElementById('pending_days_display');
@@ -1614,7 +1671,7 @@
                 return;
             }
 
-            if (!filingInput.value) {
+            if (!filingInput.value || !lastHearingInput?.value) {
                 yearsOutput.textContent = '-';
                 monthsOutput.textContent = '-';
                 daysOutput.textContent = '-';
@@ -1622,9 +1679,7 @@
             }
 
             const startDate = new Date(filingInput.value + 'T00:00:00');
-            const endDate = summaryDateInput && summaryDateInput.value
-                ? new Date(summaryDateInput.value + 'T00:00:00')
-                : new Date();
+            const endDate = new Date(lastHearingInput.value + 'T00:00:00');
 
             if (Number.isNaN(startDate.getTime()) || startDate > endDate) {
                 yearsOutput.textContent = '0';
@@ -1640,30 +1695,117 @@
         }
 
         document.getElementById('case_filing_date')?.addEventListener('change', syncPendingDuration);
-        document.getElementById('summary_date')?.addEventListener('change', syncPendingDuration);
+        document.getElementById('last_hearing_date')?.addEventListener('change', syncPendingDuration);
         syncPendingDuration();
 
         function syncCaseTitle() {
-            const complainantName = document.getElementById('complainant_name')?.value.trim() || '';
-            const defendantName = document.getElementById('defendant_name')?.value.trim() || '';
+            const partyNames = function(prefix) {
+                return Array.from(document.querySelectorAll('[data-party-prefix="' + prefix + '"] [data-party-field="name"]'))
+                    .map(function(input) { return input.value.trim(); })
+                    .filter(Boolean);
+            };
+            const complainantNames = partyNames('complainant');
+            const defendantNames = partyNames('defendant');
             const titlePreview = document.getElementById('case_title_preview');
 
             if (!titlePreview) {
                 return;
             }
 
-            if (!complainantName && !defendantName) {
+            if (!complainantNames.length && !defendantNames.length) {
                 titlePreview.textContent = 'Case parties will appear here';
                 titlePreview.classList.add('is-empty');
                 return;
             }
 
-            titlePreview.textContent = (complainantName || 'Complainant') + ' vs ' + (defendantName || 'Defendant');
+            const complainantTitle = complainantNames.length
+                ? complainantNames[0] + (complainantNames.length > 1 ? ' and others' : '')
+                : 'Complainant';
+            const defendantTitle = defendantNames.length
+                ? defendantNames[0] + (defendantNames.length > 1 ? ' and others' : '')
+                : 'Defendant';
+
+            titlePreview.textContent = complainantTitle + ' vs ' + defendantTitle;
             titlePreview.classList.remove('is-empty');
         }
 
-        document.getElementById('complainant_name')?.addEventListener('input', syncCaseTitle);
-        document.getElementById('defendant_name')?.addEventListener('input', syncCaseTitle);
+        function refreshPartyRowTitles(section) {
+            const label = section.dataset.partyLabel;
+            section.querySelectorAll('.party-entry').forEach(function(row, index) {
+                const title = row.querySelector('.party-entry-title');
+                const removeButton = row.querySelector('.party-remove-row');
+
+                if (title) {
+                    title.textContent = label + ' ' + (index + 1);
+                }
+
+                if (removeButton) {
+                    removeButton.hidden = index === 0;
+                }
+            });
+        }
+
+        function preparePartyRow(section, row, index) {
+            const prefix = section.dataset.partyPrefix;
+            row.dataset.partyIndex = index;
+
+            row.querySelectorAll('[data-party-field]').forEach(function(field) {
+                const fieldName = field.dataset.partyField;
+                field.id = prefix + '_' + index + '_' + fieldName;
+                field.name = prefix + '[' + index + '][' + fieldName + ']';
+                field.value = '';
+
+                const label = row.querySelector('label[for$="_' + fieldName + '"]');
+                if (label) {
+                    label.htmlFor = field.id;
+                }
+            });
+
+            const representation = row.querySelector('[data-party-field="representation"]');
+            const lawyerTarget = prefix + '_lawyer_fields_' + index;
+            if (representation) {
+                representation.dataset.lawyerTarget = lawyerTarget;
+                representation.addEventListener('change', function() {
+                    syncLawyerFields(representation);
+                });
+            }
+
+            row.querySelectorAll('[data-lawyer-field]').forEach(function(field) {
+                field.dataset.lawyerField = lawyerTarget;
+                field.style.display = 'none';
+            });
+
+            row.querySelector('[data-party-field="name"]')?.addEventListener('input', syncCaseTitle);
+            row.querySelector('.party-remove-row')?.addEventListener('click', function() {
+                row.remove();
+                refreshPartyRowTitles(section);
+                syncCaseTitle();
+            });
+        }
+
+        document.querySelectorAll('.party-section').forEach(function(section) {
+            const rows = section.querySelector('.party-rows');
+            const firstRow = rows?.querySelector('.party-entry');
+
+            if (!rows || !firstRow) {
+                return;
+            }
+
+            section.dataset.nextIndex = '1';
+            firstRow.querySelector('[data-party-field="name"]')?.addEventListener('input', syncCaseTitle);
+
+            section.querySelector('.party-add-row')?.addEventListener('click', function() {
+                const index = Number(section.dataset.nextIndex || 1);
+                const row = firstRow.cloneNode(true);
+                preparePartyRow(section, row, index);
+                rows.appendChild(row);
+                section.dataset.nextIndex = String(index + 1);
+                refreshPartyRowTitles(section);
+            });
+
+            refreshPartyRowTitles(section);
+        });
+
         syncCaseTitle();
 
         function syncMediationReferral() {
@@ -1796,7 +1938,11 @@
             }
 
             const decisionItem = select.closest('.decision-item');
-            const isVisible = select.value === 'Other' && (!decisionItem || decisionItem.classList.contains('is-active'));
+            const specifyValues = (select.dataset.otherValues || 'Other').split('|');
+            const hasOther = select.multiple
+                ? Array.from(select.selectedOptions).some(function(option) { return specifyValues.includes(option.value); })
+                : specifyValues.includes(select.value);
+            const isVisible = !select.disabled && hasOther && (!decisionItem || decisionItem.classList.contains('is-active'));
 
             target.style.display = isVisible ? 'block' : 'none';
             target.querySelectorAll('[data-required-when-visible]').forEach(function(field) {
@@ -1818,8 +1964,57 @@
             syncOtherField(select);
         });
 
+        const caseSectionType = document.getElementById('case_section_type');
+        const compoundableSectionWrap = document.getElementById('compoundable_section_wrap');
+        const nonCompoundableSectionWrap = document.getElementById('non_compoundable_section_wrap');
+        const caseSectionCommentsWrap = document.getElementById('case_section_comments_wrap');
+        const caseSectionComments = document.getElementById('case_section_comments');
+        const compoundableSection = document.getElementById('compoundable_case_section');
+        const nonCompoundableSection = document.getElementById('non_compoundable_case_section');
+
+        function syncCaseSectionType() {
+            const selectedType = caseSectionType?.value || '';
+            const showCompoundableSections = selectedType === 'Compoundable';
+            const showNonCompoundableSections = selectedType === 'Non-Compoundable';
+
+            if (compoundableSectionWrap) {
+                compoundableSectionWrap.style.display = showCompoundableSections ? 'block' : 'none';
+            }
+
+            if (nonCompoundableSectionWrap) {
+                nonCompoundableSectionWrap.style.display = showNonCompoundableSections ? 'block' : 'none';
+            }
+
+            if (caseSectionCommentsWrap) {
+                caseSectionCommentsWrap.style.display = selectedType ? 'block' : 'none';
+            }
+
+            if (caseSectionComments) {
+                caseSectionComments.disabled = !selectedType;
+            }
+
+            if (compoundableSection) {
+                compoundableSection.disabled = !showCompoundableSections;
+                syncOtherField(compoundableSection);
+            }
+
+            if (nonCompoundableSection) {
+                nonCompoundableSection.disabled = !showNonCompoundableSections;
+                syncOtherField(nonCompoundableSection);
+            }
+        }
+
+        caseSectionType?.addEventListener('change', syncCaseSectionType);
+        syncCaseSectionType();
+
         document.getElementById('caseSummaryDemoReset')?.addEventListener('click', function() {
             document.getElementById('caseSummaryDemoForm')?.reset();
+            document.querySelectorAll('.party-section').forEach(function(section) {
+                const rows = Array.from(section.querySelectorAll('.party-entry'));
+                rows.slice(1).forEach(function(row) { row.remove(); });
+                section.dataset.nextIndex = '1';
+                refreshPartyRowTitles(section);
+            });
             filterCourtsByDistrict();
             syncPendingDuration();
             syncCaseTitle();
@@ -1830,6 +2025,7 @@
             document.querySelectorAll('[data-yes-target]').forEach(syncYesField);
             document.querySelectorAll('[data-other-target]').forEach(syncOtherField);
             document.querySelectorAll('[data-lawyer-target]').forEach(syncLawyerFields);
+            syncCaseSectionType();
         });
 
         applyFieldNumberBadges();

@@ -682,6 +682,41 @@
         rules.forEach(syncRule);
     }
 
+    function setupExclusiveCourtAssistanceOptions() {
+        const legalRepresentation = document.getElementById('legal_representation');
+        const referralService = document.getElementById('referral_service');
+
+        if (!legalRepresentation || !referralService || legalRepresentation.dataset.exclusiveAssistanceApplied === 'true') {
+            return;
+        }
+
+        function hasValue(field) {
+            return String(field.value || '').trim() !== '';
+        }
+
+        function sync() {
+            const hasLegalRepresentation = hasValue(legalRepresentation);
+            const hasReferralService = hasValue(referralService);
+
+            // Preserve historical records where both options were already saved.
+            if (hasLegalRepresentation && hasReferralService) {
+                legalRepresentation.disabled = false;
+                referralService.disabled = false;
+                return;
+            }
+
+            legalRepresentation.disabled = hasReferralService;
+            referralService.disabled = hasLegalRepresentation;
+        }
+
+        legalRepresentation.addEventListener('change', sync);
+        referralService.addEventListener('change', sync);
+        legalRepresentation.dataset.exclusiveAssistanceApplied = 'true';
+        referralService.dataset.exclusiveAssistanceApplied = 'true';
+
+        sync();
+    }
+
     window.applyCourtPolicePrisonManualLabels = function () {
         applyOptionLabels();
 
@@ -715,5 +750,6 @@
         setupRequiredSubmitNotice();
         setupDistrictLegalAidSectionVisibility();
         setupProgressiveDependentFields();
+        setupExclusiveCourtAssistanceOptions();
     };
 })();
