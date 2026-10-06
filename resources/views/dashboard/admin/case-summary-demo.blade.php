@@ -357,6 +357,34 @@
         background: #fbfcfd;
     }
 
+    .barrier-multi-select {
+        min-height: 190px;
+        padding: 5px;
+        border-color: #ccd9d2;
+        background: #f9fbfa;
+        color: #27313d;
+        line-height: 1.35;
+    }
+
+    .barrier-multi-select:focus {
+        border-color: #72a58e;
+        box-shadow: 0 0 0 3px rgba(47, 125, 98, .11);
+    }
+
+    .barrier-multi-select option {
+        margin: 2px 0;
+        padding: 7px 9px;
+        border-radius: 4px;
+        background: #fff;
+        color: #374151;
+    }
+
+    .barrier-multi-select option:checked {
+        background: #dff2e7 linear-gradient(0deg, #dff2e7 0%, #dff2e7 100%);
+        color: #17643a;
+        font-weight: 700;
+    }
+
     .row-control-label {
         display: block;
         margin-bottom: 5px;
@@ -886,41 +914,33 @@
                                 <label class="field-label" for="case_number">1.2 Case Number <small>মামলা নাম্বার</small></label>
                                 <input type="text" id="case_number" name="case_number" class="form-control">
                             </div>
-                            <div class="col-md-4">
-                                <label class="field-label" for="case_section_type">1.3 Case Section <small>মামলার ধারা</small></label>
-                                <select id="case_section_type" name="case_section_type" class="form-select">
-                                    <option value="">Select section type</option>
-                                    <option value="Compoundable">Compoundable (আপসযোগ্য)</option>
-                                    <option value="Non-Compoundable">Non-Compoundable (আপস অযোগ্য)</option>
-                                </select>
+                            <div class="col-md-6">
+                                <label class="field-label" id="compoundable-sections-label">1.3 Compoundable Sections <small>আপসযোগ্য ধারা</small></label>
+                                <details class="act-picker" id="compoundable-section-picker">
+                                    <summary id="compoundable-section-control" aria-labelledby="compoundable-sections-label compoundable-section-summary"><span id="compoundable-section-summary">Select sections</span></summary>
+                                    <div class="act-picker-panel">
+                                        <label for="compoundable-section-search" class="visually-hidden">Search compoundable sections</label>
+                                        <input type="search" id="compoundable-section-search" class="form-control" placeholder="Search section number" autocomplete="off">
+                                        <div class="small text-muted mt-2" id="compoundable-section-results" role="status"></div>
+                                        <div class="act-picker-options" role="group" aria-labelledby="compoundable-sections-label">
+                                            @foreach (['11(c)', 143, 147, 148, 298, 323, 324, 325, 334, 335, 336, 337, 338, 341, 342, 343, 344, 346, 347, 348, 352, 354, 355, 356, 357, 358, 374, 379, 380, 381, 403, 406, 407, 408, 411, 414, 417, 418, 419, 420, 421, 422, 423, 424, 426, 427, 428, 429, 430, 447, 448, 451, 482, 483, 486, 490, 491, 492, 493, 494, 497, 498, 500, 501, 502, 504, 506, 508, 509, 511] as $sectionNumber)
+                                                <label class="act-picker-option compoundable-section-option">
+                                                    <input type="checkbox" name="compoundable_sections[]" value="{{ $sectionNumber }}">
+                                                    <span>Section {{ $sectionNumber }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </details>
+                                <div class="act-selected" id="compoundable-section-selected" aria-label="Selected compoundable sections"></div>
                             </div>
-                            <div class="col-md-4 dependent-field" id="compoundable_section_wrap">
-                                <label class="field-label" for="compoundable_case_section">1.3 Compoundable Section <small>আপসযোগ্য ধারা</small></label>
-                                <select id="compoundable_case_section" name="compoundable_case_section[]" class="form-select" data-other-target="compoundable_section_other_wrap" multiple size="4">
-                                    <option value="Demo Compoundable Section 1">Demo Compoundable Section 1</option>
-                                    <option value="Demo Compoundable Section 2">Demo Compoundable Section 2</option>
-                                    <option value="Other">অন্যান্য, উল্লেখ্ করুন (Other, please specify)</option>
-                                </select>
+                            <div class="col-md-3">
+                                <label class="field-label" for="non_compoundable_section">1.3 Non-Compoundable Section <small>অন্যান্য আপস অযোগ্য ধারা</small></label>
+                                <input type="text" id="non_compoundable_section" name="non_compoundable_section" class="form-control" placeholder="Specify non-compoundable section">
                             </div>
-                            <div class="col-md-4 dependent-field" id="non_compoundable_section_wrap">
-                                <label class="field-label" for="non_compoundable_case_section">1.3 Non-Compoundable Section <small>আপস অযোগ্য ধারা</small></label>
-                                <select id="non_compoundable_case_section" name="non_compoundable_case_section[]" class="form-select" data-other-target="non_compoundable_section_other_wrap" multiple size="4">
-                                    <option value="Demo Non-Compoundable Section 1">Demo Non-Compoundable Section 1</option>
-                                    <option value="Demo Non-Compoundable Section 2">Demo Non-Compoundable Section 2</option>
-                                    <option value="Other">অন্যান্য, উল্লেখ্ করুন (Other, please specify)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 dependent-field" id="case_section_comments_wrap">
+                            <div class="col-md-3">
                                 <label class="field-label" for="case_section_comments">1.3 Comments <small>মন্তব্য</small></label>
                                 <textarea id="case_section_comments" name="case_section_comments" class="form-control" rows="2" placeholder="Add comments, if any"></textarea>
-                            </div>
-                            <div class="col-md-4 dependent-field" id="compoundable_section_other_wrap">
-                                <label class="field-label" for="compoundable_section_other">1.3 Other Compoundable Section <small>অন্যান্য আপসযোগ্য ধারা</small></label>
-                                <input type="text" id="compoundable_section_other" name="compoundable_section_other" class="form-control" placeholder="Specify the compoundable section" data-required-when-visible>
-                            </div>
-                            <div class="col-md-4 dependent-field" id="non_compoundable_section_other_wrap">
-                                <label class="field-label" for="non_compoundable_section_other">1.3 Other Non-Compoundable Section <small>অন্যান্য আপস অযোগ্য ধারা</small></label>
-                                <input type="text" id="non_compoundable_section_other" name="non_compoundable_section_other" class="form-control" placeholder="Specify the non-compoundable section" data-required-when-visible>
                             </div>
                             <div class="col-md-4">
                                 <label class="field-label" id="act-label">1.4 Act <small>আইন</small></label>
@@ -962,7 +982,7 @@
                     <div class="accordion-body">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="field-label" for="offence_subject">2.2 Type of Offence / Subject Matter <small>অপরাধের ধরন/ বিষয়বস্তু</small></label>
+                                <label class="field-label" for="offence_subject">2.2 Description of Offence <small>অপরাধের বিবরণ</small></label>
                                 <input type="text" id="offence_subject" name="offence_subject" class="form-control">
                             </div>
                             <div class="col-md-6">
@@ -1008,9 +1028,6 @@
                                     <option value="time_petition_by_accused">আসামির সময়ের আবেদন (Time Petition by Accused)</option>
                                     <option value="time_petition_by_complainant">বাদীর সময়ের আবেদন (Time Petition by Complainant)</option>
                                     <option value="transfer_to_the_court">আদালতে স্থানান্তর (Transfer to the court)</option>
-                                    <option value="update_by_divisional_lawyer">বিভাগীয় আইনজীবী কর্তৃক হালনাগাদ (Update by Divisional Lawyer)</option>
-                                    <option value="update_from_ho">প্রধান কার্যালয় থেকে হালনাগাদ (Update from HO)</option>
-                                    <option value="update_from_lc_lawyer">এলসি আইনজীবীর কাছ থেকে হালনাগাদ (Update from LC Lawyer)</option>
                                     <option value="upload_case_document">মামলার নথি আপলোড (Upload Case Document)</option>
                                     <option value="witness">সাক্ষী (Witness)</option>
                                     <option value="Other">অন্যান্য, উল্লেখ্ করুন (Other, please specify)</option>
@@ -1156,19 +1173,20 @@
                         </div>
                         <div class="decision-grid">
                             @foreach ([
-                                ['4.1', 'absent_witnesses', 'Absence of Witness', ['Government Witness', 'IO', 'MO', 'Others', 'General Witness (Please specify)'], 'সাক্ষীর অনুপস্থিতি', ['Others', 'General Witness (Please specify)']],
-                                ['4.2', 'procedural_delays', 'Procedural Delays', ['Judge not appointed', 'Judge in training', 'Judge on leave', 'Case transferred', 'Pending in higher court', 'LCR transferred', 'Other (Please specify)', 'Long dates / Delayed scheduling'], 'পদ্ধতিগত বিলম্ব', ['Other (Please specify)']],
-                                ['4.3', 'adjournment_by_parties', 'Adjournment by Parties (3+)', [], 'পক্ষগণ কর্তৃক মুলতবি (৩+)'],
-                                ['4.4', 'adjournment_by_court', 'Adjournment by Court (3+)', [], 'আদালত কর্তৃক মুলতবি (৩+)'],
-                                ['4.5', 'lack_of_lawyer', 'Lack of Lawyer', [], 'আইনজীবীর অনুপস্থিতি'],
-                                ['4.6', 'lack_of_prosecutor', 'Lack of Prosecutor', [], 'প্রসিকিউটরের অনুপস্থিতি'],
-                                ['4.7', 'administrative_issues', 'Other Administrative Issues (Please specify)', [], 'অন্যান্য প্রশাসনিক বিষয়'],
+                                ['4.1', 'missing_documents', 'Missing Documents', ['Complaint petition', 'FIR', 'Ejahar', 'Forwarding letter', 'Summon / Warrant copy', 'Shown arrest application', 'Chargesheet', 'Final report', 'Inquest report', 'Post Mortem report', 'Medical report', 'Ballistic report', 'Legal Notice', 'AD slip', 'Cheque, Dishonor slip', 'Discharge petition', 'Bail Petition', 'Any other petition. Please specify'], 'নথিপত্রের ঘাটতি', ['Any other petition. Please specify'], true],
+                                ['4.2', 'absent_witnesses', 'Absence of Witness', ['Government Witness', 'General Witness'], 'সাক্ষীর অনুপস্থিতি', []],
+                                ['4.3', 'procedural_delays', 'Procedural Delays', ['Judge not appointed', 'Judge in training', 'Judge on leave', 'Case transferred', 'Pending in higher court', 'LCR transferred', 'Other (Please specify)', 'Long dates / Delayed scheduling'], 'পদ্ধতিগত বিলম্ব', ['Other (Please specify)']],
+                                ['4.4', 'adjournment_by_parties', 'Adjournment by Parties (3+)', [], 'পক্ষগণ কর্তৃক মুলতবি (৩+)'],
+                                ['4.5', 'adjournment_by_court', 'Adjournment by Court (3+)', [], 'আদালত কর্তৃক মুলতবি (৩+)'],
+                                ['4.6', 'lack_of_lawyer', 'Lack of Lawyer', [], 'আইনজীবীর অনুপস্থিতি'],
+                                ['4.7', 'lack_of_prosecutor', 'Lack of Prosecutor', [], 'প্রসিকিউটরের অনুপস্থিতি'],
                                 ['4.8', 'settled_outside_court', 'Settled Outside Court and Not Reported', [], 'আদালতের বাইরে নিষ্পত্তি হয়েছে কিন্তু জানানো হয়নি'],
                                 ['4.9', 'death_of_accused', 'Death of Accused', [], 'আসামির মৃত্যু'],
                                 ['4.10', 'death_of_witness', 'Death of Witness', [], 'সাক্ষীর মৃত্যু'],
                                 ['4.11', 'pending_for_argument', 'Pending for Argument', [], 'যুক্তিতর্কের জন্য অপেক্ষমাণ'],
                                 ['4.12', 'pending_for_judgment', 'Pending for Judgment', [], 'রায়ের জন্য অপেক্ষমাণ'],
                                 ['4.13', 'dismissed_but_pending', 'Case Ordered to Be Dismissed but Still Pending', [], 'খারিজের আদেশ হলেও মামলা এখনও বিচারাধীন'],
+                                ['4.14', 'administrative_issues', 'Other Administrative Issues', [], 'অন্যান্য প্রশাসনিক বিষয়'],
                             ] as $barrier)
                                 <div class="decision-item">
                                     <div class="decision-head">
@@ -1190,11 +1208,39 @@
                                     </div>
                                     <div class="dependent-field decision-detail" id="{{ $barrier[1] }}_details">
                                         <div class="row g-2">
-                                            @if (!empty($barrier[3]))
+                                            @if ($barrier[1] === 'absent_witnesses')
+                                                <div class="col-md-5">
+                                                    <label class="field-label" for="absent_witnesses_type">Witness Type <small>সাক্ষীর ধরন</small></label>
+                                                    <select id="absent_witnesses_type" name="absent_witnesses_type" class="form-select" data-required-when-active>
+                                                        <option value="">Select witness type</option>
+                                                        <option value="Government Witness">Government Witness</option>
+                                                        <option value="General Witness">General Witness</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-7 dependent-field" id="government_witness_type_wrap">
+                                                    <label class="field-label" for="government_witness_type">Government Witness Type <small>সরকারি সাক্ষীর ধরন</small></label>
+                                                    <select id="government_witness_type" name="government_witness_type" class="form-select">
+                                                        <option value="">Select type</option>
+                                                        <option value="IO">IO</option>
+                                                        <option value="MO">MO</option>
+                                                        <option value="Others">Others</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-7 offset-md-5 dependent-field" id="government_witness_other_wrap">
+                                                    <label class="field-label" for="government_witness_other">Other Government Witness <small>অন্যান্য সরকারি সাক্ষী উল্লেখ করুন</small></label>
+                                                    <input type="text" id="government_witness_other" name="government_witness_other" class="form-control">
+                                                </div>
+                                                <div class="col-md-7 offset-md-5 dependent-field" id="general_witness_details_wrap">
+                                                    <label class="field-label" for="general_witness_details">General Witness <small>সাধারণ সাক্ষী উল্লেখ করুন</small></label>
+                                                    <input type="text" id="general_witness_details" name="general_witness_details" class="form-control">
+                                                </div>
+                                            @elseif (!empty($barrier[3]))
                                                 <div class="col-md-5">
                                                     <label class="field-label" for="{{ $barrier[1] }}_type">Type <small>ধরন</small></label>
-                                                    <select id="{{ $barrier[1] }}_type" name="{{ $barrier[1] }}_type" class="form-select" data-other-target="{{ $barrier[1] }}_other_wrap" data-other-values="{{ implode('|', $barrier[5] ?? ['Other']) }}" data-required-when-active>
-                                                        <option value="">Select type</option>
+                                                    <select id="{{ $barrier[1] }}_type" name="{{ $barrier[1] }}_type{{ !empty($barrier[6]) ? '[]' : '' }}" class="form-select {{ !empty($barrier[6]) ? 'barrier-multi-select' : '' }}" data-other-target="{{ $barrier[1] }}_other_wrap" data-other-values="{{ implode('|', $barrier[5] ?? ['Other']) }}" data-required-when-active @if (!empty($barrier[6])) multiple size="7" @endif>
+                                                        @if (empty($barrier[6]))
+                                                            <option value="">Select type</option>
+                                                        @endif
                                                         @foreach ($barrier[3] as $option)
                                                             <option>{{ $option }}</option>
                                                         @endforeach
@@ -1560,6 +1606,95 @@
         });
         filterActs();
         syncSelectedActs();
+
+        const compoundablePicker = document.getElementById('compoundable-section-picker');
+        const compoundableSearch = document.getElementById('compoundable-section-search');
+        const compoundableOptions = Array.from(compoundablePicker.querySelectorAll('.compoundable-section-option')).map(function(label) {
+            return {
+                label: label,
+                checkbox: label.querySelector('input'),
+                title: label.querySelector('span').textContent.trim()
+            };
+        });
+
+        function filterCompoundableSections() {
+            const query = compoundableSearch.value.trim().toLocaleLowerCase();
+            let visible = 0;
+
+            compoundableOptions.forEach(function(option) {
+                option.label.hidden = query !== '' && !option.title.toLocaleLowerCase().includes(query);
+                if (!option.label.hidden) {
+                    visible++;
+                }
+            });
+
+            document.getElementById('compoundable-section-results').textContent = visible
+                ? visible + ' sections available'
+                : 'No matching sections found.';
+        }
+
+        function syncSelectedCompoundableSections() {
+            const selected = compoundableOptions.filter(function(option) { return option.checkbox.checked; });
+            const summary = document.getElementById('compoundable-section-summary');
+            const selectedList = document.getElementById('compoundable-section-selected');
+
+            summary.textContent = selected.length
+                ? selected.length + ' section' + (selected.length === 1 ? '' : 's') + ' selected'
+                : 'Select sections';
+            selectedList.replaceChildren();
+
+            selected.forEach(function(option) {
+                const item = document.createElement('div');
+                item.className = 'act-selected-item';
+                const title = document.createElement('span');
+                title.textContent = option.title;
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'act-selected-remove';
+                button.innerHTML = '<i class="fas fa-trash-can" aria-hidden="true"></i> Delete';
+                button.setAttribute('aria-label', 'Remove ' + option.title);
+                button.addEventListener('click', function() {
+                    option.checkbox.checked = false;
+                    syncSelectedCompoundableSections();
+                    document.getElementById('compoundable-section-control').focus();
+                });
+                item.append(title, button);
+                selectedList.append(item);
+            });
+        }
+
+        compoundableSearch.addEventListener('input', filterCompoundableSections);
+        compoundableSearch.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+            }
+        });
+        compoundablePicker.addEventListener('change', syncSelectedCompoundableSections);
+        compoundablePicker.addEventListener('toggle', function() {
+            if (compoundablePicker.open) {
+                compoundableSearch.focus();
+            }
+        });
+        compoundablePicker.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                compoundablePicker.open = false;
+                document.getElementById('compoundable-section-control').focus();
+            }
+        });
+        document.addEventListener('click', function(event) {
+            if (!compoundablePicker.contains(event.target)) {
+                compoundablePicker.open = false;
+            }
+        });
+        document.getElementById('caseSummaryDemoForm').addEventListener('reset', function() {
+            setTimeout(function() {
+                compoundableSearch.value = '';
+                filterCompoundableSections();
+                syncSelectedCompoundableSections();
+            }, 0);
+        });
+        filterCompoundableSections();
+        syncSelectedCompoundableSections();
 
         const districtSelect = document.getElementById('district');
         const courtSelect = document.getElementById('court_name');
@@ -1928,6 +2063,9 @@
             }
 
             target.querySelectorAll('[data-other-target]').forEach(syncOtherField);
+            if (target.id === 'absent_witnesses_details') {
+                syncAbsentWitnessFields();
+            }
         }
 
         function syncOtherField(select) {
@@ -1950,6 +2088,31 @@
             });
         }
 
+        function syncAbsentWitnessFields() {
+            const witnessType = document.getElementById('absent_witnesses_type');
+            const governmentType = document.getElementById('government_witness_type');
+            const governmentWrap = document.getElementById('government_witness_type_wrap');
+            const governmentOtherWrap = document.getElementById('government_witness_other_wrap');
+            const generalWrap = document.getElementById('general_witness_details_wrap');
+
+            if (!witnessType || !governmentType || !governmentWrap || !governmentOtherWrap || !generalWrap) {
+                return;
+            }
+
+            const isActive = witnessType.closest('.decision-item')?.classList.contains('is-active');
+            const showGovernment = isActive && witnessType.value === 'Government Witness';
+            const showGovernmentOther = showGovernment && governmentType.value === 'Others';
+            const showGeneral = isActive && witnessType.value === 'General Witness';
+
+            governmentWrap.style.display = showGovernment ? 'block' : 'none';
+            governmentOtherWrap.style.display = showGovernmentOther ? 'block' : 'none';
+            generalWrap.style.display = showGeneral ? 'block' : 'none';
+
+            governmentType.required = showGovernment;
+            document.getElementById('government_witness_other').required = showGovernmentOther;
+            document.getElementById('general_witness_details').required = showGeneral;
+        }
+
         document.querySelectorAll('[data-yes-target]').forEach(function(select) {
             select.addEventListener('change', function() {
                 syncYesField(select);
@@ -1964,48 +2127,9 @@
             syncOtherField(select);
         });
 
-        const caseSectionType = document.getElementById('case_section_type');
-        const compoundableSectionWrap = document.getElementById('compoundable_section_wrap');
-        const nonCompoundableSectionWrap = document.getElementById('non_compoundable_section_wrap');
-        const caseSectionCommentsWrap = document.getElementById('case_section_comments_wrap');
-        const caseSectionComments = document.getElementById('case_section_comments');
-        const compoundableSection = document.getElementById('compoundable_case_section');
-        const nonCompoundableSection = document.getElementById('non_compoundable_case_section');
-
-        function syncCaseSectionType() {
-            const selectedType = caseSectionType?.value || '';
-            const showCompoundableSections = selectedType === 'Compoundable';
-            const showNonCompoundableSections = selectedType === 'Non-Compoundable';
-
-            if (compoundableSectionWrap) {
-                compoundableSectionWrap.style.display = showCompoundableSections ? 'block' : 'none';
-            }
-
-            if (nonCompoundableSectionWrap) {
-                nonCompoundableSectionWrap.style.display = showNonCompoundableSections ? 'block' : 'none';
-            }
-
-            if (caseSectionCommentsWrap) {
-                caseSectionCommentsWrap.style.display = selectedType ? 'block' : 'none';
-            }
-
-            if (caseSectionComments) {
-                caseSectionComments.disabled = !selectedType;
-            }
-
-            if (compoundableSection) {
-                compoundableSection.disabled = !showCompoundableSections;
-                syncOtherField(compoundableSection);
-            }
-
-            if (nonCompoundableSection) {
-                nonCompoundableSection.disabled = !showNonCompoundableSections;
-                syncOtherField(nonCompoundableSection);
-            }
-        }
-
-        caseSectionType?.addEventListener('change', syncCaseSectionType);
-        syncCaseSectionType();
+        document.getElementById('absent_witnesses_type')?.addEventListener('change', syncAbsentWitnessFields);
+        document.getElementById('government_witness_type')?.addEventListener('change', syncAbsentWitnessFields);
+        syncAbsentWitnessFields();
 
         document.getElementById('caseSummaryDemoReset')?.addEventListener('click', function() {
             document.getElementById('caseSummaryDemoForm')?.reset();
@@ -2025,7 +2149,7 @@
             document.querySelectorAll('[data-yes-target]').forEach(syncYesField);
             document.querySelectorAll('[data-other-target]').forEach(syncOtherField);
             document.querySelectorAll('[data-lawyer-target]').forEach(syncLawyerFields);
-            syncCaseSectionType();
+            syncAbsentWitnessFields();
         });
 
         applyFieldNumberBadges();
