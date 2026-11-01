@@ -197,7 +197,8 @@
                 $canShowLsidManagement = auth()->user()->can('View LSID Management');
                 $canShowFormalCaseImport = auth()->user()->can('View Formal Case Import Page') && auth()->user()->can('Import Formal Cases');
                 $canShowLsidImport = auth()->user()->can('View LSID Import Page') && auth()->user()->can('Import LSID Registers');
-                $canShowCentralIdMenu = $canShowCentralIdForm || $canShowLsidRegister || $canShowLsidManagement || $canShowFormalCaseImport || $canShowLsidImport;
+                $canShowEndorsedResults = auth()->user()->can('View Endorsed Result Documents');
+                $canShowCentralIdMenu = $canShowCentralIdForm || $canShowLsidRegister || $canShowLsidManagement || $canShowFormalCaseImport || $canShowLsidImport || $canShowEndorsedResults;
             @endphp
             @if($canShowCentralIdMenu)
             <li class="has-submenu">
@@ -217,6 +218,9 @@
                     @endif
                     @if($canShowLsidImport)
                     <li><a class="nav-link nav-sublink" href="{{ route('lsid-register.import.view') }}"><i class="fas fa-file-import"></i><span class="nav-text">Bulk LSID Register</span></a></li>
+                    @endif
+                    @if($canShowEndorsedResults)
+                    <li><a class="nav-link nav-sublink" href="{{ route('endorsed-documents.index') }}"><i class="fas fa-file-signature"></i><span class="nav-text">Endorsed Results</span></a></li>
                     @endif
                 </ul>
             </li>

@@ -16,6 +16,7 @@ use App\Http\Controllers\TodoController;
 use App\Http\Controllers\CaseMessageController;
 use App\Http\Controllers\SystemSettingController;
 use App\Http\Controllers\ActController;
+use App\Http\Controllers\EndorsedResultDocumentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -137,6 +138,13 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::get('/lsid-report', [LsidRegisterController::class, 'report'])->name('lsid-register.report')->middleware('permission:View LSID Report');
     Route::get('/lsid-report/print', [LsidRegisterController::class, 'reportPdf'])->name('lsid-register.report.print')->middleware('permission:Generate LSID Report');
     Route::post('/lsid-report/pdf', [ReportController::class, 'generatePdf'])->name('lsid-register.report.pdf')->middleware('permission:Generate LSID Report');
+    Route::get('/endorsed-results', [EndorsedResultDocumentController::class, 'index'])->name('endorsed-documents.index')->middleware('permission:View Endorsed Result Documents');
+    Route::post('/endorsed-results', [EndorsedResultDocumentController::class, 'store'])->name('endorsed-documents.store')->middleware('permission:Upload Endorsed Result Document');
+    Route::get('/endorsed-results/{endorsedDocument}/edit', [EndorsedResultDocumentController::class, 'edit'])->name('endorsed-documents.edit')->middleware('permission:Replace Endorsed Result Document');
+    Route::put('/endorsed-results/{endorsedDocument}', [EndorsedResultDocumentController::class, 'update'])->name('endorsed-documents.update')->middleware('permission:Replace Endorsed Result Document');
+    Route::get('/endorsed-results/{endorsedDocument}/view', [EndorsedResultDocumentController::class, 'view'])->name('endorsed-documents.view')->middleware('permission:Download Endorsed Result Document');
+    Route::get('/endorsed-results/{endorsedDocument}/download', [EndorsedResultDocumentController::class, 'download'])->name('endorsed-documents.download')->middleware('permission:Download Endorsed Result Document');
+    Route::delete('/endorsed-results/{endorsedDocument}', [EndorsedResultDocumentController::class, 'destroy'])->name('endorsed-documents.destroy')->middleware('permission:Delete Endorsed Result Document');
     Route::get('/formal-cases/export', [ReportController::class, 'exportExcel'])->name('formal.cases.export')->middleware('permission:Export Formal Cases');
     Route::post('/dashboard/search', [ReportController::class, 'search'])->name('dashboard.search')->middleware('permission:Search Dashboard Reports');
     
