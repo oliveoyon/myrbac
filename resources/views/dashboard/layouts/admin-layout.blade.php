@@ -181,15 +181,22 @@
             </li>
             @endcanany
 
-            @can('View Formal Cases Form')
+            @canany(['View Case Summary Form', 'View Case Summary Management', 'View Formal Cases Form'])
             <li class="has-submenu">
                 <a class="nav-link submenu-toggle" href="#" aria-expanded="false"><i class="fas fa-folder-open"></i><span class="nav-text">Case Management</span><i class="fas fa-chevron-down menu-chevron"></i></a>
                 <ul class="submenu">
-                    <li><a class="nav-link nav-sublink" href="{{ route('case-summary.demo') }}"><i class="fas fa-file-alt"></i><span class="nav-text">Case Summary Form</span></a></li>
+                    @can('View Case Summary Form')
+                    <li><a class="nav-link nav-sublink" href="{{ route('case-summaries.create') }}"><i class="fas fa-file-alt"></i><span class="nav-text">Case Summary Form</span></a></li>
+                    @endcan
+                    @can('View Case Summary Management')
+                    <li><a class="nav-link nav-sublink" href="{{ route('case-summaries.index') }}"><i class="fas fa-table-list"></i><span class="nav-text">Case Summary Management</span></a></li>
+                    @endcan
+                    @can('View Formal Cases Form')
                     <li><a class="nav-link nav-sublink" href="{{ route('plc.form') }}"><i class="fas fa-scale-balanced"></i><span class="nav-text">Paralegal Aid Clinic</span></a></li>
+                    @endcan
                 </ul>
             </li>
-            @endcan
+            @endcanany
 
             @php
                 $canShowCentralIdForm = auth()->user()->can('View Formal Cases Form') && auth()->user()->can('Create Formal Case');

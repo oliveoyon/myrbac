@@ -829,7 +829,44 @@
         </div>
     </div>
 
-    <form id="caseSummaryDemoForm" class="case-summary-form" action="javascript:void(0);" enctype="multipart/form-data">
+    @php
+        $isEdit = isset($caseSummary) && $caseSummary;
+        $formData = array_replace_recursive($initialFormData ?? [], old());
+    @endphp
+
+    @if (session('success'))
+        <div class="alert alert-success" role="alert">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger" role="alert">{{ session('error') }}</div>
+    @endif
+    @if ($courts->isEmpty())
+        <div class="alert alert-warning" role="alert">
+            <strong>No courts are configured.</strong>
+            Add the required courts from Court Management before submitting a case summary.
+            @can('View Courts')
+                <a href="{{ route('dashboard.courts') }}" class="alert-link">Open Court Management</a>
+            @endcan
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger" role="alert">
+            <strong>Please correct the highlighted information.</strong>
+            <ul class="mb-0 mt-2">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form id="caseSummaryDemoForm" class="case-summary-form"
+        action="{{ $isEdit ? route('case-summaries.update', $caseSummary) : route('case-summaries.store') }}"
+        method="POST" enctype="multipart/form-data">
+        @csrf
+        @if ($isEdit)
+            @method('PUT')
+        @endif
         <div class="summary-overview-panel">
             <div class="summary-overview-heading">
                 <span class="summary-overview-icon"><i class="fas fa-file-lines"></i></span>
@@ -849,7 +886,7 @@
 
             <div class="summary-header-layout">
                 <div class="summary-type-row">
-                    <label class="field-label">Summary Type <small>সামারির ধরণ</small></label>
+                    <label class="field-label">Summary Type <span class="text-danger">*</span> <small>সামারির ধরণ</small></label>
                     <div class="summary-type-group" role="radiogroup" aria-label="Summary Type">
                         <label class="summary-type-option">
                             <input type="radio" name="summary_type" value="Paralegal Intervention" required>
@@ -864,17 +901,26 @@
 
                 <div class="summary-overview-grid">
                     <div class="summary-overview-item">
-                        <label class="field-label" for="district">District <small>জেলা</small></label>
-                        <select id="district" name="district_id" class="form-select">
+                        <label class="field-label" for="district">District <span class="text-danger">*</span> <small>জেলা</small></label>
+                        <select id="district" name="district_id" class="form-select" required>
                             <option value="">Select district</option>
                             @foreach ($districts as $district)
-                                <option value="{{ $district->id }}">{{ $district->name }}</option>
+                                <option value="{{ $district->id }}" @selected((string) ($formData['district_id'] ?? '') === (string) $district->id)>{{ $district->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="summary-overview-item">
-                        <label class="field-label" for="summary_date">Date <small>তারিখ</small></label>
-                        <input type="date" id="summary_date" name="summary_date" class="form-control summary-date-control" value="{{ now()->format('Y-m-d') }}">
+                        <label class="field-label" for="pngo">PNGO <span class="text-danger">*</span> <small>সহযোগী সংস্থা</small></label>
+                        <select id="pngo" name="pngo_id" class="form-select" required>
+                            <option value="">Select district first</option>
+                            @foreach ($pngos as $pngo)
+                                <option value="{{ $pngo->id }}" data-district="{{ $pngo->district_id }}" @selected((string) ($formData['pngo_id'] ?? '') === (string) $pngo->id)>{{ $pngo->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="summary-overview-item">
+                        <label class="field-label" for="summary_date">Date <span class="text-danger">*</span> <small>তারিখ</small></label>
+                        <input type="date" id="summary_date" name="summary_date" class="form-control summary-date-control" value="{{ now()->format('Y-m-d') }}" required>
                     </div>
                     <div class="summary-overview-item summary-duration-item">
                         <label class="field-label" for="case_pending_duration">
@@ -911,8 +957,8 @@
                     <div class="accordion-body">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="field-label" for="court_name">1.1 Court Name <small>আদালতের নাম</small></label>
-                                <select id="court_name" name="court_id" class="form-select">
+                                <label class="field-label" for="court_name">1.1 Court Name <span class="text-danger">*</span> <small>আদালতের নাম</small></label>
+                                <select id="court_name" name="court_id" class="form-select" required>
                                     <option value="">Select district first</option>
                                     @foreach ($courts as $court)
                                         <option value="{{ $court->id }}" data-district="{{ $court->district_id }}">{{ $court->name }}</option>
@@ -921,19 +967,19 @@
                                 <small class="text-muted">Court list comes from General Settings &gt; Court Management.</small>
                             </div>
                             <div class="col-md-4">
-                                <label class="field-label" for="case_nature">1.1A Nature of Case <small>মামলার প্রকৃতি</small></label>
-                                <select id="case_nature" name="case_nature" class="form-select">
+                                <label class="field-label" for="case_nature">1.1A Nature of Case <span class="text-danger">*</span> <small>মামলার প্রকৃতি</small></label>
+                                <select id="case_nature" name="case_nature" class="form-select" required>
                                     <option value="">Select case nature</option>
                                     <option value="Civil Case">দেওয়ানী মামলা (Civil Case)</option>
                                     <option value="Criminal Case">ফৌজদারী মামলা (Criminal Case)</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="field-label" for="case_number">1.2 Case Number <small>মামলা নাম্বার</small></label>
-                                <input type="text" id="case_number" name="case_number" class="form-control">
+                                <label class="field-label" for="case_number">1.2 Case Number <span class="text-danger">*</span> <small>মামলা নাম্বার</small></label>
+                                <input type="text" id="case_number" name="case_number" class="form-control" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="field-label" id="compoundable-sections-label">1.3 Compoundable Sections <small>আপসযোগ্য ধারা</small></label>
+                                <label class="field-label" id="compoundable-sections-label">1.3 Case Section <span class="text-danger">*</span> <small>আপসযোগ্য ধারা</small></label>
                                 <details class="act-picker" id="compoundable-section-picker">
                                     <summary id="compoundable-section-control" aria-labelledby="compoundable-sections-label compoundable-section-summary"><span id="compoundable-section-summary">Select sections</span></summary>
                                     <div class="act-picker-panel">
@@ -961,7 +1007,7 @@
                                 <textarea id="case_section_comments" name="case_section_comments" class="form-control" rows="2" placeholder="Add comments, if any"></textarea>
                             </div>
                             <div class="col-md-4">
-                                <label class="field-label" id="act-label">1.4 Act <small>আইন</small></label>
+                                <label class="field-label" id="act-label">1.4 Act <span class="text-danger">*</span> <small>আইন</small></label>
                                 <details class="act-picker" id="act-picker">
                                     <summary id="act" aria-labelledby="act-label act-summary"><span id="act-summary">Select acts</span></summary>
                                     <div class="act-picker-panel">
@@ -982,8 +1028,8 @@
                                 <small class="text-muted">Select one or more acts. Search or browse the full list.</small>
                             </div>
                             <div class="col-md-4">
-                                <label class="field-label" for="case_filing_date">1.7 Date of Case Filing <small>মামলা দায়েরের তারিখ</small></label>
-                                <input type="date" id="case_filing_date" name="case_filing_date" class="form-control">
+                                <label class="field-label" for="case_filing_date">1.7 Date of Case Filing <span class="text-danger">*</span> <small>মামলা দায়েরের তারিখ</small></label>
+                                <input type="date" id="case_filing_date" name="case_filing_date" class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -1004,8 +1050,8 @@
                                 <input type="text" id="offence_subject" name="offence_subject" class="form-control">
                             </div>
                             <div class="col-md-6">
-                                <label class="field-label" for="current_case_status">2.3 Current Case Status <small>মামলার বর্তমান অবস্থা</small></label>
-                                <select id="current_case_status" name="current_case_status" class="form-select" data-other-target="current_case_status_other_wrap">
+                                <label class="field-label" for="current_case_status">2.3 Current Case Status <span class="text-danger">*</span> <small>মামলার বর্তমান অবস্থা</small></label>
+                                <select id="current_case_status" name="current_case_status" class="form-select" data-other-target="current_case_status_other_wrap" required>
                                     <option value="">Select status</option>
                                     <option value="accused_submitted_petition_for_discharge">আসামি অব্যাহতির আবেদন দাখিল করেছে (Accused submitted petition for discharge)</option>
                                     <option value="appeal">আপিল (Appeal)</option>
@@ -1056,20 +1102,20 @@
                                 <input type="text" id="current_case_status_other" name="current_case_status_other" class="form-control">
                             </div>
                             <div class="col-md-4">
-                                <label class="field-label" for="hearing_count">2.4 Number of Hearing Held <small>শুনানীর সংখ্যা</small></label>
-                                <input type="number" min="0" id="hearing_count" name="hearing_count" class="form-control">
+                                <label class="field-label" for="hearing_count">2.4 Number of Hearings in Pre-trial <span class="text-danger">*</span> <small>শুনানীর সংখ্যা</small></label>
+                                <input type="number" min="0" id="hearing_count" name="hearing_count" class="form-control" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="field-label" for="trial_hearing_count">2.4A Number of Hearings in Trial <span class="text-danger">*</span> <small>বিচার পর্যায়ে শুনানীর সংখ্যা (চার্জ গঠনের পরে)</small></label>
                                 <input type="number" min="0" id="trial_hearing_count" name="trial_hearing_count" class="form-control" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="field-label" for="last_hearing_date">2.5 Last Hearing Date <small>শেষ শুনানীর তারিখ</small></label>
-                                <input type="date" id="last_hearing_date" name="last_hearing_date" class="form-control">
+                                <label class="field-label" for="last_hearing_date">2.5 Last Hearing Date <span class="text-danger">*</span> <small>শেষ শুনানীর তারিখ</small></label>
+                                <input type="date" id="last_hearing_date" name="last_hearing_date" class="form-control" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="field-label" for="next_hearing_date">2.6 Next Hearing Date <small>পরবর্তী শুনানির তারিখ</small></label>
-                                <input type="date" id="next_hearing_date" name="next_hearing_date" class="form-control">
+                                <label class="field-label" for="next_hearing_date">2.6 Next Hearing Date <span class="text-danger">*</span> <small>পরবর্তী শুনানির তারিখ</small></label>
+                                <input type="date" id="next_hearing_date" name="next_hearing_date" class="form-control" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="field-label" for="accused_status">2.7 Status of Accused <small>আসামির অবস্থা</small></label>
@@ -1130,12 +1176,12 @@
                                         </div>
                                         <div class="row g-3">
                                             <div class="col-md-4">
-                                                <label class="field-label" for="{{ $prefix }}_0_name">{{ $party[0] }}.1 Name <small>{{ $party[3] }}</small></label>
-                                                <input type="text" id="{{ $prefix }}_0_name" name="{{ $prefix }}[0][name]" class="form-control" data-party-field="name">
+                                                <label class="field-label" for="{{ $prefix }}_0_name">{{ $party[0] }}.1 Name <span class="text-danger">*</span> <small>{{ $party[3] }}</small></label>
+                                                <input type="text" id="{{ $prefix }}_0_name" name="{{ $prefix }}[0][name]" class="form-control" data-party-field="name" required>
                                             </div>
                                             <div class="col-md-4">
-                                                <label class="field-label" for="{{ $prefix }}_0_sex">{{ $party[0] }}.2 Sex <small>লিঙ্গ</small></label>
-                                                <select id="{{ $prefix }}_0_sex" name="{{ $prefix }}[0][sex]" class="form-select" data-party-field="sex">
+                                                <label class="field-label" for="{{ $prefix }}_0_sex">{{ $party[0] }}.2 Sex <span class="text-danger">*</span> <small>লিঙ্গ</small></label>
+                                                <select id="{{ $prefix }}_0_sex" name="{{ $prefix }}[0][sex]" class="form-select" data-party-field="sex" required>
                                                     <option value="">Select sex</option><option>Male</option><option>Female</option><option>Transgender Person</option>
                                                 </select>
                                             </div>
@@ -1674,7 +1720,17 @@
                     <div class="accordion-body">
                         <label class="field-label" for="summary_attachments">Upload Supporting Documents <small>প্রমাণ/সহায়ক নথি</small></label>
                         <input type="file" id="summary_attachments" name="summary_attachments[]" class="form-control" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-                        <small class="text-muted d-block mt-2">Accepted files: PDF, JPG, PNG, DOC and DOCX.</small>
+                        <small class="text-muted d-block mt-2">Accepted files: PDF, JPG, PNG, DOC and DOCX. Maximum 2 MB per file and 10 files per submission.</small>
+                        @if ($isEdit && $caseSummary->attachments->isNotEmpty())
+                            <div class="mt-3">
+                                <strong class="d-block mb-2">Existing attachments</strong>
+                                <ul class="mb-0">
+                                    @foreach ($caseSummary->attachments as $attachment)
+                                        <li>{{ $attachment->original_file_name }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -1682,7 +1738,7 @@
 
         <div class="demo-submit-bar">
             <button type="button" class="btn btn-outline-secondary" id="caseSummaryDemoReset"><i class="fas fa-rotate-left"></i> Reset</button>
-            <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit Case Summary</button>
+            <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> {{ $isEdit ? 'Update Case Summary' : 'Submit Case Summary' }}</button>
         </div>
     </form>
 </section>
@@ -1691,7 +1747,33 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const initialFormData = @json($formData);
         const summaryTypeInputs = document.querySelectorAll('input[name="summary_type"]');
+        let validationNoticeOpen = false;
+
+        document.getElementById('caseSummaryDemoForm')?.addEventListener('invalid', function(event) {
+            const section = event.target.closest('.accordion-item');
+            const collapse = section?.querySelector('.accordion-collapse');
+            const toggle = section?.querySelector('.accordion-button');
+
+            collapse?.classList.add('show');
+            toggle?.classList.remove('collapsed');
+            toggle?.setAttribute('aria-expanded', 'true');
+            event.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            if (!validationNoticeOpen && window.Swal) {
+                validationNoticeOpen = true;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Required information missing',
+                    text: 'Please complete the highlighted field before submitting.',
+                    confirmButtonColor: '#b42318'
+                }).finally(function() {
+                    validationNoticeOpen = false;
+                    event.target.focus({ preventScroll: true });
+                });
+            }
+        }, true);
 
         function setSummarySectionVisibility(sectionNumber, isVisible) {
             const section = document.querySelector('[data-summary-section="' + sectionNumber + '"]');
@@ -1891,7 +1973,38 @@
         syncSelectedCompoundableSections();
 
         const districtSelect = document.getElementById('district');
+        const pngoSelect = document.getElementById('pngo');
         const courtSelect = document.getElementById('court_name');
+
+        function filterPngosByDistrict() {
+            if (!districtSelect || !pngoSelect) {
+                return;
+            }
+
+            const districtId = districtSelect.value;
+            const currentPngo = pngoSelect.value;
+            let currentPngoStillVisible = false;
+            let visiblePngoCount = 0;
+
+            Array.from(pngoSelect.options).forEach(function(option) {
+                if (!option.value) {
+                    option.hidden = false;
+                    option.textContent = districtId ? 'Select PNGO' : 'Select district first';
+                    return;
+                }
+
+                const visible = option.dataset.district === districtId;
+                option.hidden = !visible;
+                visiblePngoCount += visible ? 1 : 0;
+                currentPngoStillVisible = currentPngoStillVisible || (visible && option.value === currentPngo);
+            });
+
+            if (!districtId || !currentPngoStillVisible) {
+                pngoSelect.value = '';
+            }
+
+            pngoSelect.disabled = !districtId || visiblePngoCount === 0;
+        }
 
         function filterCourtsByDistrict() {
             if (!districtSelect || !courtSelect) {
@@ -1929,7 +2042,11 @@
             courtSelect.disabled = !districtId || visibleCourtCount === 0;
         }
 
-        districtSelect?.addEventListener('change', filterCourtsByDistrict);
+        districtSelect?.addEventListener('change', function() {
+            filterPngosByDistrict();
+            filterCourtsByDistrict();
+        });
+        filterPngosByDistrict();
         filterCourtsByDistrict();
 
         function applyFieldNumberBadges() {
@@ -2141,6 +2258,81 @@
 
             refreshPartyRowTitles(section);
         });
+
+        function hydratePartyRows(prefix, records) {
+            const section = document.querySelector('[data-party-prefix="' + prefix + '"]');
+            const addButton = section?.querySelector('.party-add-row');
+
+            if (!section || !Array.isArray(records) || records.length === 0) {
+                return;
+            }
+
+            while (section.querySelectorAll('.party-entry').length < records.length) {
+                addButton?.click();
+            }
+
+            section.querySelectorAll('.party-entry').forEach(function(row, index) {
+                const record = records[index] || {};
+                row.querySelectorAll('[data-party-field]').forEach(function(field) {
+                    field.value = record[field.dataset.partyField] ?? '';
+                    field.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            });
+        }
+
+        function hydrateForm(data) {
+            const form = document.getElementById('caseSummaryDemoForm');
+
+            if (!form || !data || Object.keys(data).length === 0) {
+                return;
+            }
+
+            Object.entries(data).forEach(function([name, value]) {
+                if (['complainant', 'defendant', 'act_ids', 'compoundable_sections'].includes(name)) {
+                    return;
+                }
+
+                const fields = form.querySelectorAll('[name="' + CSS.escape(name) + '"]');
+                fields.forEach(function(field) {
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        field.checked = Array.isArray(value)
+                            ? value.map(String).includes(String(field.value))
+                            : String(field.value) === String(value);
+                    } else if (field.type !== 'file' && field.type !== 'hidden' && value !== null) {
+                        field.value = field.type === 'date' ? String(value).slice(0, 10) : value;
+                    }
+                });
+
+                if (Array.isArray(value)) {
+                    form.querySelectorAll('[name="' + CSS.escape(name + '[]') + '"]').forEach(function(field) {
+                        if (field.type === 'checkbox') {
+                            field.checked = value.map(String).includes(String(field.value));
+                        } else if (field.multiple) {
+                            Array.from(field.options).forEach(function(option) {
+                                option.selected = value.map(String).includes(String(option.value));
+                            });
+                        }
+                    });
+                }
+            });
+
+            (data.act_ids || []).forEach(function(value) {
+                const field = form.querySelector('input[name="act_ids[]"][value="' + CSS.escape(String(value)) + '"]');
+                if (field) field.checked = true;
+            });
+            (data.compoundable_sections || []).forEach(function(value) {
+                const field = form.querySelector('input[name="compoundable_sections[]"][value="' + CSS.escape(String(value)) + '"]');
+                if (field) field.checked = true;
+            });
+
+            hydratePartyRows('complainant', data.complainant || []);
+            hydratePartyRows('defendant', data.defendant || []);
+            form.querySelectorAll('input:checked, select').forEach(function(field) {
+                field.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        }
+
+        hydrateForm(initialFormData);
 
         syncCaseTitle();
 
@@ -2356,17 +2548,39 @@
         applyFieldNumberBadges();
 
         document.getElementById('caseSummaryDemoForm')?.addEventListener('submit', function(event) {
-            event.preventDefault();
+            const hasCaseSection = document.querySelectorAll('input[name="compoundable_sections[]"]:checked').length > 0
+                || document.getElementById('non_compoundable_section')?.value.trim() !== '';
+            const hasAct = document.querySelectorAll('input[name="act_ids[]"]:checked').length > 0;
 
-            if (window.Swal) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Case Summary',
-                    text: 'The entered information has been reviewed successfully.',
-                    confirmButtonColor: '#2f7d62'
-                });
-            } else {
-                alert('The entered information has been reviewed successfully.');
+            if (!hasCaseSection || !hasAct) {
+                event.preventDefault();
+                const missingField = !hasCaseSection ? 'Case Section' : 'Act';
+                const picker = !hasCaseSection
+                    ? document.getElementById('compoundable-section-picker')
+                    : document.getElementById('act-picker');
+
+                document.getElementById('summaryOne')?.classList.add('show');
+                picker.open = true;
+                picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Required information missing',
+                        text: 'Please provide at least one ' + missingField + '.',
+                        confirmButtonColor: '#b42318'
+                    });
+                } else {
+                    alert('Please provide at least one ' + missingField + '.');
+                }
+
+                return;
+            }
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             }
         });
     });

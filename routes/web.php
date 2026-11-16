@@ -17,6 +17,7 @@ use App\Http\Controllers\CaseMessageController;
 use App\Http\Controllers\SystemSettingController;
 use App\Http\Controllers\ActController;
 use App\Http\Controllers\EndorsedResultDocumentController;
+use App\Http\Controllers\CaseSummaryController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -97,14 +98,39 @@ Route::prefix('mne')->middleware(['auth', 'verified', 'check.password.change'])-
     Route::post('role/update-permissions/{roleId}', [RolePermissionController::class, 'updatePermissions'])->middleware('permission:Update Role Permissions');  
 
     Route::get('court-police-prison', [FormalController::class, 'index'])->name('form.index')->middleware('permission:View Formal Cases Form');
-    Route::get('case-summary', function () {
-        $districts = \App\Models\District::orderBy('name')->get();
-        $courts = \App\Models\Court::with('district:id,name')->orderBy('district_id')->orderBy('name')->get();
-
-        $acts = \App\Models\Act::orderBy('title')->get(['id', 'title', 'act_number', 'year']);
-
-        return view('dashboard.admin.case-summary-demo', compact('districts', 'courts', 'acts'));
-    })->name('case-summary.demo')->middleware('permission:View Formal Cases Form');
+    Route::get('case-summary', [CaseSummaryController::class, 'create'])
+        ->name('case-summaries.create')
+        ->middleware('permission:View Case Summary Form');
+    Route::post('case-summary', [CaseSummaryController::class, 'store'])
+        ->name('case-summaries.store')
+        ->middleware('permission:Create Case Summary');
+    Route::get('case-summary-management', [CaseSummaryController::class, 'index'])
+        ->name('case-summaries.index')
+        ->middleware('permission:View Case Summary Management');
+    Route::get('case-summary/{caseSummary}', [CaseSummaryController::class, 'show'])
+        ->name('case-summaries.show')
+        ->middleware('permission:View Case Summary Details');
+    Route::get('case-summary/{caseSummary}/edit', [CaseSummaryController::class, 'edit'])
+        ->name('case-summaries.edit')
+        ->middleware('permission:Edit Case Summary');
+    Route::put('case-summary/{caseSummary}', [CaseSummaryController::class, 'update'])
+        ->name('case-summaries.update')
+        ->middleware('permission:Edit Case Summary');
+    Route::patch('case-summary/{caseSummary}/verify', [CaseSummaryController::class, 'verifyByDpo'])
+        ->name('case-summaries.verify')
+        ->middleware('permission:Verify Case Summary by DPO');
+    Route::post('case-summary/{caseSummary}/follow-ups', [CaseSummaryController::class, 'addFollowUp'])
+        ->name('case-summaries.follow-ups.store')
+        ->middleware('permission:Add Case Summary Follow-up');
+    Route::get('case-summary-attachments/{attachment}/view', [CaseSummaryController::class, 'viewAttachment'])
+        ->name('case-summaries.attachments.view')
+        ->middleware('permission:Download Case Summary Attachment');
+    Route::get('case-summary-attachments/{attachment}/download', [CaseSummaryController::class, 'downloadAttachment'])
+        ->name('case-summaries.attachments.download')
+        ->middleware('permission:Download Case Summary Attachment');
+    Route::delete('case-summary-attachments/{attachment}', [CaseSummaryController::class, 'deleteAttachment'])
+        ->name('case-summaries.attachments.delete')
+        ->middleware('permission:Delete Case Summary Attachment');
     Route::get('plc', function () {
         $districts = \App\Models\District::orderBy('name')->get();
 
