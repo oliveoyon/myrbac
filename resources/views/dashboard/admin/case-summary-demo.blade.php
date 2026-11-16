@@ -20,6 +20,8 @@
     .act-selected-remove:hover { border-color: #c30f08; background: #fff7f6; }
     .case-summary-page {
         display: grid;
+        grid-auto-rows: max-content;
+        align-content: start;
         gap: 16px;
         color: #1f2933;
         background: #f5f6f8;
@@ -891,7 +893,7 @@
 
         <div class="accordion" id="caseSummaryAccordion">
 
-            <div class="accordion-item case-summary-card">
+            <div class="accordion-item case-summary-card" data-summary-section="1">
                 <h2 class="accordion-header" id="summaryHeaderOne">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#summaryOne" aria-expanded="true" aria-controls="summaryOne">
                         <span class="case-summary-badge">1</span> কেস চিহ্নিত করা (Case Identification)
@@ -980,7 +982,7 @@
                 </div>
             </div>
 
-            <div class="accordion-item case-summary-card">
+            <div class="accordion-item case-summary-card" data-summary-section="2">
                 <h2 class="accordion-header" id="summaryHeaderTwo">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryTwo" aria-expanded="false" aria-controls="summaryTwo">
                         <span class="case-summary-badge">2</span> কেস প্রোফাইল (Case Profile)
@@ -1091,7 +1093,7 @@
                 </div>
             </div>
 
-            <div class="accordion-item case-summary-card">
+            <div class="accordion-item case-summary-card" data-summary-section="3">
                 <h2 class="accordion-header" id="summaryHeaderThree">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryThree" aria-expanded="false" aria-controls="summaryThree">
                         <span class="case-summary-badge">3</span> পক্ষগণের প্রাথমিক তথ্য (Basic Information of the Parties)
@@ -1182,7 +1184,7 @@
                 </div>
             </div>
 
-            <div class="accordion-item case-summary-card">
+            <div class="accordion-item case-summary-card" data-summary-section="4">
                 <h2 class="accordion-header" id="summaryHeaderFour">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryFour" aria-expanded="false" aria-controls="summaryFour">
                         <span class="case-summary-badge">4</span> মামলার অগ্রগতির ক্ষেত্রে প্রতিবন্ধকতা (Barriers Preventing Progress)
@@ -1291,7 +1293,7 @@
                 </div>
             </div>
 
-            <div class="accordion-item case-summary-card">
+            <div class="accordion-item case-summary-card" data-summary-section="5">
                 <h2 class="accordion-header" id="summaryHeaderFive">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryFive" aria-expanded="false" aria-controls="summaryFive">
                         <span class="case-summary-badge">5</span> নিষ্পত্তির প্রস্তাবিত পথ/সমাধান (Proposed Disposal Route / Solutions)
@@ -1342,7 +1344,7 @@
                 </div>
             </div>
 
-            <div class="accordion-item case-summary-card">
+            <div class="accordion-item case-summary-card" data-summary-section="6">
                 <h2 class="accordion-header" id="summaryHeaderSix">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summarySix" aria-expanded="false" aria-controls="summarySix">
                         <span class="case-summary-badge">6</span> প্যারালিগ্যাল কর্তৃক গৃহীত পদক্ষেপ (Intervention Taken by Paralegal)
@@ -1401,7 +1403,7 @@
                 </div>
             </div>
 
-            <div class="accordion-item case-summary-card">
+            <div class="accordion-item case-summary-card" data-summary-section="7">
                 <h2 class="accordion-header" id="summaryHeaderSeven">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summarySeven" aria-expanded="false" aria-controls="summarySeven">
                         <span class="case-summary-badge">7</span> জুডিসিয়ারি কর্তৃক গৃহীত পদক্ষেপ (Intervention Taken by Judiciary)
@@ -1458,7 +1460,7 @@
                 </div>
             </div>
 
-            <div class="accordion-item case-summary-card">
+            <div class="accordion-item case-summary-card" data-summary-section="8">
                 <h2 class="accordion-header" id="summaryHeaderEight">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryEight" aria-expanded="false" aria-controls="summaryEight">
                         <span class="case-summary-badge">8</span> মামলা নিষ্পত্তি (Case Disposed)
@@ -1608,13 +1610,13 @@
                 </div>
             </div>
 
-            <div class="accordion-item case-summary-card">
-                <h2 class="accordion-header" id="summaryHeaderTen">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryTen" aria-expanded="false" aria-controls="summaryTen">
-                        <span class="case-summary-badge">10</span> মামলার অগ্রগতি (Case Progress / Follow-up)
+            <div class="accordion-item case-summary-card" data-summary-section="9">
+                <h2 class="accordion-header" id="summaryHeaderNine">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryNine" aria-expanded="false" aria-controls="summaryNine">
+                        <span class="case-summary-badge">9</span> মামলার অগ্রগতি (Case Progress / Follow-up)
                     </button>
                 </h2>
-                <div id="summaryTen" class="accordion-collapse collapse" aria-labelledby="summaryHeaderTen" data-bs-parent="#caseSummaryAccordion">
+                <div id="summaryNine" class="accordion-collapse collapse" aria-labelledby="summaryHeaderNine" data-bs-parent="#caseSummaryAccordion">
                     <div class="accordion-body">
                         <div class="section-note">Previous follow-up records are preserved in chronological order.</div>
                         <div class="row g-3">
@@ -1639,13 +1641,13 @@
                 </div>
             </div>
 
-            <div class="accordion-item case-summary-card">
-                <h2 class="accordion-header" id="summaryHeaderEvidence">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryEvidence" aria-expanded="false" aria-controls="summaryEvidence">
-                        <span class="case-summary-badge">11</span> প্রমাণ/সহায়ক নথি (Evidence Attachments)
+            <div class="accordion-item case-summary-card" data-summary-section="10">
+                <h2 class="accordion-header" id="summaryHeaderTen">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryTen" aria-expanded="false" aria-controls="summaryTen">
+                        <span class="case-summary-badge">10</span> প্রমাণ/সহায়ক নথি (Evidence Attachments)
                     </button>
                 </h2>
-                <div id="summaryEvidence" class="accordion-collapse collapse" aria-labelledby="summaryHeaderEvidence" data-bs-parent="#caseSummaryAccordion">
+                <div id="summaryTen" class="accordion-collapse collapse" aria-labelledby="summaryHeaderTen" data-bs-parent="#caseSummaryAccordion">
                     <div class="accordion-body">
                         <label class="field-label" for="summary_attachments">Upload Supporting Documents <small>প্রমাণ/সহায়ক নথি</small></label>
                         <input type="file" id="summary_attachments" name="summary_attachments[]" class="form-control" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
@@ -1666,6 +1668,52 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const summaryTypeInputs = document.querySelectorAll('input[name="summary_type"]');
+
+        function setSummarySectionVisibility(sectionNumber, isVisible) {
+            const section = document.querySelector('[data-summary-section="' + sectionNumber + '"]');
+
+            if (!section) {
+                return;
+            }
+
+            section.style.display = isVisible ? '' : 'none';
+            section.querySelectorAll('input, select, textarea').forEach(function(field) {
+                field.disabled = !isVisible;
+            });
+
+            if (!isVisible) {
+                const collapse = section.querySelector('.accordion-collapse');
+                const toggle = section.querySelector('.accordion-button');
+                collapse?.classList.remove('show');
+                toggle?.classList.add('collapsed');
+                toggle?.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        function syncSummaryTypeSections() {
+            const selectedType = document.querySelector('input[name="summary_type"]:checked')?.value || '';
+            const hasSelectedType = selectedType !== '';
+            const isJudicial = selectedType === 'Judicial Intervention';
+            const isParalegal = selectedType === 'Paralegal Intervention';
+
+            ['1', '2', '8', '9', '10'].forEach(function(sectionNumber) {
+                setSummarySectionVisibility(sectionNumber, hasSelectedType);
+            });
+            ['3', '4', '5', '6'].forEach(function(sectionNumber) {
+                setSummarySectionVisibility(sectionNumber, hasSelectedType && !isJudicial);
+            });
+            setSummarySectionVisibility('7', hasSelectedType && !isParalegal);
+        }
+
+        summaryTypeInputs.forEach(function(input) {
+            input.addEventListener('change', syncSummaryTypeSections);
+        });
+        document.getElementById('caseSummaryDemoForm')?.addEventListener('reset', function() {
+            setTimeout(syncSummaryTypeSections, 0);
+        });
+        syncSummaryTypeSections();
+
         const actPicker = document.getElementById('act-picker');
         const actSearch = document.getElementById('act-search');
         const actOptions = Array.from(actPicker.querySelectorAll('.act-picker-option')).map(label => ({
