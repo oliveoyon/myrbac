@@ -911,6 +911,14 @@
                                 <small class="text-muted">Court list comes from General Settings &gt; Court Management.</small>
                             </div>
                             <div class="col-md-4">
+                                <label class="field-label" for="case_nature">1.1A Nature of Case <small>মামলার প্রকৃতি</small></label>
+                                <select id="case_nature" name="case_nature" class="form-select">
+                                    <option value="">Select case nature</option>
+                                    <option value="Civil Case">দেওয়ানী মামলা (Civil Case)</option>
+                                    <option value="Criminal Case">ফৌজদারী মামলা (Criminal Case)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
                                 <label class="field-label" for="case_number">1.2 Case Number <small>মামলা নাম্বার</small></label>
                                 <input type="text" id="case_number" name="case_number" class="form-control">
                             </div>
@@ -1042,6 +1050,10 @@
                                 <input type="number" min="0" id="hearing_count" name="hearing_count" class="form-control">
                             </div>
                             <div class="col-md-4">
+                                <label class="field-label" for="trial_hearing_count">2.4A Number of Hearings in Trial <span class="text-danger">*</span> <small>বিচার পর্যায়ে শুনানীর সংখ্যা (চার্জ গঠনের পরে)</small></label>
+                                <input type="number" min="0" id="trial_hearing_count" name="trial_hearing_count" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
                                 <label class="field-label" for="last_hearing_date">2.5 Last Hearing Date <small>শেষ শুনানীর তারিখ</small></label>
                                 <input type="date" id="last_hearing_date" name="last_hearing_date" class="form-control">
                             </div>
@@ -1139,9 +1151,19 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="field-label" for="{{ $prefix }}_0_representation">{{ $party[0] }}.7 Representation <small>প্রতিনিধিত্ব</small></label>
-                                                <select id="{{ $prefix }}_0_representation" name="{{ $prefix }}[0][representation]" class="form-select" data-party-field="representation" data-lawyer-target="{{ $prefix }}_lawyer_fields_0">
-                                                    <option value="">Select representation</option><option>Self</option><option>Lawyer</option><option>NGO</option><option>Legal Aid Office</option>
+                                                <select id="{{ $prefix }}_0_representation" name="{{ $prefix }}[0][representation]" class="form-select" data-party-field="representation" data-lawyer-target="{{ $prefix }}_lawyer_fields_0" data-representation-other-target="{{ $prefix }}_representation_other_0">
+                                                    <option value="">Select representation</option>
+                                                    <option value="Self">পক্ষ নিজে (Self)</option>
+                                                    <option value="Lawyer">আইনজীবী (Lawyer)</option>
+                                                    <option value="Prosecution">প্রসিকিউশন (Prosecution)</option>
+                                                    <option value="NGO">এনজিও (NGO)</option>
+                                                    <option value="Legal Aid Office">লিগ্যাল এইড অফিস (Legal Aid Office)</option>
+                                                    <option value="Other">অন্যান্য, উল্লেখ করুন (Other, Please Specify)</option>
                                                 </select>
+                                            </div>
+                                            <div class="col-md-4 dependent-field" data-representation-other-field="{{ $prefix }}_representation_other_0">
+                                                <label class="field-label" for="{{ $prefix }}_0_representation_other">{{ $party[0] }}.7 Other Representation <small>অন্যান্য প্রতিনিধিত্ব, উল্লেখ করুন</small></label>
+                                                <input type="text" id="{{ $prefix }}_0_representation_other" name="{{ $prefix }}[0][representation_other]" class="form-control" data-party-field="representation_other">
                                             </div>
                                             <div class="col-md-4 dependent-field" data-lawyer-field="{{ $prefix }}_lawyer_fields_0">
                                                 <label class="field-label" for="{{ $prefix }}_0_lawyer_name">{{ $party[0] }}.8 Lawyer Name <small>মামলায় নিযুক্ত আইনজীবীর নাম</small></label>
@@ -1406,6 +1428,31 @@
                                 <label class="field-label" for="judicial_mediation_date">7.1 Referral Date <small>রেফারের তারিখ</small></label>
                                 <input type="date" id="judicial_mediation_date" name="judicial_mediation_date" class="form-control">
                             </div>
+                            @foreach ([
+                                ['7.2', 'judiciary_priority_hearing', 'Priority Hearing', 'অগ্রাধিকার ভিত্তিক শুনানী'],
+                                ['7.3', 'judiciary_diversion_to_probation', 'Diversion to Probation', 'প্রবেশনে ডাইভারশন'],
+                                ['7.4', 'judiciary_withdrawal', 'Withdrawal', 'প্রত্যাহার'],
+                                ['7.5', 'judiciary_administrative_followup', 'Administrative Follow-up', 'প্রশাসনিক ফলোআপ'],
+                                ['7.6', 'judiciary_case_scheduling', 'Scheduling of Cases', 'মামলার সময়সূচি নির্ধারণ'],
+                            ] as $judiciaryAction)
+                                <div class="col-md-4">
+                                    <div class="summary-field-card h-100">
+                                        <label class="field-label" for="{{ $judiciaryAction[1] }}_date">
+                                            {{ $judiciaryAction[0] }} {{ $judiciaryAction[2] }}
+                                            <small>{{ $judiciaryAction[3] }}</small>
+                                        </label>
+                                        <input type="date" id="{{ $judiciaryAction[1] }}_date" name="{{ $judiciaryAction[1] }}_date" class="form-control">
+                                    </div>
+                                </div>
+                            @endforeach
+                            <div class="col-md-4">
+                                <div class="summary-field-card h-100">
+                                    <label class="field-label" for="judiciary_other_action_details">7.7 Other Action <small>অন্যান্য পদক্ষেপ, উল্লেখ করুন</small></label>
+                                    <input type="text" id="judiciary_other_action_details" name="judiciary_other_action_details" class="form-control mb-2" placeholder="Please specify">
+                                    <label class="field-label" for="judiciary_other_action_date">Action Date <small>পদক্ষেপের তারিখ</small></label>
+                                    <input type="date" id="judiciary_other_action_date" name="judiciary_other_action_date" class="form-control">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1419,63 +1466,139 @@
                 </h2>
                 <div id="summaryEight" class="accordion-collapse collapse" aria-labelledby="summaryHeaderEight" data-bs-parent="#caseSummaryAccordion">
                     <div class="accordion-body">
-                        <div class="row g-3">
-                            <div class="col-lg-6">
-                                <div class="summary-field-card h-100">
-                                    <label class="field-label" for="case_disposal_method">8.1 How Disposed <small>যেভাবে মামলা নিষ্পত্তি হয়েছে</small></label>
-                                    <select id="case_disposal_method" name="case_disposal_method" class="form-select">
-                                        <option value="">Select disposal method</option>
-                                        <option value="Acquitted">Acquitted</option>
-                                        <option value="Sentence Given">Sentence Given</option>
-                                    </select>
-
-                                    <div class="dependent-field mt-2" id="acquittal_reason_wrap">
-                                        <label class="field-label" for="acquittal_reason">Acquittal Reason <small>খালাসের কারণ</small></label>
-                                        <select id="acquittal_reason" name="acquittal_reason" class="form-select">
-                                            <option value="">Select reason</option>
-                                            <option value="Lack of Evidence">Lack of Evidence</option>
-                                            <option value="Complaint Withdrawn">Complaint Withdrawn</option>
-                                            <option value="Deceased">Deceased</option>
-                                        </select>
+                        <div class="decision-grid">
+                            <div class="decision-item">
+                                <div class="decision-head">
+                                    <div class="decision-title">
+                                        <span class="field-no">8.1</span>
+                                        <span class="decision-title-text">
+                                            <span>মেডিয়েশনের মাধ্যমে নিষ্পত্তি</span>
+                                            <small>Disposed through Mediation</small>
+                                        </span>
                                     </div>
-
-                                    <div class="dependent-field mt-2" id="punishment_details_wrap">
-                                        <label class="field-label" for="punishment_details">Details of Punishment <small>শাস্তির বিস্তারিত</small></label>
-                                        <textarea id="punishment_details" name="punishment_details" class="form-control" rows="2" placeholder="Enter punishment details"></textarea>
+                                    <div class="decision-control">
+                                        <label class="row-control-label" for="disposed_through_mediation_status">Disposed / নিষ্পত্তি</label>
+                                        <input type="hidden" name="disposed_through_mediation" value="No">
+                                        <label class="decision-check" for="disposed_through_mediation_status">
+                                            <span>Yes / হ্যাঁ</span>
+                                            <input id="disposed_through_mediation_status" type="checkbox" name="disposed_through_mediation" value="Yes" data-yes-target="disposed_through_mediation_details" data-exclusive-group="case-disposal-outcome">
+                                        </label>
                                     </div>
+                                </div>
+                                <div class="dependent-field decision-detail" id="disposed_through_mediation_details">
+                                    <label class="field-label" for="mediation_disposal_date">Disposal Date <small>নিষ্পত্তির তারিখ</small></label>
+                                    <input type="date" id="mediation_disposal_date" name="mediation_disposal_date" class="form-control" data-required-when-active>
+                                </div>
+                            </div>
 
-                                    <div class="dependent-field mt-2" id="case_disposal_date_wrap">
-                                        <label class="field-label" for="case_disposal_date">Disposal Date <small>নিষ্পত্তির তারিখ</small></label>
-                                        <input type="date" id="case_disposal_date" name="case_disposal_date" class="form-control">
+                            <div class="decision-item">
+                                <div class="decision-head">
+                                    <div class="decision-title">
+                                        <span class="field-no">8.2</span>
+                                        <span class="decision-title-text">
+                                            <span>রায়ের মাধ্যমে নিষ্পত্তি</span>
+                                            <small>Disposed off by Judgment</small>
+                                        </span>
+                                    </div>
+                                    <div class="decision-control">
+                                        <label class="row-control-label" for="disposed_by_judgment_status">Disposed / নিষ্পত্তি</label>
+                                        <input type="hidden" name="disposed_by_judgment" value="No">
+                                        <label class="decision-check" for="disposed_by_judgment_status">
+                                            <span>Yes / হ্যাঁ</span>
+                                            <input id="disposed_by_judgment_status" type="checkbox" name="disposed_by_judgment" value="Yes" data-yes-target="disposed_by_judgment_details" data-exclusive-group="case-disposal-outcome">
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="dependent-field decision-detail" id="disposed_by_judgment_details">
+                                    <div class="row g-2">
+                                        <div class="col-12">
+                                            <label class="field-label" for="judgment_details">Details <small>বিস্তারিত</small></label>
+                                            <textarea id="judgment_details" name="judgment_details" class="form-control" rows="2" data-required-when-active></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="solution-checkbox" for="judgment_written_delivered">
+                                                <input type="hidden" name="judgment_written_delivered" value="No">
+                                                <input id="judgment_written_delivered" type="checkbox" name="judgment_written_delivered" value="Yes">
+                                                <span class="solution-check-copy">
+                                                    <strong>Judgment Written and Delivered</strong>
+                                                    <small>রায় লেখা ও প্রদান করা হয়েছে</small>
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="solution-checkbox" for="decree_pronounced">
+                                                <input type="hidden" name="decree_pronounced" value="No">
+                                                <input id="decree_pronounced" type="checkbox" name="decree_pronounced" value="Yes">
+                                                <span class="solution-check-copy">
+                                                    <strong>Decree Pronounced</strong>
+                                                    <small>ডিক্রি ঘোষণা করা হয়েছে</small>
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="field-label" for="judgment_disposal_date">Disposal Date <small>নিষ্পত্তির তারিখ</small></label>
+                                            <input type="date" id="judgment_disposal_date" name="judgment_disposal_date" class="form-control" data-required-when-active>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
-                                <div class="decision-item h-100">
-                                    <div class="decision-head">
-                                        <div class="decision-title">
-                                            <span class="field-no">8.2</span>
-                                            <span class="decision-title-text">
-                                                <span>মেডিয়েশনের মাধ্যমে নিষ্পত্তি</span>
-                                                <small>Disposed through Mediation</small>
-                                            </span>
-                                        </div>
-                                        <div class="decision-control">
-                                            <label class="row-control-label" for="disposed_through_mediation_status">Disposed / নিষ্পত্তি</label>
-                                            <input type="hidden" name="disposed_through_mediation" value="No">
-                                            <label class="decision-check" for="disposed_through_mediation_status">
-                                                <span>Yes / হ্যাঁ</span>
-                                                <input id="disposed_through_mediation_status" type="checkbox" name="disposed_through_mediation" value="Yes" data-yes-target="disposed_through_mediation_details">
-                                            </label>
-                                        </div>
+                            <div class="decision-item">
+                                <div class="decision-head">
+                                    <div class="decision-title">
+                                        <span class="field-no">8.3</span>
+                                        <span class="decision-title-text">
+                                            <span>মামলা খারিজ</span>
+                                            <small>Case Dismissed</small>
+                                        </span>
                                     </div>
-                                    <div class="dependent-field decision-detail" id="disposed_through_mediation_details">
-                                        <div class="row g-2">
-                                            <div class="col-12">
-                                                <label class="field-label" for="mediation_disposal_date">Disposal Date <small>নিষ্পত্তির তারিখ</small></label>
-                                                <input type="date" id="mediation_disposal_date" name="mediation_disposal_date" class="form-control" data-required-when-active>
-                                            </div>
+                                    <div class="decision-control">
+                                        <label class="row-control-label" for="case_dismissed_status">Dismissed / খারিজ</label>
+                                        <input type="hidden" name="case_dismissed" value="No">
+                                        <label class="decision-check" for="case_dismissed_status">
+                                            <span>Yes / হ্যাঁ</span>
+                                            <input id="case_dismissed_status" type="checkbox" name="case_dismissed" value="Yes" data-yes-target="case_dismissed_details" data-exclusive-group="case-disposal-outcome">
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="dependent-field decision-detail" id="case_dismissed_details">
+                                    <label class="field-label" for="case_dismissed_date">Dismissal Date <small>খারিজের তারিখ</small></label>
+                                    <input type="date" id="case_dismissed_date" name="case_dismissed_date" class="form-control" data-required-when-active>
+                                </div>
+                            </div>
+
+                            <div class="decision-item">
+                                <div class="decision-head">
+                                    <div class="decision-title">
+                                        <span class="field-no">8.4</span>
+                                        <span class="decision-title-text">
+                                            <span>খালাস</span>
+                                            <small>Acquittal</small>
+                                        </span>
+                                    </div>
+                                    <div class="decision-control">
+                                        <label class="row-control-label" for="acquittal_status">Acquitted / খালাস</label>
+                                        <input type="hidden" name="acquitted" value="No">
+                                        <label class="decision-check" for="acquittal_status">
+                                            <span>Yes / হ্যাঁ</span>
+                                            <input id="acquittal_status" type="checkbox" name="acquitted" value="Yes" data-yes-target="acquittal_details" data-exclusive-group="case-disposal-outcome">
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="dependent-field decision-detail" id="acquittal_details">
+                                    <div class="row g-2">
+                                        <div class="col-12">
+                                            <label class="field-label" for="acquittal_reason">Acquittal Reason <small>খালাসের কারণ</small></label>
+                                            <select id="acquittal_reason" name="acquittal_reason" class="form-select" data-required-when-active>
+                                                <option value="">Select reason</option>
+                                                <option value="Lack of Evidence">Lack of Evidence</option>
+                                                <option value="Complaint Withdrawn">Complaint Withdrawn</option>
+                                                <option value="Deceased">Deceased</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="field-label" for="acquittal_date">Acquittal Date <small>খালাসের তারিখ</small></label>
+                                            <input type="date" id="acquittal_date" name="acquittal_date" class="form-control" data-required-when-active>
                                         </div>
                                     </div>
                                 </div>
@@ -1898,8 +2021,10 @@
 
             const representation = row.querySelector('[data-party-field="representation"]');
             const lawyerTarget = prefix + '_lawyer_fields_' + index;
+            const representationOtherTarget = prefix + '_representation_other_' + index;
             if (representation) {
                 representation.dataset.lawyerTarget = lawyerTarget;
+                representation.dataset.representationOtherTarget = representationOtherTarget;
                 representation.addEventListener('change', function() {
                     syncLawyerFields(representation);
                 });
@@ -1907,6 +2032,11 @@
 
             row.querySelectorAll('[data-lawyer-field]').forEach(function(field) {
                 field.dataset.lawyerField = lawyerTarget;
+                field.style.display = 'none';
+            });
+
+            row.querySelectorAll('[data-representation-other-field]').forEach(function(field) {
+                field.dataset.representationOtherField = representationOtherTarget;
                 field.style.display = 'none';
             });
 
@@ -1989,44 +2119,25 @@
         document.getElementById('judicial_mediation_destination')?.addEventListener('change', syncJudicialMediationReferral);
         syncJudicialMediationReferral();
 
-        function syncCaseDisposal() {
-            const method = document.getElementById('case_disposal_method');
-            const acquittalWrap = document.getElementById('acquittal_reason_wrap');
-            const acquittalReason = document.getElementById('acquittal_reason');
-            const punishmentWrap = document.getElementById('punishment_details_wrap');
-            const punishmentDetails = document.getElementById('punishment_details');
-            const dateWrap = document.getElementById('case_disposal_date_wrap');
-            const disposalDate = document.getElementById('case_disposal_date');
-
-            if (!method || !acquittalWrap || !acquittalReason || !punishmentWrap || !punishmentDetails || !dateWrap || !disposalDate) {
-                return;
-            }
-
-            const isAcquitted = method.value === 'Acquitted';
-            const isSentenced = method.value === 'Sentence Given';
-            const hasMethod = isAcquitted || isSentenced;
-
-            acquittalWrap.style.display = isAcquitted ? 'block' : 'none';
-            acquittalReason.required = isAcquitted;
-            punishmentWrap.style.display = isSentenced ? 'block' : 'none';
-            punishmentDetails.required = isSentenced;
-            dateWrap.style.display = hasMethod ? 'block' : 'none';
-            disposalDate.required = hasMethod;
-        }
-
-        document.getElementById('case_disposal_method')?.addEventListener('change', syncCaseDisposal);
-        syncCaseDisposal();
-
         function syncLawyerFields(select) {
             const targetName = select.dataset.lawyerTarget;
+            const otherTargetName = select.dataset.representationOtherTarget;
 
-            if (!targetName) {
-                return;
+            if (targetName) {
+                document.querySelectorAll('[data-lawyer-field="' + targetName + '"]').forEach(function(field) {
+                    field.style.display = select.value === 'Lawyer' ? 'block' : 'none';
+                });
             }
 
-            document.querySelectorAll('[data-lawyer-field="' + targetName + '"]').forEach(function(field) {
-                field.style.display = select.value === 'Lawyer' ? 'block' : 'none';
-            });
+            if (otherTargetName) {
+                document.querySelectorAll('[data-representation-other-field="' + otherTargetName + '"]').forEach(function(field) {
+                    const isOther = select.value === 'Other';
+                    field.style.display = isOther ? 'block' : 'none';
+                    field.querySelectorAll('input, select, textarea').forEach(function(input) {
+                        input.required = isOther;
+                    });
+                });
+            }
         }
 
         document.querySelectorAll('[data-lawyer-target]').forEach(function(select) {
@@ -2120,6 +2231,24 @@
             syncYesField(select);
         });
 
+        document.querySelectorAll('[data-exclusive-group]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                if (!checkbox.checked) {
+                    return;
+                }
+
+                const groupName = checkbox.dataset.exclusiveGroup;
+                document.querySelectorAll('[data-exclusive-group="' + groupName + '"]').forEach(function(otherCheckbox) {
+                    if (otherCheckbox === checkbox || !otherCheckbox.checked) {
+                        return;
+                    }
+
+                    otherCheckbox.checked = false;
+                    syncYesField(otherCheckbox);
+                });
+            });
+        });
+
         document.querySelectorAll('[data-other-target]').forEach(function(select) {
             select.addEventListener('change', function() {
                 syncOtherField(select);
@@ -2144,8 +2273,6 @@
             syncCaseTitle();
             syncMediationReferral();
             syncJudicialMediationReferral();
-            syncCaseDisposal();
-
             document.querySelectorAll('[data-yes-target]').forEach(syncYesField);
             document.querySelectorAll('[data-other-target]').forEach(syncOtherField);
             document.querySelectorAll('[data-lawyer-target]').forEach(syncLawyerFields);
