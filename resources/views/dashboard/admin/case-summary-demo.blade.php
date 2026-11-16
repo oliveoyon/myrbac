@@ -458,6 +458,14 @@
         margin-top: 10px;
     }
 
+    .witness-type-checklist {
+        grid-template-columns: 1fr;
+    }
+
+    .witness-type-checklist .solution-check-row:nth-child(odd) {
+        border-right: 0;
+    }
+
     .dependent-field {
         display: none;
         padding-top: 4px;
@@ -1234,12 +1242,27 @@
                                         <div class="row g-2">
                                             @if ($barrier[1] === 'absent_witnesses')
                                                 <div class="col-md-5">
-                                                    <label class="field-label" for="absent_witnesses_type">Witness Type <small>সাক্ষীর ধরন</small></label>
-                                                    <select id="absent_witnesses_type" name="absent_witnesses_type" class="form-select" data-required-when-active>
-                                                        <option value="">Select witness type</option>
-                                                        <option value="Government Witness">Government Witness</option>
-                                                        <option value="General Witness">General Witness</option>
-                                                    </select>
+                                                    <label class="field-label">Witness Type <small>সাক্ষীর ধরন</small></label>
+                                                    <div class="solution-checklist witness-type-checklist">
+                                                        <div class="solution-check-row">
+                                                            <label class="solution-checkbox" for="absent_witness_government">
+                                                                <input id="absent_witness_government" type="checkbox" name="absent_witnesses_type[]" value="Government Witness">
+                                                                <span class="solution-check-copy">
+                                                                    <strong>Government Witness</strong>
+                                                                    <small>সরকারি সাক্ষী</small>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="solution-check-row">
+                                                            <label class="solution-checkbox" for="absent_witness_general">
+                                                                <input id="absent_witness_general" type="checkbox" name="absent_witnesses_type[]" value="General Witness">
+                                                                <span class="solution-check-copy">
+                                                                    <strong>General Witness</strong>
+                                                                    <small>সাধারণ সাক্ষী</small>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-7 dependent-field" id="government_witness_type_wrap">
                                                     <label class="field-label" for="government_witness_type">Government Witness Type <small>সরকারি সাক্ষীর ধরন</small></label>
@@ -1254,9 +1277,9 @@
                                                     <label class="field-label" for="government_witness_other">Other Government Witness <small>অন্যান্য সরকারি সাক্ষী উল্লেখ করুন</small></label>
                                                     <input type="text" id="government_witness_other" name="government_witness_other" class="form-control">
                                                 </div>
-                                                <div class="col-md-7 offset-md-5 dependent-field" id="general_witness_details_wrap">
-                                                    <label class="field-label" for="general_witness_details">General Witness <small>সাধারণ সাক্ষী উল্লেখ করুন</small></label>
-                                                    <input type="text" id="general_witness_details" name="general_witness_details" class="form-control">
+                                                <div class="col-12">
+                                                    <label class="field-label" for="absent_witness_information">Information of Absent Witnesses <small>অনুপস্থিত সাক্ষীর তথ্য</small></label>
+                                                    <input type="text" id="absent_witness_information" name="absent_witness_information" class="form-control" placeholder="Enter name or relevant information of the absent witness">
                                                 </div>
                                             @elseif (!empty($barrier[3]))
                                                 <div class="col-md-5">
@@ -2248,28 +2271,30 @@
         }
 
         function syncAbsentWitnessFields() {
-            const witnessType = document.getElementById('absent_witnesses_type');
+            const governmentWitness = document.getElementById('absent_witness_government');
+            const generalWitness = document.getElementById('absent_witness_general');
             const governmentType = document.getElementById('government_witness_type');
             const governmentWrap = document.getElementById('government_witness_type_wrap');
             const governmentOtherWrap = document.getElementById('government_witness_other_wrap');
-            const generalWrap = document.getElementById('general_witness_details_wrap');
+            const witnessInformation = document.getElementById('absent_witness_information');
 
-            if (!witnessType || !governmentType || !governmentWrap || !governmentOtherWrap || !generalWrap) {
+            if (!governmentWitness || !generalWitness || !governmentType || !governmentWrap || !governmentOtherWrap || !witnessInformation) {
                 return;
             }
 
-            const isActive = witnessType.closest('.decision-item')?.classList.contains('is-active');
-            const showGovernment = isActive && witnessType.value === 'Government Witness';
+            const isActive = governmentWitness.closest('.decision-item')?.classList.contains('is-active');
+            const hasWitnessType = governmentWitness.checked || generalWitness.checked;
+            const showGovernment = isActive && governmentWitness.checked;
             const showGovernmentOther = showGovernment && governmentType.value === 'Others';
-            const showGeneral = isActive && witnessType.value === 'General Witness';
 
             governmentWrap.style.display = showGovernment ? 'block' : 'none';
             governmentOtherWrap.style.display = showGovernmentOther ? 'block' : 'none';
-            generalWrap.style.display = showGeneral ? 'block' : 'none';
 
+            governmentWitness.required = isActive && !hasWitnessType;
+            generalWitness.required = false;
             governmentType.required = showGovernment;
             document.getElementById('government_witness_other').required = showGovernmentOther;
-            document.getElementById('general_witness_details').required = showGeneral;
+            witnessInformation.required = isActive;
         }
 
         document.querySelectorAll('[data-yes-target]').forEach(function(select) {
@@ -2304,7 +2329,8 @@
             syncOtherField(select);
         });
 
-        document.getElementById('absent_witnesses_type')?.addEventListener('change', syncAbsentWitnessFields);
+        document.getElementById('absent_witness_government')?.addEventListener('change', syncAbsentWitnessFields);
+        document.getElementById('absent_witness_general')?.addEventListener('change', syncAbsentWitnessFields);
         document.getElementById('government_witness_type')?.addEventListener('change', syncAbsentWitnessFields);
         syncAbsentWitnessFields();
 
