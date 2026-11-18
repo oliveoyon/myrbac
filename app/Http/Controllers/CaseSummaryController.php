@@ -309,7 +309,7 @@ class CaseSummaryController extends Controller
                         && (int) $scope->pngo_id === (int) $pngo->id
                 ))
                 ->values();
-        } elseif ($user->hasAnyRole(['Admin', 'Super Admin'])) {
+        } elseif ($user->can('Create Case Summary')) {
             $pngos = Pngo::with('district')->orderBy('name')->get();
         } else {
             abort(403, 'Your account has no district and PNGO scope for case summary entry.');
@@ -334,7 +334,7 @@ class CaseSummaryController extends Controller
 
         $allowed = $user->hasPngoScopes()
             ? $user->pngoScopes()->where('district_id', $districtId)->where('pngo_id', $pngoId)->exists()
-            : ($user->hasAnyRole(['Admin', 'Super Admin'])
+            : ($user->can('Create Case Summary')
                 || ((int) $user->district_id === $districtId && (int) $user->pngo_id === $pngoId));
 
         abort_unless($allowed, 403);
